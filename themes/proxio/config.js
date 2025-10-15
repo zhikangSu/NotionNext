@@ -37,7 +37,7 @@ const CONFIG = {
 
   // 特性区块
   PROXIO_FEATURE_ENABLE: true, // 特性区块开关
-  PROXIO_FEATURE_TITLE: '为什么选我',
+  PROXIO_FEATURE_TITLE: '为什么',
   PROXIO_FEATURE_TEXT_1: '我能让您的项目焕发光彩',
   PROXIO_FEATURE_TEXT_2: '丰富的案例经验，专业的技术服务，优质的沟通效率',
 
