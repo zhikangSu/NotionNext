@@ -39,7 +39,7 @@ module.exports = {
     'Hi，我是一个程序员, Hi，我是一个打工人,Hi，我是一个干饭人,欢迎来到我的博客🎉',
 
   PROXIO_FOOTER_SLOGAN: '记录学习、技术折腾和普通生活。',
-  PROXIO_ABOUT_PHOTO_URL: '/images/personal/star-mascot-about.png',
+  PROXIO_ABOUT_PHOTO_URL: '/images/personal/star-mascot-about-blue.png',
   PROXIO_FOOTER_LINKS: [
     {
       name: '找到我',
