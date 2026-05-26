@@ -5,6 +5,9 @@
  * blog.config.js and other upstream-managed defaults.
  */
 module.exports = {
+  NOTION_PAGE_ID:
+    process.env.NOTION_PAGE_ID || '1fa4532b67f880dfb623d1ecd71af898',
+
   THEME: process.env.NEXT_PUBLIC_THEME || 'proxio',
   SINCE: process.env.NEXT_PUBLIC_SINCE || 2024,
 
