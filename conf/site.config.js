@@ -17,6 +17,14 @@ module.exports = {
   KEYWORDS: process.env.NEXT_PUBLIC_KEYWORD || 'Notion, 博客',
   BLOG_FAVICON: process.env.NEXT_PUBLIC_FAVICON || '/favicon.ico',
 
+  NOTION_HIDDEN_PAGE_IDS: [
+    // Default NotionNext sample content that should stay out of the public site.
+    '1fa4532b-67f8-81b9-a189-f22e7d3f4d17',
+    '1fa4532b-67f8-8194-bd47-d466738812d4',
+    '1fa4532b-67f8-81e5-87ff-f9d4b0223fea',
+    '1fa4532b-67f8-8194-b874-dde8cf56eaa1'
+  ],
+
   CONTACT_GITHUB:
     process.env.NEXT_PUBLIC_CONTACT_GITHUB || 'https://github.com/zhikangSu',
   CONTACT_BILIBILI:
@@ -28,5 +36,31 @@ module.exports = {
 
   GREETING_WORDS:
     process.env.NEXT_PUBLIC_GREETING_WORDS ||
-    'Hi，我是一个程序员, Hi，我是一个打工人,Hi，我是一个干饭人,欢迎来到我的博客🎉'
+    'Hi，我是一个程序员, Hi，我是一个打工人,Hi，我是一个干饭人,欢迎来到我的博客🎉',
+
+  PROXIO_FOOTER_SLOGAN: '记录学习、技术折腾和普通生活。',
+  PROXIO_FOOTER_LINKS: [
+    {
+      name: '找到我',
+      menus: [
+        { title: 'GitHub', href: 'https://github.com/zhikangSu' },
+        {
+          title: 'Bilibili',
+          href: 'https://space.bilibili.com/338768779?spm_id_from=333.1007.0.0'
+        },
+        {
+          title: '小红书',
+          href: 'https://www.xiaohongshu.com/user/profile/604f49e8000000000100253c'
+        }
+      ]
+    },
+    {
+      name: '站点',
+      menus: [
+        { title: '关于', href: '/about' },
+        { title: '归档', href: '/archive' },
+        { title: '标签', href: '/tag' }
+      ]
+    }
+  ]
 }
