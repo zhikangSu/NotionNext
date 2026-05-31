@@ -1,0 +1,83 @@
+{
+  "run_id": "bandit__gaussian_10arm__seed_0__ucb",
+  "algo": "bandit",
+  "env": "gaussian_10arm",
+  "seed": 0,
+  "created_at": "2026-05-31T14:12:46.249079+00:00",
+  "commit": null,
+  "trace_schema_version": "0.1.0",
+  "determinism": {
+    "mode": "exact",
+    "backend": "numpy",
+    "tol": null,
+    "note": null,
+    "versions": {
+      "python": "3.11.15",
+      "platform": "Linux-5.15.0-60-generic-x86_64-with-glibc2.35",
+      "numpy": "2.2.6"
+    }
+  },
+  "title": "UCB bandit on gaussian_10arm",
+  "notes": "Stationary Gaussian bandit, incremental action-value update. Deterministic (exact golden).",
+  "hyperparams": {
+    "n_arms": 10,
+    "steps": 500,
+    "epsilon": 0.1,
+    "strategy": "ucb",
+    "alpha": null,
+    "c": 2.0,
+    "snapshot_every": 100
+  },
+  "available_views": [
+    "bandit_arms",
+    "action_value",
+    "update_inspector",
+    "metrics"
+  ],
+  "event_files": [
+    "events/0000.jsonl.gz"
+  ],
+  "snapshot_files": [
+    "snapshots/bandit_000000.json.gz",
+    "snapshots/bandit_000100.json.gz",
+    "snapshots/bandit_000200.json.gz",
+    "snapshots/bandit_000300.json.gz",
+    "snapshots/bandit_000400.json.gz",
+    "snapshots/bandit_000500.json.gz",
+    "snapshots/bandit_000500.json.gz"
+  ],
+  "n_events": 500,
+  "metrics_summary": {
+    "average_reward": {
+      "first": -0.4975442414439589,
+      "last": 1.0212102176727444,
+      "min": -0.8336806233554503,
+      "max": 1.0249262965725143,
+      "mean": 0.8362540334555464,
+      "count": 500
+    },
+    "cumulative_regret": {
+      "first": 1.178269824036744,
+      "last": 128.4059397223758,
+      "min": 1.178269824036744,
+      "max": 128.4059397223758,
+      "mean": 89.05114059051995,
+      "count": 500
+    },
+    "optimal_action_rate": {
+      "first": 0.0,
+      "last": 0.708,
+      "min": 0.0,
+      "max": 0.708,
+      "mean": 0.5336373635826438,
+      "count": 500
+    }
+  },
+  "eoi_definitions": {
+    "max_td_error": "One of the largest |TD error| events \u2014 where the value estimate was most surprised."
+  },
+  "eoi_counts": {
+    "max_td_error": 25
+  },
+  "eoi_file": "eoi.json"
+}

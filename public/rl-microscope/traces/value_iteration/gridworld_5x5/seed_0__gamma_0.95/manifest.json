@@ -1,0 +1,82 @@
+{
+  "run_id": "value_iteration__gridworld_5x5__seed_0__gamma_0.95",
+  "algo": "value_iteration",
+  "env": "gridworld_5x5",
+  "seed": 0,
+  "created_at": "2026-05-31T14:12:46.233381+00:00",
+  "commit": null,
+  "trace_schema_version": "0.1.0",
+  "determinism": {
+    "mode": "exact",
+    "backend": "numpy",
+    "tol": null,
+    "note": null,
+    "versions": {
+      "python": "3.11.15",
+      "platform": "Linux-5.15.0-60-generic-x86_64-with-glibc2.35",
+      "numpy": "2.2.6"
+    }
+  },
+  "title": "Value iteration on gridworld_5x5",
+  "notes": "Model-based Bellman backups \u2014 pure NumPy, fully deterministic (exact golden).",
+  "hyperparams": {
+    "gamma": 0.95,
+    "theta": 0.0001,
+    "max_sweeps": 100,
+    "eval_sweeps": 50
+  },
+  "available_views": [
+    "value_heatmap",
+    "policy_arrows",
+    "bellman_backup",
+    "update_inspector",
+    "metrics"
+  ],
+  "event_files": [
+    "events/0000.jsonl.gz"
+  ],
+  "snapshot_files": [
+    "snapshots/values_000000.json.gz",
+    "snapshots/values_000001.json.gz",
+    "snapshots/values_000002.json.gz",
+    "snapshots/values_000003.json.gz",
+    "snapshots/values_000004.json.gz",
+    "snapshots/values_000005.json.gz",
+    "snapshots/values_000006.json.gz",
+    "snapshots/values_000007.json.gz",
+    "snapshots/values_000008.json.gz",
+    "snapshots/values_000009.json.gz",
+    "snapshots/values_000010.json.gz",
+    "snapshots/values_000011.json.gz",
+    "snapshots/values_000012.json.gz",
+    "snapshots/values_000013.json.gz",
+    "snapshots/values_000014.json.gz",
+    "snapshots/values_000015.json.gz"
+  ],
+  "n_events": 288,
+  "metrics_summary": {
+    "max_delta": {
+      "first": 1.0,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.6831000278459598,
+      "count": 15
+    },
+    "mean_value": {
+      "first": 0.016,
+      "last": 0.43305952831801886,
+      "min": 0.016,
+      "max": 0.43305952831801886,
+      "mean": 0.21931893832466973,
+      "count": 15
+    }
+  },
+  "eoi_definitions": {
+    "max_td_error": "One of the largest |TD error| events \u2014 where the value estimate was most surprised."
+  },
+  "eoi_counts": {
+    "max_td_error": 25
+  },
+  "eoi_file": "eoi.json"
+}

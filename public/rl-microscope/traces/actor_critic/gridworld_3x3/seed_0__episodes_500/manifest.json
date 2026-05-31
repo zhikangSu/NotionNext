@@ -1,0 +1,137 @@
+{
+  "run_id": "actor_critic__gridworld_3x3__seed_0__episodes_500",
+  "algo": "actor_critic",
+  "env": "gridworld_3x3",
+  "seed": 0,
+  "created_at": "2026-05-31T14:12:46.260494+00:00",
+  "commit": null,
+  "trace_schema_version": "0.1.0",
+  "determinism": {
+    "mode": "exact",
+    "backend": "numpy",
+    "tol": null,
+    "note": null,
+    "versions": {
+      "python": "3.11.15",
+      "platform": "Linux-5.15.0-60-generic-x86_64-with-glibc2.35",
+      "numpy": "2.2.6"
+    }
+  },
+  "title": "Actor-Critic (GAE) on gridworld_3x3",
+  "notes": "Tabular softmax actor + tabular critic, GAE advantages. Deterministic (exact golden).",
+  "hyperparams": {
+    "lr_actor": 0.2,
+    "lr_critic": 0.3,
+    "gamma": 0.95,
+    "lam": 0.95,
+    "episodes": 500,
+    "max_grad_norm": 5.0,
+    "snapshot_every": 25
+  },
+  "available_views": [
+    "rollout",
+    "policy_probs",
+    "value_heatmap",
+    "advantage_inspector",
+    "update_inspector",
+    "metrics"
+  ],
+  "event_files": [
+    "events/0000.jsonl.gz",
+    "events/0001.jsonl.gz"
+  ],
+  "snapshot_files": [
+    "snapshots/policy_000000.json.gz",
+    "snapshots/policy_000389.json.gz",
+    "snapshots/policy_000558.json.gz",
+    "snapshots/policy_000711.json.gz",
+    "snapshots/policy_000869.json.gz",
+    "snapshots/policy_000998.json.gz",
+    "snapshots/policy_001135.json.gz",
+    "snapshots/policy_001278.json.gz",
+    "snapshots/policy_001430.json.gz",
+    "snapshots/policy_001566.json.gz",
+    "snapshots/policy_001678.json.gz",
+    "snapshots/policy_001793.json.gz",
+    "snapshots/policy_001917.json.gz",
+    "snapshots/policy_002036.json.gz",
+    "snapshots/policy_002152.json.gz",
+    "snapshots/policy_002265.json.gz",
+    "snapshots/policy_002377.json.gz",
+    "snapshots/policy_002488.json.gz",
+    "snapshots/policy_002597.json.gz",
+    "snapshots/policy_002705.json.gz",
+    "snapshots/policy_002812.json.gz",
+    "snapshots/policy_002812.json.gz"
+  ],
+  "n_events": 3812,
+  "metrics_summary": {
+    "actor_loss": {
+      "first": 4.692376741996609,
+      "last": 0.026264570453279897,
+      "min": -25.011847918761678,
+      "max": 10.373615929707322,
+      "mean": -0.1920969620573773,
+      "count": 500
+    },
+    "critic_loss": {
+      "first": 1.9135485153404312,
+      "last": 0.002238345168520749,
+      "min": 6.815593493330991e-06,
+      "max": 5.807747519996601,
+      "mean": 0.12872827596069353,
+      "count": 500
+    },
+    "entropy": {
+      "first": 1.3852465567793613,
+      "last": 0.786680873193318,
+      "min": 0.786680873193318,
+      "max": 1.3852465567793613,
+      "mean": 0.9319825193094051,
+      "count": 500
+    },
+    "episode_length": {
+      "first": 24,
+      "last": 4,
+      "min": 4,
+      "max": 30,
+      "mean": 5.624,
+      "count": 500
+    },
+    "episode_reward": {
+      "first": 0.07999999999999974,
+      "last": 0.88,
+      "min": -1.2000000000000004,
+      "max": 0.88,
+      "mean": 0.8087999999999975,
+      "count": 500
+    },
+    "success": {
+      "first": 1.0,
+      "last": 1.0,
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.994,
+      "count": 500
+    },
+    "value_mean": {
+      "first": 0.11282781092801253,
+      "last": 0.7516804710342423,
+      "min": -0.21799460155080752,
+      "max": 0.7644049170420826,
+      "mean": 0.6835966713916237,
+      "count": 500
+    }
+  },
+  "eoi_definitions": {
+    "argmax_flip": "The greedy action argmax_a Q(s,a) (or argmax pi) at a state flipped \u2014 the policy arrow actually changed.",
+    "policy_delta": "The action distribution moved by more than the threshold (sum_a |pi_after - pi_before|) after a full minibatch x epoch update.",
+    "advantage_sign_change": "The advantage estimate changed sign between consecutive samples \u2014 the update flips from encouraging to discouraging an action."
+  },
+  "eoi_counts": {
+    "argmax_flip": 5,
+    "policy_delta": 15,
+    "advantage_sign_change": 481
+  },
+  "eoi_file": "eoi.json"
+}

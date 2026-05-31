@@ -1,0 +1,299 @@
+{
+  "runs": [
+    {
+      "run_id": "actor_critic__gridworld_3x3__seed_0__episodes_500",
+      "algo": "actor_critic",
+      "env": "gridworld_3x3",
+      "seed": 0,
+      "title": "Actor-Critic (GAE) on gridworld_3x3",
+      "path": "actor_critic/gridworld_3x3/seed_0__episodes_500",
+      "hyperparams": {
+        "lr_actor": 0.2,
+        "lr_critic": 0.3,
+        "gamma": 0.95,
+        "lam": 0.95,
+        "episodes": 500,
+        "max_grad_norm": 5.0,
+        "snapshot_every": 25
+      },
+      "n_events": 3812,
+      "eoi_counts": {
+        "argmax_flip": 5,
+        "policy_delta": 15,
+        "advantage_sign_change": 481
+      }
+    },
+    {
+      "run_id": "bandit__gaussian_10arm__seed_0__eps_0.1",
+      "algo": "bandit",
+      "env": "gaussian_10arm",
+      "seed": 0,
+      "title": "epsilon-greedy bandit on gaussian_10arm",
+      "path": "bandit/gaussian_10arm/seed_0__eps_0.1",
+      "hyperparams": {
+        "n_arms": 10,
+        "steps": 500,
+        "epsilon": 0.1,
+        "strategy": "epsilon_greedy",
+        "alpha": null,
+        "c": 2.0,
+        "snapshot_every": 100
+      },
+      "n_events": 500,
+      "eoi_counts": {
+        "max_td_error": 25
+      }
+    },
+    {
+      "run_id": "bandit__gaussian_10arm__seed_0__ucb",
+      "algo": "bandit",
+      "env": "gaussian_10arm",
+      "seed": 0,
+      "title": "UCB bandit on gaussian_10arm",
+      "path": "bandit/gaussian_10arm/seed_0__ucb",
+      "hyperparams": {
+        "n_arms": 10,
+        "steps": 500,
+        "epsilon": 0.1,
+        "strategy": "ucb",
+        "alpha": null,
+        "c": 2.0,
+        "snapshot_every": 100
+      },
+      "n_events": 500,
+      "eoi_counts": {
+        "max_td_error": 25
+      }
+    },
+    {
+      "run_id": "policy_iteration__gridworld_4x4__seed_0__gamma_0.95",
+      "algo": "policy_iteration",
+      "env": "gridworld_4x4",
+      "seed": 0,
+      "title": "Policy iteration on gridworld_4x4",
+      "path": "policy_iteration/gridworld_4x4/seed_0__gamma_0.95",
+      "hyperparams": {
+        "gamma": 0.95,
+        "theta": 0.0001,
+        "max_sweeps": 100,
+        "eval_sweeps": 50
+      },
+      "n_events": 1608,
+      "eoi_counts": {
+        "argmax_flip": 12,
+        "max_td_error": 25
+      }
+    },
+    {
+      "run_id": "ppo_mini__gridworld_3x3__seed_0__clip_0.1",
+      "algo": "ppo_mini",
+      "env": "gridworld_3x3",
+      "seed": 0,
+      "title": "PPO-mini on gridworld_3x3",
+      "path": "ppo_mini/gridworld_3x3/seed_0__clip_0.1",
+      "hyperparams": {
+        "lr": 0.3,
+        "lr_critic": 0.3,
+        "gamma": 0.95,
+        "lam": 0.95,
+        "clip_epsilon": 0.1,
+        "update_epochs": 4,
+        "num_minibatches": 4,
+        "batch_trajectories": 8,
+        "iterations": 80,
+        "max_grad_norm": 5.0,
+        "target_kl": null,
+        "entropy_coef": 0.0,
+        "normalize_adv": true,
+        "snapshot_every": 5
+      },
+      "n_events": 6130,
+      "eoi_counts": {
+        "argmax_flip": 5,
+        "policy_delta": 20,
+        "clip_active": 1011,
+        "advantage_sign_change": 1067
+      }
+    },
+    {
+      "run_id": "ppo_mini__gridworld_3x3__seed_0__clip_0.2",
+      "algo": "ppo_mini",
+      "env": "gridworld_3x3",
+      "seed": 0,
+      "title": "PPO-mini on gridworld_3x3",
+      "path": "ppo_mini/gridworld_3x3/seed_0__clip_0.2",
+      "hyperparams": {
+        "lr": 0.3,
+        "lr_critic": 0.3,
+        "gamma": 0.95,
+        "lam": 0.95,
+        "clip_epsilon": 0.2,
+        "update_epochs": 4,
+        "num_minibatches": 4,
+        "batch_trajectories": 8,
+        "iterations": 80,
+        "max_grad_norm": 5.0,
+        "target_kl": null,
+        "entropy_coef": 0.0,
+        "normalize_adv": true,
+        "snapshot_every": 5
+      },
+      "n_events": 6010,
+      "eoi_counts": {
+        "argmax_flip": 3,
+        "policy_delta": 9,
+        "clip_active": 681,
+        "advantage_sign_change": 1155
+      }
+    },
+    {
+      "run_id": "ppo_mini__gridworld_3x3__seed_0__clip_0.3",
+      "algo": "ppo_mini",
+      "env": "gridworld_3x3",
+      "seed": 0,
+      "title": "PPO-mini on gridworld_3x3",
+      "path": "ppo_mini/gridworld_3x3/seed_0__clip_0.3",
+      "hyperparams": {
+        "lr": 0.3,
+        "lr_critic": 0.3,
+        "gamma": 0.95,
+        "lam": 0.95,
+        "clip_epsilon": 0.3,
+        "update_epochs": 4,
+        "num_minibatches": 4,
+        "batch_trajectories": 8,
+        "iterations": 80,
+        "max_grad_norm": 5.0,
+        "target_kl": null,
+        "entropy_coef": 0.0,
+        "normalize_adv": true,
+        "snapshot_every": 5
+      },
+      "n_events": 5904,
+      "eoi_counts": {
+        "argmax_flip": 1,
+        "policy_delta": 13,
+        "clip_active": 654,
+        "advantage_sign_change": 1122
+      }
+    },
+    {
+      "run_id": "q_learning__cliffworld__seed_0__alpha_0.1",
+      "algo": "q_learning",
+      "env": "cliffworld",
+      "seed": 0,
+      "title": "Q-learning on cliffworld",
+      "path": "q_learning/cliffworld/seed_0__alpha_0.1",
+      "hyperparams": {
+        "alpha": 0.1,
+        "gamma": 0.95,
+        "epsilon": 0.1,
+        "episodes": 250,
+        "snapshot_every": 25
+      },
+      "n_events": 11272,
+      "eoi_counts": {
+        "argmax_flip": 7481,
+        "max_td_error": 25
+      }
+    },
+    {
+      "run_id": "q_learning__cliffworld__seed_0__alpha_0.5",
+      "algo": "q_learning",
+      "env": "cliffworld",
+      "seed": 0,
+      "title": "Q-learning on cliffworld",
+      "path": "q_learning/cliffworld/seed_0__alpha_0.5",
+      "hyperparams": {
+        "alpha": 0.5,
+        "gamma": 0.95,
+        "epsilon": 0.1,
+        "episodes": 250,
+        "snapshot_every": 25
+      },
+      "n_events": 5919,
+      "eoi_counts": {
+        "argmax_flip": 1769,
+        "max_td_error": 25
+      }
+    },
+    {
+      "run_id": "reinforce__gridworld_3x3__seed_0__episodes_500",
+      "algo": "reinforce",
+      "env": "gridworld_3x3",
+      "seed": 0,
+      "title": "REINFORCE on gridworld_3x3",
+      "path": "reinforce/gridworld_3x3/seed_0__episodes_500",
+      "hyperparams": {
+        "lr": 0.2,
+        "gamma": 0.95,
+        "episodes": 500,
+        "max_grad_norm": 5.0,
+        "baseline": true,
+        "snapshot_every": 25
+      },
+      "n_events": 3269,
+      "eoi_counts": {
+        "argmax_flip": 1,
+        "policy_delta": 6,
+        "advantage_sign_change": 817
+      }
+    },
+    {
+      "run_id": "sarsa__cliffworld__seed_0__alpha_0.5",
+      "algo": "sarsa",
+      "env": "cliffworld",
+      "seed": 0,
+      "title": "SARSA on cliffworld",
+      "path": "sarsa/cliffworld/seed_0__alpha_0.5",
+      "hyperparams": {
+        "alpha": 0.5,
+        "gamma": 0.95,
+        "epsilon": 0.1,
+        "episodes": 250,
+        "snapshot_every": 25
+      },
+      "n_events": 6930,
+      "eoi_counts": {
+        "argmax_flip": 1963,
+        "max_td_error": 25
+      }
+    },
+    {
+      "run_id": "value_iteration__gridworld_4x4__seed_0__gamma_0.95",
+      "algo": "value_iteration",
+      "env": "gridworld_4x4",
+      "seed": 0,
+      "title": "Value iteration on gridworld_4x4",
+      "path": "value_iteration/gridworld_4x4/seed_0__gamma_0.95",
+      "hyperparams": {
+        "gamma": 0.95,
+        "theta": 0.0001,
+        "max_sweeps": 100,
+        "eval_sweeps": 50
+      },
+      "n_events": 96,
+      "eoi_counts": {
+        "max_td_error": 25
+      }
+    },
+    {
+      "run_id": "value_iteration__gridworld_5x5__seed_0__gamma_0.95",
+      "algo": "value_iteration",
+      "env": "gridworld_5x5",
+      "seed": 0,
+      "title": "Value iteration on gridworld_5x5",
+      "path": "value_iteration/gridworld_5x5/seed_0__gamma_0.95",
+      "hyperparams": {
+        "gamma": 0.95,
+        "theta": 0.0001,
+        "max_sweeps": 100,
+        "eval_sweeps": 50
+      },
+      "n_events": 288,
+      "eoi_counts": {
+        "max_td_error": 25
+      }
+    }
+  ]
+}

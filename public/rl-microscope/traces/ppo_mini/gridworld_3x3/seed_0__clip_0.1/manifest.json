@@ -1,0 +1,145 @@
+{
+  "run_id": "ppo_mini__gridworld_3x3__seed_0__clip_0.1",
+  "algo": "ppo_mini",
+  "env": "gridworld_3x3",
+  "seed": 0,
+  "created_at": "2026-05-31T14:12:46.240632+00:00",
+  "commit": null,
+  "trace_schema_version": "0.1.0",
+  "determinism": {
+    "mode": "exact",
+    "backend": "numpy",
+    "tol": null,
+    "note": null,
+    "versions": {
+      "python": "3.11.15",
+      "platform": "Linux-5.15.0-60-generic-x86_64-with-glibc2.35",
+      "numpy": "2.2.6"
+    }
+  },
+  "title": "PPO-mini on gridworld_3x3",
+  "notes": "Tabular softmax policy + tabular critic, GAE advantages, clipped surrogate. Pure NumPy \u2014 fully deterministic (exact golden).",
+  "hyperparams": {
+    "lr": 0.3,
+    "lr_critic": 0.3,
+    "gamma": 0.95,
+    "lam": 0.95,
+    "clip_epsilon": 0.1,
+    "update_epochs": 4,
+    "num_minibatches": 4,
+    "batch_trajectories": 8,
+    "iterations": 80,
+    "max_grad_norm": 5.0,
+    "target_kl": null,
+    "entropy_coef": 0.0,
+    "normalize_adv": true,
+    "snapshot_every": 5
+  },
+  "available_views": [
+    "rollout",
+    "policy_probs",
+    "value_heatmap",
+    "advantage_inspector",
+    "ppo_clip_inspector",
+    "update_inspector",
+    "metrics"
+  ],
+  "event_files": [
+    "events/0000.jsonl.gz",
+    "events/0001.jsonl.gz",
+    "events/0002.jsonl.gz",
+    "events/0003.jsonl.gz"
+  ],
+  "snapshot_files": [
+    "snapshots/policy_000000.json.gz",
+    "snapshots/policy_000005.json.gz",
+    "snapshots/policy_000010.json.gz",
+    "snapshots/policy_000015.json.gz",
+    "snapshots/policy_000020.json.gz",
+    "snapshots/policy_000025.json.gz",
+    "snapshots/policy_000030.json.gz",
+    "snapshots/policy_000035.json.gz",
+    "snapshots/policy_000040.json.gz",
+    "snapshots/policy_000045.json.gz",
+    "snapshots/policy_000050.json.gz",
+    "snapshots/policy_000055.json.gz",
+    "snapshots/policy_000060.json.gz",
+    "snapshots/policy_000065.json.gz",
+    "snapshots/policy_000070.json.gz",
+    "snapshots/policy_000075.json.gz",
+    "snapshots/policy_000080.json.gz",
+    "snapshots/policy_000080.json.gz"
+  ],
+  "n_events": 6130,
+  "metrics_summary": {
+    "actor_loss": {
+      "first": -0.005251369655701408,
+      "last": -9.131298480761157e-23,
+      "min": -0.0402383917121939,
+      "max": -9.100279207790419e-23,
+      "mean": -0.007636691000582266,
+      "count": 80
+    },
+    "approx_kl": {
+      "first": 0.046204143301711846,
+      "last": 3.3030009120599974e-14,
+      "min": -0.025350391034735915,
+      "max": 0.15012299623428751,
+      "mean": 0.020289542096300496,
+      "count": 80
+    },
+    "clipfrac": {
+      "first": 0.7564102564102564,
+      "last": 0.0,
+      "min": 0.0,
+      "max": 0.8085106382978723,
+      "mean": 0.12900460662645746,
+      "count": 80
+    },
+    "critic_loss": {
+      "first": 0.07196794187619349,
+      "last": 6.162975822039155e-33,
+      "min": 6.162975822039155e-33,
+      "max": 0.07196794187619349,
+      "mean": 0.003209212690508394,
+      "count": 80
+    },
+    "entropy": {
+      "first": 1.332509382520999,
+      "last": 0.3522969815932711,
+      "min": 0.35229698159305717,
+      "max": 1.332509382520999,
+      "mean": 0.5120532247433356,
+      "count": 80
+    },
+    "episode_reward": {
+      "first": 0.12999999999999984,
+      "last": 0.88,
+      "min": 0.12999999999999984,
+      "max": 0.88,
+      "mean": 0.8501875000000008,
+      "count": 80
+    },
+    "success_rate": {
+      "first": 0.875,
+      "last": 1.0,
+      "min": 0.875,
+      "max": 1.0,
+      "mean": 0.996875,
+      "count": 80
+    }
+  },
+  "eoi_definitions": {
+    "argmax_flip": "The greedy action argmax_a Q(s,a) (or argmax pi) at a state flipped \u2014 the policy arrow actually changed.",
+    "policy_delta": "The action distribution moved by more than the threshold (sum_a |pi_after - pi_before|) after a full minibatch x epoch update.",
+    "clip_active": "The PPO probability ratio left [1-eps, 1+eps], so the clipped branch of the surrogate objective bound this sample.",
+    "advantage_sign_change": "The advantage estimate changed sign between consecutive samples \u2014 the update flips from encouraging to discouraging an action."
+  },
+  "eoi_counts": {
+    "argmax_flip": 5,
+    "policy_delta": 20,
+    "clip_active": 1011,
+    "advantage_sign_change": 1067
+  },
+  "eoi_file": "eoi.json"
+}

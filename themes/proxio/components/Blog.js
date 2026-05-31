@@ -49,6 +49,27 @@ export const Blog = ({ posts }) => {
               </div>
             </div>
           </div>
+          <div className='px-4 pb-10'>
+            <SmartLink
+              href='/rl'
+              className='mx-auto flex max-w-[760px] flex-col items-center justify-between gap-5 rounded-xl border border-gray-200 bg-[#fafafa] px-6 py-5 text-center shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-dark hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-white sm:flex-row sm:text-left'>
+              <div>
+                <span className='text-sm font-medium text-primary'>
+                  强化学习可视化教程
+                </span>
+                <h3 className='mt-2 text-xl font-semibold text-dark dark:text-white'>
+                  策略更新显微镜
+                </h3>
+                <p className='mt-2 text-sm leading-7 text-body-color dark:text-dark-6'>
+                  把 Q-learning、PPO、SAC 的更新过程放到同一个可交互页面里。
+                </p>
+              </div>
+              <span className='inline-flex shrink-0 items-center rounded-full bg-dark px-5 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-dark'>
+                进入教程
+                <i className='fa-solid fa-arrow-right ml-3' />
+              </span>
+            </SmartLink>
+          </div>
           {/* 博客列表 此处优先展示3片文章 */}
           <div className='-mx-4 grid md:grid-cols-2 grid-cols-1'>
             {posts?.map((item, index) => {

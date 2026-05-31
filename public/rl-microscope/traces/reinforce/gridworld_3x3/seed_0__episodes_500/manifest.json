@@ -1,0 +1,127 @@
+{
+  "run_id": "reinforce__gridworld_3x3__seed_0__episodes_500",
+  "algo": "reinforce",
+  "env": "gridworld_3x3",
+  "seed": 0,
+  "created_at": "2026-05-31T14:12:46.230199+00:00",
+  "commit": null,
+  "trace_schema_version": "0.1.0",
+  "determinism": {
+    "mode": "exact",
+    "backend": "numpy",
+    "tol": null,
+    "note": null,
+    "versions": {
+      "python": "3.11.15",
+      "platform": "Linux-5.15.0-60-generic-x86_64-with-glibc2.35",
+      "numpy": "2.2.6"
+    }
+  },
+  "title": "REINFORCE on gridworld_3x3",
+  "notes": "Tabular softmax policy, MC return - baseline. Deterministic (exact golden).",
+  "hyperparams": {
+    "lr": 0.2,
+    "gamma": 0.95,
+    "episodes": 500,
+    "max_grad_norm": 5.0,
+    "baseline": true,
+    "snapshot_every": 25
+  },
+  "available_views": [
+    "rollout",
+    "policy_probs",
+    "policy_arrows",
+    "update_inspector",
+    "metrics"
+  ],
+  "event_files": [
+    "events/0000.jsonl.gz",
+    "events/0001.jsonl.gz"
+  ],
+  "snapshot_files": [
+    "snapshots/policy_000000.json.gz",
+    "snapshots/policy_000374.json.gz",
+    "snapshots/policy_000556.json.gz",
+    "snapshots/policy_000701.json.gz",
+    "snapshots/policy_000840.json.gz",
+    "snapshots/policy_000970.json.gz",
+    "snapshots/policy_001094.json.gz",
+    "snapshots/policy_001224.json.gz",
+    "snapshots/policy_001365.json.gz",
+    "snapshots/policy_001509.json.gz",
+    "snapshots/policy_001631.json.gz",
+    "snapshots/policy_001745.json.gz",
+    "snapshots/policy_001869.json.gz",
+    "snapshots/policy_001983.json.gz",
+    "snapshots/policy_002097.json.gz",
+    "snapshots/policy_002211.json.gz",
+    "snapshots/policy_002328.json.gz",
+    "snapshots/policy_002443.json.gz",
+    "snapshots/policy_002553.json.gz",
+    "snapshots/policy_002664.json.gz",
+    "snapshots/policy_002769.json.gz",
+    "snapshots/policy_002769.json.gz"
+  ],
+  "n_events": 3269,
+  "metrics_summary": {
+    "actor_loss": {
+      "first": 8.717566700598393,
+      "last": 0.00295595054793778,
+      "min": -35.309964976760305,
+      "max": 8.717566700598393,
+      "mean": -0.09574366023178939,
+      "count": 500
+    },
+    "baseline": {
+      "first": 0.07999999999999974,
+      "last": 0.8143200000000007,
+      "min": 0.07999999999999974,
+      "max": 0.8143200000000007,
+      "mean": 0.7262184419748887,
+      "count": 500
+    },
+    "entropy": {
+      "first": 1.38489420873099,
+      "last": 0.7738975796385947,
+      "min": 0.7732754173870728,
+      "max": 1.38489420873099,
+      "mean": 0.9388527417757593,
+      "count": 500
+    },
+    "episode_length": {
+      "first": 24,
+      "last": 4,
+      "min": 4,
+      "max": 30,
+      "mean": 5.538,
+      "count": 500
+    },
+    "episode_reward": {
+      "first": 0.07999999999999974,
+      "last": 0.88,
+      "min": -1.2000000000000004,
+      "max": 0.88,
+      "mean": 0.8143199999999977,
+      "count": 500
+    },
+    "success": {
+      "first": 1.0,
+      "last": 1.0,
+      "min": 0.0,
+      "max": 1.0,
+      "mean": 0.996,
+      "count": 500
+    }
+  },
+  "eoi_definitions": {
+    "argmax_flip": "The greedy action argmax_a Q(s,a) (or argmax pi) at a state flipped \u2014 the policy arrow actually changed.",
+    "policy_delta": "The action distribution moved by more than the threshold (sum_a |pi_after - pi_before|) after a full minibatch x epoch update.",
+    "advantage_sign_change": "The advantage estimate changed sign between consecutive samples \u2014 the update flips from encouraging to discouraging an action."
+  },
+  "eoi_counts": {
+    "argmax_flip": 1,
+    "policy_delta": 6,
+    "advantage_sign_change": 817
+  },
+  "eoi_file": "eoi.json"
+}

@@ -18,6 +18,7 @@ import { Footer } from './components/Footer'
 import { Header } from './components/Header'
 import { Hero } from './components/Hero'
 import { Pricing } from './components/Pricing'
+import { RLSpotlight } from './components/RLSpotlight'
 import { Team } from './components/Team'
 import { Testimonials } from './components/Testimonials'
 import CONFIG from './config'
@@ -100,6 +101,7 @@ const LayoutIndex = props => {
         <>
             {/* 英雄区 */}
             {siteConfig('PROXIO_HERO_ENABLE', true, CONFIG) && <Hero {...props} />}
+            <RLSpotlight />
             {/* 博文列表 */}
             {siteConfig('PROXIO_BLOG_ENABLE', true, CONFIG) && (
                 <>
@@ -249,7 +251,7 @@ const LayoutSearch = props => {
                 }
             })
         }
-    }, [])
+    }, [keyword])
     return (
         <>
             <section className='max-w-7xl mx-auto bg-white pb-10 pt-20 dark:bg-dark lg:pb-20 lg:pt-[120px]'>
