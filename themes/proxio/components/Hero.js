@@ -98,7 +98,7 @@ export const Hero = props => {
                   <SmartLink
                     href='/rl'
                     className='inline-flex items-center justify-center rounded-2xl bg-white px-7 py-[14px] text-center text-base font-medium text-dark shadow-1 transition duration-300 ease-in-out hover:bg-gray-2'>
-                    RL 可视化教程
+                    RL Policy Lab
                     <i className='fa-solid fa-arrow-right ml-3' />
                   </SmartLink>
                 </li>

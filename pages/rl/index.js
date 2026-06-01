@@ -4,6 +4,7 @@ import { fetchGlobalAllData } from '@/lib/db/SiteDataApi'
 import Head from 'next/head'
 
 const APP_PATH = '/rl-microscope/index.html'
+const DEFAULT_APP_PATH = `${APP_PATH}#/rl/q-learning`
 
 const quickLinks = [
   { href: `${APP_PATH}#/rl/q-learning`, label: 'Q-learning' },
@@ -16,20 +17,20 @@ const RLPage = () => {
   return (
     <>
       <Head>
-        <title>策略更新显微镜 | Policy Update Microscope</title>
+        <title>策略演化实验室 | RL Policy Lab</title>
         <meta
           name='description'
-          content='交互式强化学习可视化：逐步查看 transition、TD target、advantage、PPO ratio 如何改变 Q 值、value、action probability 和 policy。'
+          content='交互式强化学习实验室：逐步查看 transition、TD target、advantage、PPO ratio 如何改变 Q 值、value、action probability 和 policy。'
         />
       </Head>
 
       <section className='rl-shell'>
         <div className='rl-header'>
           <div>
-            <p className='rl-kicker'>RL Visualization</p>
-            <h1>策略更新显微镜</h1>
+            <p className='rl-kicker'>RL Policy Lab</p>
+            <h1>策略演化实验室</h1>
             <p className='rl-summary'>
-              逐步查看公式、数值代入、update event 和 policy before/after，理解强化学习到底如何更新 policy。
+              逐步拆开公式、数值代入、update event 和 policy before/after，看见强化学习策略如何一步步演化。
             </p>
           </div>
 
@@ -47,8 +48,8 @@ const RLPage = () => {
 
         <div className='rl-frame-wrap'>
           <iframe
-            src={APP_PATH}
-            title='Policy Update Microscope'
+            src={DEFAULT_APP_PATH}
+            title='RL Policy Lab'
             allow='clipboard-write'
             className='rl-frame'
           />
@@ -202,9 +203,9 @@ export async function getStaticProps(req) {
   delete props.allPages
 
   props.post = {
-    title: '策略更新显微镜',
+    title: '策略演化实验室',
     summary:
-      '交互式强化学习可视化：逐步查看 transition、TD target、advantage、PPO ratio 如何改变 policy。',
+      '交互式强化学习实验室：逐步查看 transition、TD target、advantage、PPO ratio 如何改变 policy。',
     slug: 'rl',
     type: 'Page',
     tags: ['RL', 'Reinforcement Learning', 'Visualization'],
