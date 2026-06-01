@@ -130,6 +130,24 @@ a:hover {
   letter-spacing: 0.08em;
 }
 
+.panel-help {
+  color: #64748b;
+}
+
+.guide-panel {
+  border-color: #c7d2fe;
+  background: #eef2ff;
+  color: #111827;
+}
+
+.guide-panel strong {
+  color: #3151dd;
+}
+
+.guide-panel span {
+  color: #475569;
+}
+
 .card {
   color: var(--text);
   padding: 20px;
@@ -200,6 +218,35 @@ input[type='range'] {
 
 .grid-svg {
   border: 1px solid #e5eaf3;
+}
+
+.legend {
+  color: #64748b;
+}
+
+.legend-swatch {
+  border-color: #cbd5e1;
+}
+
+.legend-swatch.mid {
+  background: #94a3b8;
+}
+
+.legend-swatch.current {
+  border-color: #ef4444;
+}
+
+.legend-line,
+.legend-line::after {
+  color: #334155;
+}
+
+.legend-line {
+  border-top-color: #334155;
+}
+
+.legend-line::after {
+  border-left-color: #334155;
 }
 
 table.qtable td,
