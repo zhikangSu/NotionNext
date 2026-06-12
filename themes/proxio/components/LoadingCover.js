@@ -5,13 +5,13 @@ const LoadingCover = ({ onFinishLoading }) => {
     const [isVisible, setIsVisible] = useState(true);
     const welcomeText = siteConfig('PROXIO_WELCOME_TEXT', '欢迎来到我们的网站！');
 
-    // 定义颜色变量
+    // 定义颜色变量（Meowsu 天空配色）
     const colors = {
-        backgroundStart: '#1a1a1a', // 深灰色
-        backgroundMiddle: '#4d4d4d', // 中灰色
-        backgroundEnd: '#e6e6e6', // 浅灰色
-        textColor: '#ffffff', // 白色
-        rippleColor: 'rgba(255, 255, 255, 0.6)', // 半透明白色
+        backgroundStart: '#EAF2FF', // 浅天蓝
+        backgroundMiddle: '#C9DEFF', // 天蓝
+        backgroundEnd: '#FFF6E3', // 奶油
+        textColor: '#1E2447', // 墨蓝
+        rippleColor: 'rgba(53, 99, 233, 0.35)', // 半透明品牌蓝
     };
 
     useEffect(() => {
@@ -46,8 +46,20 @@ const LoadingCover = ({ onFinishLoading }) => {
 
         document.body.addEventListener('click', handleClick);
 
+        // 2.6 秒后自动进入，不强制访客点击
+        const autoTimer = setTimeout(() => {
+            pageContainer?.classList?.add('page-clicked');
+            setIsVisible(false);
+            setTimeout(() => {
+                if (onFinishLoading) {
+                    onFinishLoading();
+                }
+            }, 600);
+        }, 2600);
+
         return () => {
             document.body.removeEventListener('click', handleClick);
+            clearTimeout(autoTimer);
         };
     }, [onFinishLoading]);
 
@@ -56,7 +68,11 @@ const LoadingCover = ({ onFinishLoading }) => {
     return (
         <div className="welcome" id="pageContainer">
             <div className="welcome-text px-2" id="welcomeText">
+                <span aria-hidden="true" style={{ display: 'block', fontSize: '3rem', marginBottom: '0.5rem' }}>⭐</span>
                 {welcomeText}
+                <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 'normal', opacity: 0.6, marginTop: '1rem' }}>
+                    点击任意处进入
+                </span>
             </div>
             <style jsx>
                 {`
@@ -94,7 +110,7 @@ const LoadingCover = ({ onFinishLoading }) => {
                         font-size: 2.5rem;
                         font-weight: bold;
                         color: ${colors.textColor};
-                        text-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.6);
+                        text-shadow: 0 0 18px rgba(53, 99, 233, 0.25);
                         user-select: none;
                         animation: textPulse 3s ease-in-out infinite, fadeInUp 1.5s ease-out forwards;
                         text-align: center;
@@ -132,11 +148,11 @@ const LoadingCover = ({ onFinishLoading }) => {
                     @keyframes textPulse {
                         0%, 100% {
                             transform: scale(1);
-                            text-shadow: 0 0 15px rgba(255, 255, 255, 0.9), 0 0 30px rgba(255, 255, 255, 0.6);
+                            text-shadow: 0 0 18px rgba(53, 99, 233, 0.25);
                         }
                         50% {
                             transform: scale(1.1);
-                            text-shadow: 0 0 25px rgba(255, 255, 255, 1), 0 0 40px rgba(255, 255, 255, 0.8);
+                            text-shadow: 0 0 28px rgba(53, 99, 233, 0.4);
                         }
                     }
 

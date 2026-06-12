@@ -13,11 +13,16 @@ const Announcement = ({ post, className }) => {
       <div className={className}>
         <section
           id='announcement-wrapper'
-          className='rounded-xl px-2  wow fadeInUp' data-wow-delay='.2s'>
-          {/* <div><i className='mr-2 fas fa-bullhorn' />{locale.COMMON.ANNOUNCEMENT}</div> */}
+          className='wow fadeInUp container mx-auto px-2'
+          data-wow-delay='.2s'>
           {post && (
-            <div id='announcement-content'>
-              <NotionPage post={post}/>
+            <div className='sticker-card relative mx-auto max-w-[760px] px-6 py-6'>
+              <span className='section-badge absolute -top-4 left-6 -rotate-3'>
+                📢 公告
+              </span>
+              <div id='announcement-content' className='pt-4'>
+                <NotionPage post={post} />
+              </div>
             </div>
           )}
         </section>

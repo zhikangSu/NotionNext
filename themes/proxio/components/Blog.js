@@ -4,7 +4,7 @@ import { siteConfig } from '@/lib/config'
 import SmartLink from '@/components/SmartLink'
 
 /**
- * 博文列表
+ * 博文列表：贴纸卡片风格
  * @param {*} param0
  * @returns
  */
@@ -14,121 +14,113 @@ export const Blog = ({ posts }) => {
     return null
   }
 
-  // 博客列表默认显示summary文字，当鼠标指向时显示文章封面。这里可选把summary文字替换成图片占位符。
-  const PROXIO_BLOG_PLACEHOLDER_IMG_URL_1 = siteConfig(
-    'PROXIO_BLOG_PLACEHOLDER_IMG_URL_1'
-  )
-  const PROXIO_BLOG_PLACEHOLDER_IMG_URL_2 = siteConfig(
-    'PROXIO_BLOG_PLACEHOLDER_IMG_URL_2'
-  )
-  const PROXIO_BLOG_PLACEHOLDER_IMG_URL_3 = siteConfig(
-    'PROXIO_BLOG_PLACEHOLDER_IMG_URL_3'
-  )
-  const PROXIO_BLOG_PLACEHOLDER_IMG_URL_4 = siteConfig(
-    'PROXIO_BLOG_PLACEHOLDER_IMG_URL_4'
-  )
+  // 首页的 allNavPages 没有 publishDay 字段，用 publishDate 时间戳兜底
+  const formatDate = item => {
+    if (item?.publishDay) {
+      return item.publishDay
+    }
+    if (item?.publishDate) {
+      const d = new Date(item.publishDate)
+      if (!isNaN(d.getTime())) {
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      }
+    }
+    return ''
+  }
 
   return (
     <>
       {/* <!-- ====== Blog Section Start --> */}
-      <section className='bg-white pt-20 dark:bg-dark lg:pt-[120px]'>
+      <section className='pt-20 lg:pt-[100px]'>
         <div className='container mx-auto'>
           {/* 区块标题文字 */}
           <div
-            className='-mx-4 flex flex-wrap justify-center wow fadeInUp'
+            className='wow fadeInUp -mx-4 flex flex-wrap justify-center'
             data-wow-delay='.2s'>
             <div className='w-full px-4 py-4'>
-              <div className='mx-auto max-w-[485px] text-center space-y-4'>
-                <span className='px-3 py-0.5 rounded-2xl mb-2 dark:bg-dark-1 border border-gray-200 dark:border-[#333333] dark:text-white'>
+              <div className='mx-auto max-w-[485px] space-y-4 text-center'>
+                <span className='section-badge'>
                   {siteConfig('PROXIO_BLOG_TITLE')}
                 </span>
-
                 <h2 className='text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]'>
                   {siteConfig('PROXIO_BLOG_TEXT_1')}
                 </h2>
               </div>
             </div>
           </div>
-          <div className='px-4 pb-10'>
+
+          {/* RL 实验室入口 */}
+          <div className='px-4 pb-12'>
             <SmartLink
               href='/rl'
-              className='mx-auto flex max-w-[760px] flex-col items-center justify-between gap-5 rounded-xl border border-gray-200 bg-[#fafafa] px-6 py-5 text-center shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-dark hover:shadow-md dark:border-gray-700 dark:bg-gray-800 dark:hover:border-white sm:flex-row sm:text-left'>
+              className='sticker-card mx-auto flex max-w-[760px] flex-col items-center justify-between gap-5 px-7 py-6 text-center sm:flex-row sm:text-left'>
               <div>
-                <span className='text-sm font-medium text-primary'>
-                  强化学习交互实验
+                <span className='text-sm font-bold text-primary'>
+                  🎮 强化学习交互实验
                 </span>
-                <h3 className='mt-2 text-xl font-semibold text-dark dark:text-white'>
+                <h3 className='mt-2 text-xl font-bold text-dark dark:text-white'>
                   策略演化实验室
                 </h3>
-                <p className='mt-2 text-sm leading-7 text-body-color dark:text-dark-6'>
+                <p className='mt-2 text-sm leading-7 text-body-color'>
                   把 Q-learning、PPO、REINFORCE 的更新过程放到同一个可交互页面里。
                 </p>
               </div>
-              <span className='inline-flex shrink-0 items-center rounded-full bg-dark px-5 py-2.5 text-sm font-medium text-white dark:bg-white dark:text-dark'>
+              <span className='btn-meow shrink-0 !px-5 !py-2.5 text-sm'>
                 进入实验室
-                <i className='fa-solid fa-arrow-right ml-3' />
+                <i className='fa-solid fa-arrow-right' />
               </span>
             </SmartLink>
           </div>
-          {/* 博客列表 此处优先展示3片文章 */}
-          <div className='-mx-4 grid md:grid-cols-2 grid-cols-1'>
+
+          {/* 博客列表 */}
+          <div className='-mx-4 grid grid-cols-1 gap-y-10 md:grid-cols-2'>
             {posts?.map((item, index) => {
-              // 文章封面图片，默认使用占位符 根据index 判断获取的时哪一张图片
-              let coverImg = PROXIO_BLOG_PLACEHOLDER_IMG_URL_1
-              if (index === 0) {
-                coverImg = PROXIO_BLOG_PLACEHOLDER_IMG_URL_1
-              } else if (index === 1) {
-                coverImg = PROXIO_BLOG_PLACEHOLDER_IMG_URL_2
-              } else if (index === 2) {
-                coverImg = PROXIO_BLOG_PLACEHOLDER_IMG_URL_3
-              } else if (index === 3) {
-                coverImg = PROXIO_BLOG_PLACEHOLDER_IMG_URL_4
-              }
               return (
                 <div key={index} className='w-full px-4'>
-                  <div
-                    className='wow fadeInUp group mb-10 relative overflow-hidden blog'
+                  <SmartLink
+                    href={item?.href}
+                    className='wow fadeInUp sticker-card group block overflow-hidden'
                     data-wow-delay='.1s'>
-                    <div className='relative rounded-xl border overflow-hidden shadow-md dark:border-gray-700 dark:bg-gray-800'>
-                      <SmartLink href={item?.href} className='block'>
-                        {item.pageCoverThumbnail && (
-                          // 图片半透明
-                          <LazyImage
-                            src={item.pageCoverThumbnail}
-                            alt={item.title}
-                            className='w-full h-80 object-cover transition-transform duration-500 rounded-xl'
-                          />
-                        )}
-                        {/* 遮罩层，仅覆盖图片部分 */}
-                        <div className='absolute inset-0 bg-gray-100 dark:bg-hexo-black-gray transition-all duration-500 group-hover:opacity-50 group-hover:bg-black' />
-                        {/* 鼠标悬停时显示的文字内容 */}
-                        <div className='absolute inset-0 flex items-center justify-center group-hover:scale-110 duration-200 group-hover:text-white'>
-                          {!coverImg && (
-                            <p className='max-w-[370px] text-base text-body-color dark:text-dark-6 flex items-center justify-center duration-200 group-hover:text-white '>
-                              {item.summary}
-                            </p>
-                          )}
-                          <LazyImage
-                            src={coverImg}
-                            className='absolute max-h-full object-cover'
-                          />
+                    {/* 封面 */}
+                    <div className='relative aspect-[16/9] overflow-hidden bg-meow-sky dark:bg-meow-card'>
+                      {item.pageCoverThumbnail ? (
+                        <LazyImage
+                          src={item.pageCoverThumbnail}
+                          alt={item.title}
+                          className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
+                        />
+                      ) : (
+                        // 无封面时的星星占位
+                        <div className='dot-bg flex h-full w-full items-center justify-center'>
+                          <span className='meow-twinkle text-5xl'>⭐</span>
                         </div>
-                      </SmartLink>
+                      )}
                     </div>
                     {/* 内容部分 */}
-                    <div className='relative z-10 p-4'>
-                      <span className='inline-blocktext-center text-xs font-medium leading-loose text-white'>
-                        {item.publishDay}
-                      </span>
-                      <h3>
-                        <SmartLink
-                          href={item?.href}
-                          className='mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl'>
-                          {item.title}
-                        </SmartLink>
+                    <div className='space-y-3 p-6'>
+                      <div className='flex flex-wrap items-center gap-2'>
+                        {formatDate(item) && (
+                          <span className='inline-flex items-center gap-1 rounded-full bg-meow-yellow px-3 py-0.5 text-xs font-bold text-meow-ink'>
+                            <i className='fa-regular fa-calendar' />
+                            {formatDate(item)}
+                          </span>
+                        )}
+                        {item.category && (
+                          <span className='inline-flex items-center rounded-full bg-meow-pink-soft px-3 py-0.5 text-xs font-bold text-meow-ink'>
+                            {item.category}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className='text-xl font-bold text-dark group-hover:text-primary dark:text-white dark:group-hover:text-meow-sky-deep sm:text-2xl lg:text-xl xl:text-2xl'>
+                        {item.title}
                       </h3>
+                      {item.summary && (
+                        <p className='line-clamp-2 text-sm leading-7 text-body-color'>
+                          {item.summary}
+                        </p>
+                      )}
                     </div>
-                  </div>
+                  </SmartLink>
                 </div>
               )
             })}

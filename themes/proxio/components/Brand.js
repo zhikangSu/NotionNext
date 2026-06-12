@@ -1,66 +1,48 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { siteConfig } from '@/lib/config'
-import { useEffect, useRef } from 'react'
+
+// 关键词chip的配色轮换
+const CHIP_STYLES = [
+  'bg-meow-sky text-meow-ink',
+  'bg-meow-pink-soft text-meow-ink',
+  'bg-meow-cream text-meow-ink',
+  'bg-meow-sky-deep text-meow-ink'
+]
+
+const CHIP_ICONS = ['⭐', '🛠️', '✨', '🎮', '📚', '🚀']
 
 /**
- * 合作伙伴滚动组件
+ * 关键词跑马灯：把标签做成彩色小贴纸无限滚动
  * @returns
  */
 export const Brand = () => {
   const brands = siteConfig('PROXIO_BRANDS', [])
 
-  const scrollContainerRef = useRef(null)
+  if (!brands || brands.length === 0) {
+    return null
+  }
 
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current
-
-    let scrollAmount = 0
-    const scrollSpeed = 1 // 滚动速度
-
-    const scroll = () => {
-      if (scrollContainer) {
-        scrollAmount += scrollSpeed
-        scrollContainer.scrollLeft = scrollAmount
-
-        // 如果滚动到内容的一半，立即重置滚动位置
-        if (scrollAmount >= scrollContainer.scrollWidth / 2) {
-          scrollAmount = 0
-        }
-      }
-      requestAnimationFrame(scroll)
-    }
-
-    scroll()
-
-    return () => cancelAnimationFrame(scroll)
-  }, [])
+  const Chip = ({ item, index }) => (
+    <span
+      className={`mx-3 inline-flex items-center gap-2 whitespace-nowrap rounded-full border-2 border-meow-ink/10 px-5 py-2 text-base font-bold dark:border-white/10 ${CHIP_STYLES[index % CHIP_STYLES.length]}`}>
+      <span aria-hidden='true'>{CHIP_ICONS[index % CHIP_ICONS.length]}</span>
+      {item}
+    </span>
+  )
 
   return (
     <>
       {/* <!-- ====== Brands Section Start --> */}
-      <section id='brand' className='py-12 dark:bg-dark'>
-        <div
-          className='overflow-hidden whitespace-nowrap container mx-auto p-3 border rounded-2xl border-gray-200 dark:border-[#333333]'
-          ref={scrollContainerRef}
-        >
-          <div className='inline-block'>
+      <section id='brand' className='py-12'>
+        <div className='meow-marquee-wrap container mx-auto overflow-hidden'>
+          <div className='meow-marquee flex w-max items-center py-2'>
             {brands?.map((item, index) => (
-              <span
-                key={index}
-                className='mx-8 text-lg font-semibold text-gray-700 dark:text-gray-300'
-              >
-                {item}
-              </span>
+              <Chip key={index} item={item} index={index} />
             ))}
             {/* 克隆一份内容，用于无缝滚动 */}
             {brands.map((item, index) => (
-              <span
-                key={`clone-${index}`}
-                className='mx-8 text-lg font-semibold text-gray-700 dark:text-gray-300'
-              >
-                {item}
-              </span>
+              <Chip key={`clone-${index}`} item={item} index={index} />
             ))}
           </div>
         </div>

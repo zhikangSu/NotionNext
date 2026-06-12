@@ -23,43 +23,48 @@ export const Footer = ({ title }) => {
   return (
     <footer
       id='footer-bottom'
-      className='z-10 justify-center m-auto w-full p-6 relative container'>
-      <div className='max-w-screen-3xl w-full mx-auto '>
+      className='container relative z-10 m-auto w-full justify-center p-6'>
+      <div className='max-w-screen-3xl mx-auto w-full rounded-t-[2rem] border-2 border-b-0 border-meow-ink/10 bg-white/60 px-8 backdrop-blur dark:border-white/10 dark:bg-meow-card/50'>
         {/* 信息与链接区块 */}
-        <div className='w-full flex lg:flex-row flex-col justify-between py-16'>
-          <div className='gap-y-2 flex flex-col items-start dark:text-gray-200'>
-            <div className='flex gap-x-1'>
+        <div className='flex w-full flex-col justify-between gap-10 py-14 lg:flex-row'>
+          <div className='flex max-w-sm flex-col items-start gap-y-3 dark:text-gray-200'>
+            <div className='flex items-center gap-x-2'>
               <LazyImage
                 src={siteInfo?.icon}
-                className='rounded-full'
-                width={24}
+                className='meow-wiggle rounded-full'
+                width={28}
                 alt={siteConfig('AUTHOR')}
               />
-              <h1 className='text-lg'>{title}</h1>
-              <span
-                className='underline font-bold justify-start'>
+              <span className='font-display text-lg font-bold'>
                 {siteConfig('AUTHOR')}
               </span>
+              <span aria-hidden='true' className='meow-twinkle text-base select-none'>
+                ⭐
+              </span>
             </div>
-            <div className='px-1'>{siteConfig('DESCRIPTION')}</div>
+            <div className='text-sm leading-7 text-body-color'>
+              {siteConfig('DESCRIPTION')}
+            </div>
             {contactEmailDisplay && (
-              <div className='px-1'>{contactEmailDisplay}</div>
+              <div className='text-sm text-body-color'>{contactEmailDisplay}</div>
             )}
           </div>
 
           {/* 右侧链接区块 */}
-          <div className='flex gap-x-4'>
+          <div className='flex gap-x-16'>
             {PROXIO_FOOTER_LINKS?.map((group, index) => {
               return (
                 <div key={index}>
-                  <div className='font-bold text-xl dark:text-white lg:pb-8 pb-4'>
+                  <div className='pb-4 text-base font-bold dark:text-white'>
                     {group.name}
                   </div>
-                  <div className='flex flex-col gap-y-2'>
+                  <div className='flex flex-col gap-y-2.5'>
                     {group?.menus?.map((menu, index) => {
                       return (
                         <div key={index}>
-                          <SmartLink href={menu.href} className='hover:underline dark:text-gray-200'>
+                          <SmartLink
+                            href={menu.href}
+                            className='text-sm text-body-color transition-colors duration-150 hover:text-primary dark:hover:text-meow-sky-deep'>
                             {menu.title}
                           </SmartLink>
                         </div>
@@ -73,15 +78,15 @@ export const Footer = ({ title }) => {
         </div>
 
         {/* 页脚 */}
-        <div className='dark:text-gray-200 py-4 flex flex-col lg:flex-row  justify-between items-center border-t border-gray-600'>
-          <div className='flex gap-x-2 flex-wrap justify-between items-center'>
+        <div className='flex flex-col items-center justify-between gap-4 border-t-2 border-dashed border-meow-ink/10 py-5 dark:border-white/10 dark:text-gray-200 lg:flex-row'>
+          <div className='flex flex-wrap items-center justify-between gap-x-2 text-sm'>
             <CopyRightDate />
             <PoweredBy />
           </div>
 
           <DarkModeButton className='dark:text-white' />
 
-          <div className='flex justify-between items-center gap-x-2'>
+          <div className='flex items-center justify-between gap-x-2'>
             <div className='flex items-center gap-x-4'>
               <AnalyticsBusuanzi />
               <SocialButton />
@@ -90,7 +95,7 @@ export const Footer = ({ title }) => {
         </div>
 
         {/* 备案 */}
-        <div className='dark:text-gray-200 w-full text-center flex flex-wrap items-center justify-center gap-x-2'>
+        <div className='flex w-full flex-wrap items-center justify-center gap-x-2 pb-4 text-center text-sm dark:text-gray-200'>
           <BeiAnSite />
           <BeiAnGongAn />
         </div>

@@ -39,7 +39,6 @@ import { CTA } from './components/CTA'
 import SearchInput from './components/SearchInput'
 import { SignInForm } from './components/SignInForm'
 import { SignUpForm } from './components/SignUpForm'
-import { SVG404 } from './components/svg/SVG404'
 import Lenis from '@/components/Lenis'
 import Announcement from './components/Announcement'
 import CursorDot from '@/components/CursorDot'
@@ -107,10 +106,10 @@ const LayoutIndex = props => {
                 <>
                     <Blog posts={posts} />
                     {/* 更多文章按钮 */}
-                    <div className='container mx-auto flex justify-end mb-4'>
-                        <SmartLink className='text-lg underline' href={'/archive'}>
+                    <div className='container mx-auto mb-4 mt-10 flex justify-center'>
+                        <SmartLink className='btn-meow-ghost' href={'/archive'}>
                             <span>{locale.COMMON.MORE}</span>
-                            <i className='ml-2 fas fa-arrow-right' />
+                            <i className='fas fa-arrow-right' />
                         </SmartLink>
                     </div>
                 </>
@@ -254,7 +253,7 @@ const LayoutSearch = props => {
     }, [keyword])
     return (
         <>
-            <section className='max-w-7xl mx-auto bg-white pb-10 pt-20 dark:bg-dark lg:pb-20 lg:pt-[120px]'>
+            <section className='mx-auto max-w-7xl pb-10 pt-20 lg:pb-20 lg:pt-[120px]'>
                 <SearchInput {...props} />
                 {currentSearch && <Blog {...props} />}
             </section>
@@ -283,36 +282,35 @@ const Layout404 = props => {
     return (
         <>
             {/* <!-- ====== 404 Section Start --> */}
-            <section className='bg-white py-20 dark:bg-dark-2 lg:py-[110px]'>
+            <section className='dot-bg py-20 lg:py-[110px]'>
                 <div className='container mx-auto'>
-                    <div className='flex flex-wrap items-center -mx-4'>
-                        <div className='w-full px-4 md:w-5/12 lg:w-6/12'>
-                            <div className='text-center'>
+                    <div className='mx-auto max-w-[480px] text-center'>
+                        <div className='relative mx-auto mb-10 w-48'>
+                            <div className='sticker-card meow-float-slow overflow-hidden rotate-3'>
                                 <img
-                                    src='/images/starter/404.svg'
-                                    alt='image'
-                                    className='max-w-full mx-auto'
+                                    src='/images/personal/star-mascot-about.png'
+                                    alt='404'
+                                    className='w-full'
                                 />
                             </div>
+                            <span
+                                aria-hidden='true'
+                                className='meow-twinkle absolute -left-6 -top-4 select-none text-3xl'>
+                                ⭐
+                            </span>
                         </div>
-                        <div className='w-full px-4 md:w-7/12 lg:w-6/12 xl:w-5/12'>
-                            <div>
-                                <div className='mb-8'>
-                                    <SVG404 />
-                                </div>
-                                <h3 className='mb-5 text-2xl font-semibold text-dark dark:text-white'>
-                                    {siteConfig('PROXIO_404_TITLE')}
-                                </h3>
-                                <p className='mb-8 text-base text-body-color dark:text-dark-6'>
-                                    {siteConfig('PROXIO_404_TEXT')}
-                                </p>
-                                <SmartLink
-                                    href='/'
-                                    className='py-3 text-base font-medium text-white transition rounded-md bg-dark px-7 hover:bg-primary'>
-                                    {siteConfig('PROXIO_404_BACK')}
-                                </SmartLink>
-                            </div>
-                        </div>
+                        <h2 className='font-display mb-3 text-6xl font-extrabold text-primary'>
+                            404
+                        </h2>
+                        <h3 className='mb-5 text-2xl font-bold text-dark dark:text-white'>
+                            {siteConfig('PROXIO_404_TITLE')}
+                        </h3>
+                        <p className='mb-8 text-base leading-7 text-body-color'>
+                            {siteConfig('PROXIO_404_TEXT')}
+                        </p>
+                        <SmartLink href='/' className='btn-meow'>
+                            {siteConfig('PROXIO_404_BACK')}
+                        </SmartLink>
                     </div>
                 </div>
             </section>
@@ -331,65 +329,77 @@ const LayoutPostList = props => {
     return (
         <>
             {/* <!-- ====== Blog Section Start --> */}
-            <section className='bg-white pb-10 pt-20 dark:bg-dark lg:pb-20 lg:pt-[120px]'>
+            <section className='pb-10 pt-20 lg:pb-20 lg:pt-[120px]'>
                 <div className='container mx-auto'>
                     {/* 区块标题文字 */}
                     <div className='-mx-4 flex flex-wrap justify-center'>
                         <div className='w-full px-4'>
-                            <div className='mx-auto mb-[60px] max-w-[485px] text-center'>
+                            <div className='mx-auto mb-[60px] max-w-[485px] space-y-4 text-center'>
                                 {slotTitle && (
-                                    <h2 className='mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]'>
-                                        {slotTitle}
-                                    </h2>
+                                    <>
+                                        <span className='section-badge'>
+                                            {category
+                                                ? '分类'
+                                                : '标签'}
+                                        </span>
+                                        <h2 className='mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]'>
+                                            {slotTitle}
+                                        </h2>
+                                    </>
                                 )}
 
                                 {!slotTitle && (
                                     <>
-                                        <span className='mb-2 block text-lg font-semibold text-primary'>
+                                        <span className='section-badge'>
                                             {siteConfig('PROXIO_BLOG_TITLE')}
                                         </span>
                                         <h2 className='mb-4 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]'>
                                             {siteConfig('PROXIO_BLOG_TEXT_1')}
                                         </h2>
-
                                     </>
                                 )}
                             </div>
                         </div>
                     </div>
-                    {/* 博客列表 此处优先展示4篇文章 */}
+                    {/* 博客列表 */}
                     <div className='-mx-4 flex flex-wrap'>
                         {posts?.map((item, index) => {
                             return (
                                 <div key={index} className='w-full px-4 md:w-1/2 lg:w-1/3'>
-                                    <div
-                                        className='wow fadeInUp group mb-10'
+                                    <SmartLink
+                                        href={item?.href}
+                                        className='wow fadeInUp sticker-card group mb-10 block overflow-hidden'
                                         data-wow-delay='.1s'>
-                                        <div className='mb-8 overflow-hidden rounded-[5px]'>
-                                            <SmartLink href={item?.href} className='block'>
+                                        <div className='relative aspect-[16/9] overflow-hidden bg-meow-sky dark:bg-meow-card'>
+                                            {item.pageCoverThumbnail ? (
                                                 <img
                                                     src={item.pageCoverThumbnail}
                                                     alt={item.title}
-                                                    className='w-full transition group-hover:rotate-6 group-hover:scale-125'
+                                                    className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-105'
                                                 />
-                                            </SmartLink>
+                                            ) : (
+                                                <div className='dot-bg flex h-full w-full items-center justify-center'>
+                                                    <span className='meow-twinkle text-4xl'>⭐</span>
+                                                </div>
+                                            )}
                                         </div>
-                                        <div>
-                                            <span className='mb-6 inline-block rounded-[5px] bg-primary px-4 py-0.5 text-center text-xs font-medium leading-loose text-white'>
-                                                {item.publishDay}
-                                            </span>
-                                            <h3>
-                                                <SmartLink
-                                                    href={item?.href}
-                                                    className='mb-4 inline-block text-xl font-semibold text-dark hover:text-primary dark:text-white dark:hover:text-primary sm:text-2xl lg:text-xl xl:text-2xl'>
-                                                    {item.title}
-                                                </SmartLink>
+                                        <div className='space-y-3 p-5'>
+                                            {item.publishDay && (
+                                                <span className='inline-flex items-center gap-1 rounded-full bg-meow-yellow px-3 py-0.5 text-xs font-bold text-meow-ink'>
+                                                    <i className='fa-regular fa-calendar' />
+                                                    {item.publishDay}
+                                                </span>
+                                            )}
+                                            <h3 className='text-lg font-bold text-dark group-hover:text-primary dark:text-white dark:group-hover:text-meow-sky-deep xl:text-xl'>
+                                                {item.title}
                                             </h3>
-                                            <p className='max-w-[370px] text-base text-body-color dark:text-dark-6'>
-                                                {item.summary}
-                                            </p>
+                                            {item.summary && (
+                                                <p className='line-clamp-2 text-sm leading-6 text-body-color'>
+                                                    {item.summary}
+                                                </p>
+                                            )}
                                         </div>
-                                    </div>
+                                    </SmartLink>
                                 </div>
                             )
                         })}
@@ -409,14 +419,14 @@ const LayoutCategoryIndex = props => {
     const { categoryOptions } = props
     const { locale } = useGlobal()
     return (
-        <section className='bg-white pb-10 pt-20 dark:bg-dark lg:pb-20 lg:pt-[120px]'>
-            <div className='container mx-auto  min-h-96'>
-                <span className='mb-2 text-lg font-semibold text-primary flex justify-center items-center '>
-                    {locale.COMMON.CATEGORY}
-                </span>
+        <section className='pb-10 pt-20 lg:pb-20 lg:pt-[120px]'>
+            <div className='container mx-auto min-h-96'>
+                <div className='mb-10 flex items-center justify-center'>
+                    <span className='section-badge'>{locale.COMMON.CATEGORY}</span>
+                </div>
                 <div
                     id='category-list'
-                    className='duration-200 flex flex-wrap justify-center items-center '>
+                    className='flex flex-wrap items-center justify-center gap-4 duration-200'>
                     {categoryOptions?.map(category => {
                         return (
                             <SmartLink
@@ -424,12 +434,12 @@ const LayoutCategoryIndex = props => {
                                 href={`/category/${category.name}`}
                                 passHref
                                 legacyBehavior>
-                                <h2
-                                    className={
-                                        'hover:text-black text-2xl font-semibold text-dark sm:text-4xl md:text-[40px] md:leading-[1.2] dark:hover:text-white dark:text-gray-300 dark:hover:bg-gray-600 px-5 cursor-pointer py-2 hover:bg-gray-100'
-                                    }>
-                                    <i className='mr-4 fas fa-folder' />
-                                    {category.name}({category.count})
+                                <h2 className='sticker-card cursor-pointer px-6 py-3 text-xl font-bold text-dark dark:text-white sm:text-2xl'>
+                                    <i className='mr-3 fas fa-folder text-meow-yellow' />
+                                    {category.name}
+                                    <span className='ml-2 text-sm font-medium text-body-color'>
+                                        {category.count}
+                                    </span>
                                 </h2>
                             </SmartLink>
                         )
@@ -449,28 +459,29 @@ const LayoutTagIndex = props => {
     const { tagOptions } = props
     const { locale } = useGlobal()
     return (
-        <section className='bg-white pb-10 pt-20 dark:bg-dark lg:pb-20 lg:pt-[120px]'>
-            <div className='container mx-auto  min-h-96'>
-                <span className='mb-2 text-lg font-semibold text-primary flex justify-center items-center '>
-                    {locale.COMMON.TAGS}
-                </span>
+        <section className='pb-10 pt-20 lg:pb-20 lg:pt-[120px]'>
+            <div className='container mx-auto min-h-96'>
+                <div className='mb-10 flex items-center justify-center'>
+                    <span className='section-badge'>{locale.COMMON.TAGS}</span>
+                </div>
                 <div
                     id='tags-list'
-                    className='duration-200 flex flex-wrap justify-center items-center'>
+                    className='flex flex-wrap items-center justify-center gap-3 duration-200'>
                     {tagOptions.map(tag => {
                         return (
-                            <div key={tag.name} className='p-2'>
-                                <SmartLink
-                                    key={tag}
-                                    href={`/tag/${encodeURIComponent(tag.name)}`}
-                                    passHref
-                                    className={`cursor-pointer inline-block rounded hover:bg-gray-500 hover:text-white duration-200  mr-2 py-1 px-2 text-md whitespace-nowrap dark:hover:text-white text-gray-600 hover:shadow-xl dark:border-gray-400 notion-${tag.color}_background dark:bg-gray-800`}>
-                                    <div className='font-light dark:text-gray-400'>
-                                        <i className='mr-1 fas fa-tag' />{' '}
-                                        {tag.name + (tag.count ? `(${tag.count})` : '')}{' '}
-                                    </div>
-                                </SmartLink>
-                            </div>
+                            <SmartLink
+                                key={tag.name}
+                                href={`/tag/${encodeURIComponent(tag.name)}`}
+                                passHref
+                                className='inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full border-2 border-meow-ink/10 bg-white px-4 py-1.5 text-sm font-bold text-meow-ink duration-200 hover:-translate-y-0.5 hover:border-primary hover:text-primary dark:border-white/10 dark:bg-meow-card dark:text-gray-200 dark:hover:text-meow-sky-deep'>
+                                <i className='fas fa-tag text-meow-pink' />
+                                {tag.name}
+                                {tag.count ? (
+                                    <span className='text-xs font-medium text-body-color'>
+                                        {tag.count}
+                                    </span>
+                                ) : null}
+                            </SmartLink>
                         )
                     })}
                 </div>
@@ -488,7 +499,7 @@ const LayoutSignIn = props => {
     const title = siteConfig('PROXIO_SIGNIN', '登录')
     const description = siteConfig(
         'PROXIO_SIGNIN_DESCRITION',
-        '这里是演示页面，NotionNext目前不提供会员登录功能'
+        '本站暂未开放会员登录功能'
     )
     return (
         <>
@@ -519,7 +530,7 @@ const LayoutSignUp = props => {
     const title = siteConfig('PROXIO_SIGNIN', '注册')
     const description = siteConfig(
         'PROXIO_SIGNIN_DESCRITION',
-        '这里是演示页面，NotionNext目前不提供会员注册功能'
+        '本站暂未开放会员注册功能'
     )
     return (
         <>

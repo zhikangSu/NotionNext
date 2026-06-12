@@ -5,14 +5,16 @@ import CONFIG from '../config'
 import SmartLink from '@/components/SmartLink'
 
 /**
- * 英雄大图区块
+ * 英雄区块：天空渐变 + 吉祥物贴纸卡 + 漂浮星星
  */
 export const Hero = props => {
   const config = props?.NOTION_CONFIG || CONFIG
-  const pageCover = props?.siteInfo?.pageCover
-  const bannerImage =
-    siteConfig('PROXIO_HERO_BANNER_IMAGE', null, config) || pageCover
-  const bannerIframe = siteConfig('PROXIO_HERO_BANNER_IFRAME_URL', null, config)
+  const welcome = siteConfig('PROXIO_WELCOME_TEXT', '', config)
+  const mascot = siteConfig(
+    'PROXIO_HERO_MASCOT_URL',
+    '/images/personal/star-mascot-about.png',
+    config
+  )
   const PROXIO_HERO_BUTTON_1_TEXT = siteConfig(
     'PROXIO_HERO_BUTTON_1_TEXT',
     null,
@@ -23,90 +25,115 @@ export const Hero = props => {
     null,
     config
   )
-  const PROXIO_HERO_BUTTON_2_ICON = siteConfig(
-    'PROXIO_HERO_BUTTON_2_ICON',
-    null,
-    config
-  )
+
   return (
     <>
       {/* <!-- ====== Hero Section Start --> */}
-      <div id='home' className='h-screen relative overflow-hidden bg-primary '>
-        {/* 横幅图片 */}
-        {!bannerIframe && bannerImage && (
-          <LazyImage
-            priority
-            className='w-full object-cover absolute h-screen left-0 top-0 pointer-events-none'
-            src={bannerImage}
-          />
-        )}
-        <iframe
-          src={bannerIframe}
-          className='w-full absolute h-screen left-0 top-0 pointer-events-none'
-        />
-        {/* 阴影遮罩 */}
-        <div className='h-1/3 w-full absolute left-0 bottom-0 z-10'>
-          <div
-            className='h-full w-full absolute group-hover:opacity-100 transition-all duration-1000 
-                    bg-gradient-to-b from-transparent to-white dark:to-black'
-          />
-        </div>
-      </div>
-      {/* 文字标题等 */}
-      <div className='w-full pb-15 dark:text-white'>
-        <div className='container -mx-4 flex flex-wrap items-center'>
-          <div className='w-full px-4'>
+      <section
+        id='home'
+        className='hero-sky dot-bg relative overflow-hidden pb-16 pt-32 lg:pb-24 lg:pt-40'>
+        {/* 漂浮装饰星星 */}
+        <span
+          aria-hidden='true'
+          className='meow-twinkle absolute left-[8%] top-[18%] select-none text-3xl'>
+          ⭐
+        </span>
+        <span
+          aria-hidden='true'
+          className='meow-twinkle absolute right-[12%] top-[14%] select-none text-2xl'
+          style={{ animationDelay: '0.8s' }}>
+          ✨
+        </span>
+        <span
+          aria-hidden='true'
+          className='meow-twinkle absolute bottom-[14%] left-[18%] select-none text-xl'
+          style={{ animationDelay: '1.4s' }}>
+          ⭐
+        </span>
+        <span
+          aria-hidden='true'
+          className='meow-twinkle absolute bottom-[24%] right-[22%] select-none text-2xl'
+          style={{ animationDelay: '2s' }}>
+          ✨
+        </span>
+
+        <div className='container'>
+          <div className='flex flex-col-reverse items-center gap-12 lg:flex-row lg:justify-between'>
+            {/* 左侧文字 */}
             <div
-              className='hero-content wow fadeInUp mx-auto max-w-[780px] text-center'
-              data-wow-delay='0.5s'>
-              {/* 主标题 */}
-              <h1 className='mb-6 text-3xl font-bold leading-snug sm:text-4xl sm:leading-snug lg:text-5xl lg:leading-[1.2]'>
+              className='wow fadeInUp max-w-[600px] text-center lg:text-left'
+              data-wow-delay='.2s'>
+              {welcome && <span className='section-badge mb-6'>{welcome}</span>}
+              <h1 className='mb-6 mt-4 text-3xl font-extrabold leading-snug dark:text-white sm:text-4xl lg:text-5xl lg:leading-[1.25]'>
                 {siteConfig('PROXIO_HERO_TITLE_1', null, config)}
               </h1>
-              {/* 次标题 */}
-              <p className='mx-auto mb-9 max-w-[600px] text-base font-medium  sm:text-lg sm:leading-[1.44]'>
+              <p className='mx-auto mb-9 max-w-[520px] text-base text-body-color sm:text-lg sm:leading-[1.7] lg:mx-0'>
                 {siteConfig('PROXIO_HERO_TITLE_2', null, config)}
               </p>
               {/* 按钮组 */}
-              <ul className='mb-10 flex flex-wrap items-center justify-center gap-5'>
+              <ul className='flex flex-wrap items-center justify-center gap-4 lg:justify-start'>
                 {PROXIO_HERO_BUTTON_1_TEXT && (
                   <li>
                     <SmartLink
-                      href={siteConfig('PROXIO_HERO_BUTTON_1_URL', '')}
-                      className='inline-flex items-center justify-center rounded-2xl bg-white px-7 py-[14px] text-center text-base font-medium text-dark shadow-1 transition duration-300 ease-in-out hover:bg-gray-2'>
+                      href={siteConfig('PROXIO_HERO_BUTTON_1_URL', '', config)}
+                      className='btn-meow'>
                       {PROXIO_HERO_BUTTON_1_TEXT}
+                      <i className='fa-solid fa-arrow-right' />
                     </SmartLink>
                   </li>
                 )}
                 {PROXIO_HERO_BUTTON_2_TEXT && (
                   <li>
                     <SmartLink
-                      href={siteConfig('PROXIO_HERO_BUTTON_2_URL', '')}
-                      className='inline-flex items-center justify-center rounded-2xl bg-white px-7 py-[14px] text-center text-base font-medium text-dark shadow-1 transition duration-300 ease-in-out hover:bg-gray-2'>
-                      {PROXIO_HERO_BUTTON_2_ICON && (
-                        <img
-                          alt=''
-                          className='mr-4 w-5'
-                          src={PROXIO_HERO_BUTTON_2_ICON}
-                        />
-                      )}
+                      href={siteConfig('PROXIO_HERO_BUTTON_2_URL', '', config)}
+                      className='btn-meow-ghost'>
+                      <i className='fa-brands fa-github text-lg' />
                       {PROXIO_HERO_BUTTON_2_TEXT}
                     </SmartLink>
                   </li>
                 )}
                 <li>
-                  <SmartLink
-                    href='/rl'
-                    className='inline-flex items-center justify-center rounded-2xl bg-white px-7 py-[14px] text-center text-base font-medium text-dark shadow-1 transition duration-300 ease-in-out hover:bg-gray-2'>
-                    RL Policy Lab
-                    <i className='fa-solid fa-arrow-right ml-3' />
+                  <SmartLink href='/rl' className='btn-meow-ghost'>
+                    🎮 RL Policy Lab
                   </SmartLink>
                 </li>
               </ul>
             </div>
+
+            {/* 右侧吉祥物贴纸卡 */}
+            <div className='wow fadeInUp relative shrink-0' data-wow-delay='.3s'>
+              <div className='meow-float-slow relative'>
+                <div className='sticker-card w-56 rotate-2 overflow-hidden sm:w-64 lg:w-80'>
+                  <LazyImage
+                    priority
+                    src={mascot}
+                    alt={siteConfig('AUTHOR')}
+                    className='h-full w-full object-cover'
+                  />
+                </div>
+                {/* 角标小贴纸 */}
+                <span className='section-badge absolute -bottom-4 -left-6 -rotate-6'>
+                  Vibe Coding
+                </span>
+                <span
+                  aria-hidden='true'
+                  className='meow-twinkle absolute -right-4 -top-5 select-none text-4xl'>
+                  ⭐
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 向下滚动提示 */}
+          <div className='mt-16 hidden justify-center lg:flex'>
+            <span
+              aria-hidden='true'
+              className='meow-bounce select-none text-2xl text-body-color'>
+              ⌄
+            </span>
           </div>
         </div>
-      </div>
+      </section>
       {/* <!-- ====== Hero Section End --> */}
     </>
   )

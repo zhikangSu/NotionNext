@@ -51,9 +51,24 @@ module.exports = {
           7: '#D1D5DB',
           8: '#E5E7EB'
         },
-        primary: '#3758F9',
-        'blue-dark': '#1B44C8',
+        primary: '#3563E9', // Meowsu 品牌蓝（取自星星吉祥物）
+        'blue-dark': '#2549C7',
         secondary: '#13C296',
+        // Meowsu 游乐场调色板
+        meow: {
+          blue: '#3563E9',
+          sky: '#EAF2FF',
+          'sky-deep': '#C9DEFF',
+          pink: '#F2699C',
+          'pink-soft': '#FFD8E6',
+          yellow: '#FFD43B',
+          cream: '#FFF6E3',
+          red: '#EF5A5A',
+          ink: '#1E2447',
+          paper: '#F7FAFF',
+          navy: '#0C1226',
+          card: '#151D36'
+        },
         'body-color': '#637381',
         'body-secondary': '#8899A8',
         warning: '#FBBF24',

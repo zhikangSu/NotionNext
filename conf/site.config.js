@@ -21,6 +21,13 @@ module.exports = {
     'Meowsu, AI Native, Vibe Coding, AI 编程, Claude Code, 学习记录, 个人项目',
   BLOG_FAVICON: process.env.NEXT_PUBLIC_FAVICON || '/favicon.ico',
 
+  // 字体：正文用 Noto Sans SC，标题用圆润的 Baloo 2（中文自动回退系统字体）
+  FONT_STYLE: process.env.NEXT_PUBLIC_FONT_STYLE || 'font-sans',
+  FONT_URL: [
+    'https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap',
+    'https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&display=swap'
+  ],
+
   NOTION_HIDDEN_PAGE_IDS: [
     // Default NotionNext sample content that should stay out of the public site.
     '1fa4532b-67f8-81b9-a189-f22e7d3f4d17',
@@ -42,7 +49,10 @@ module.exports = {
     process.env.NEXT_PUBLIC_GREETING_WORDS ||
     'Hi，我是 Meowsu, 一个 AI Native 的 Vibe Coder, 这里记录学习、实验和酷东西, 欢迎来到我的小站',
 
-  PROXIO_WELCOME_TEXT: '欢迎来到 Meowsu 的 AI 游乐场',
+  PROXIO_WELCOME_TEXT: '👋 欢迎来到 Meowsu 的 AI 游乐场',
+
+  // 英雄区吉祥物
+  PROXIO_HERO_MASCOT_URL: '/images/personal/star-mascot-about.png',
 
   PROXIO_HERO_TITLE_1: '我是 Meowsu，一个专注 Vibe Coding 的 AI Native',
   PROXIO_HERO_TITLE_2:

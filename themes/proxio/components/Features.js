@@ -1,100 +1,81 @@
 import { siteConfig } from '@/lib/config'
-import { SVGDesign } from './svg/SVGDesign'
-import { SVGEssential } from './svg/SVGEssential'
-import { SVGGifts } from './svg/SVGGifts'
-import { SVGTemplate } from './svg/SVGTemplate'
 import SmartLink from '@/components/SmartLink'
 import LazyImage from '@/components/LazyImage'
+
+// 图标气泡的配色轮换
+const ICON_BUBBLES = [
+  'bg-meow-sky text-meow-blue',
+  'bg-meow-pink-soft text-meow-pink',
+  'bg-meow-cream text-yellow-500'
+]
+
 /**
- * 产品特性相关，将显示在首页中
+ * 我在做什么：三张贴纸卡
  * @returns
  */
 export const Features = () => {
+  const features = [1, 2, 3].map(i => ({
+    iconClass: siteConfig(`PROXIO_FEATURE_${i}_ICON_CLASS`),
+    iconImg: siteConfig(`PROXIO_FEATURE_${i}_ICON_IMG_URL`),
+    title: siteConfig(`PROXIO_FEATURE_${i}_TITLE_1`),
+    text: siteConfig(`PROXIO_FEATURE_${i}_TEXT_1`)
+  }))
+
   return (
     <>
       {/* <!-- ====== Features Section Start --> */}
-      <section className='pb-8 pt-20 dark:bg-dark lg:pb-[40px] lg:pt-[120px]'>
+      <section className='pb-8 pt-20 lg:pb-[60px] lg:pt-[100px]'>
         <div className='container'>
-
-          <div className='-mx-4 flex flex-wrap wow fadeInUp' data-wow-delay='.2s'>
+          <div className='wow fadeInUp -mx-4 flex flex-wrap' data-wow-delay='.2s'>
             <div className='w-full px-4'>
-              <div className='mx-auto mb-12 lg:mb-[40px]'>
-                <span className='px-3 py-0.5 rounded-2xl dark:bg-dark-1 border border-gray-200 dark:border-[#333333] dark:text-white'>
+              <div className='mx-auto mb-12 max-w-[600px] text-center lg:mb-[60px]'>
+                <span className='section-badge'>
                   {siteConfig('PROXIO_FEATURE_TITLE')}
                 </span>
                 <h2 className='my-5 text-3xl font-bold text-dark dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.2]'>
                   {siteConfig('PROXIO_FEATURE_TEXT_1')}
                 </h2>
-                <p className='text-base text-body-color dark:text-dark-6'>
+                <p className='text-base leading-7 text-body-color'>
                   {siteConfig('PROXIO_FEATURE_TEXT_2')}
                 </p>
               </div>
             </div>
           </div>
-          {/* 支持三个特性 */}
-          <div className='-mx-4 flex flex-col md:flex-row gap-4 px-4'>
 
-            <div className='w-full p-6 rounded-xl border border-gray-200 dark:border-[#333333]'>
-              <div className='wow fadeInUp group flex-col space-y-2 flex' data-wow-delay='.1s'>
-                <div className='flex w-12 h-12'>
-                  <div className='overflow-hidden w-full flex justify-center items-center rounded-xl border border-gray-200 dark:border-[#333333] dark:text-white'>
-                    <i className={siteConfig('PROXIO_FEATURE_1_ICON_CLASS') + ' absolute'}></i>
-                    <LazyImage src={siteConfig('PROXIO_FEATURE_1_ICON_IMG_URL')} className='z-10' />
+          {/* 三张特性贴纸卡 */}
+          <div className='-mx-4 flex flex-col gap-6 px-4 md:flex-row'>
+            {features.map((f, index) => (
+              <div key={index} className='sticker-card w-full p-7'>
+                <div
+                  className='wow fadeInUp group flex flex-col space-y-4'
+                  data-wow-delay='.1s'>
+                  <div
+                    className={`meow-wiggle flex h-14 w-14 items-center justify-center rounded-2xl text-2xl ${ICON_BUBBLES[index % ICON_BUBBLES.length]}`}>
+                    {f.iconImg ? (
+                      <LazyImage src={f.iconImg} className='h-8 w-8' />
+                    ) : (
+                      <i className={f.iconClass}></i>
+                    )}
                   </div>
+                  <h4 className='text-xl font-bold text-dark dark:text-white'>
+                    {f.title}
+                  </h4>
+                  <p className='leading-7 text-body-color'>{f.text}</p>
                 </div>
-                <h4 className='mb-3 text-xl font-bold text-dark dark:text-white'>
-                  {siteConfig('PROXIO_FEATURE_1_TITLE_1')}
-                </h4>
-                <p className='mb-8 text-body-color dark:text-dark-6 lg:mb-9'>
-                  {siteConfig('PROXIO_FEATURE_1_TEXT_1')}
-                </p>
               </div>
-            </div>
-
-            <div className='w-full p-6 rounded-xl border border-gray-200 dark:border-[#333333]'>
-              <div className='wow fadeInUp group flex-col space-y-2 flex' data-wow-delay='.1s'>
-                <div className='flex w-12 h-12'>
-                  <div className='overflow-hidden w-full flex justify-center items-center rounded-xl border border-gray-200 dark:border-[#333333] dark:text-white'>
-                    <i class={siteConfig('PROXIO_FEATURE_2_ICON_CLASS')}></i>
-                    <LazyImage src={siteConfig('PROXIO_FEATURE_2_ICON_IMG_URL')} className='z-10' />
-                  </div>
-                </div>
-                <h4 className='mb-3 text-xl font-bold text-dark dark:text-white'>
-                  {siteConfig('PROXIO_FEATURE_2_TITLE_1')}
-                </h4>
-                <p className='mb-8 text-body-color dark:text-dark-6 lg:mb-9'>
-                  {siteConfig('PROXIO_FEATURE_2_TEXT_1')}
-                </p>
-              </div>
-            </div>
-
-            <div className='w-full p-6 rounded-xl border border-gray-200 dark:border-[#333333]'>
-              <div className='wow fadeInUp group flex-col space-y-2 flex' data-wow-delay='.1s'>
-                <div className='flex w-12 h-12'>
-                  <div className='overflow-hidden w-full flex justify-center items-center rounded-xl border border-gray-200 dark:border-[#333333] dark:text-white'>
-                    <i class={siteConfig('PROXIO_FEATURE_3_ICON_CLASS')}></i>
-                    <LazyImage src={siteConfig('PROXIO_FEATURE_3_ICON_IMG_URL')} className='z-10' />
-                  </div>
-                </div>
-                <h4 className='mb-3 text-xl font-bold text-dark dark:text-white'>
-                  {siteConfig('PROXIO_FEATURE_3_TITLE_1')}
-                </h4>
-                <p className='mb-8 text-body-color dark:text-dark-6 lg:mb-9'>
-                  {siteConfig('PROXIO_FEATURE_3_TEXT_1')}
-                </p>
-              </div>
-            </div>
-
+            ))}
           </div>
 
-          <div className='mt-8 w-full flex justify-center items-center'>
-            <SmartLink
-              href={siteConfig('PROXIO_FEATURE_BUTTON_URL', '')}
-              className='px-4 py-2 rounded-3xl border dark:border-gray-200 border-[#333333] text-base font-medium text-dark hover:bg-gray-100 dark:text-white dark:hover:bg-white dark:hover:text-black duration-200'>
-              {siteConfig('PROXIO_FEATURE_BUTTON_TEXT')}
-              <i className="pl-4 fa-solid fa-arrow-right"></i>
-            </SmartLink>
-          </div>
+          {siteConfig('PROXIO_FEATURE_BUTTON_TEXT') && (
+            <div className='mt-12 flex w-full items-center justify-center'>
+              <SmartLink
+                href={siteConfig('PROXIO_FEATURE_BUTTON_URL', '')}
+                className='btn-meow'>
+                {siteConfig('PROXIO_FEATURE_BUTTON_TEXT')}
+                <i className='fa-solid fa-arrow-right'></i>
+              </SmartLink>
+            </div>
+          )}
         </div>
       </section>
       {/* <!-- ====== Features Section End --> */}
