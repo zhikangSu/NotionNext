@@ -163,6 +163,7 @@ module.exports = {
       name: '站点',
       menus: [
         { title: '关于', href: '/about' },
+        { title: '老年陪伴 AI', href: '/elderly-companion-ai' },
         { title: '归档', href: '/archive' },
         { title: '标签', href: '/tag' }
       ]
