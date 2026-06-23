@@ -503,3 +503,10 @@
 .link-btn.deep { background: var(--meow-pink); color: #fff; }
 .deep-note { margin-top: 10px; color: var(--meow-muted); font-weight: 700; font-size: .86rem; }
 .deep-queued { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 2px dashed rgba(30,36,71,.25); border-radius: 999px; background: var(--meow-pink-soft); color: #b43c6b; font-weight: 900; font-size: .84rem; }
+
+/* 论文库 papers.html：按日期分组 */
+.date-head { font-family: 'Baloo 2', 'Noto Sans SC', sans-serif; font-weight: 800; font-size: 1.15rem; margin: 28px 0 14px; color: var(--meow-ink); display: flex; align-items: center; gap: 8px; }
+.date-head:first-of-type { margin-top: 6px; }
+.archive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+@media (max-width: 980px) { .archive-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 640px) { .archive-grid { grid-template-columns: 1fr; } }
