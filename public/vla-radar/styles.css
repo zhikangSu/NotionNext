@@ -264,6 +264,8 @@
     .time-card {
       scroll-snap-align: start;
       position: relative;
+      display: flex;
+      flex-direction: column;
       min-height: 260px;
       background: #fff;
       border: 2px solid var(--meow-ink);
@@ -272,11 +274,14 @@
       box-shadow: 4px 4px 0 rgba(30,36,71,.85);
       cursor: pointer;
       transition: .18s ease;
+      color: inherit;
+      text-decoration: none;
     }
     .time-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-blue); }
     .year { display: inline-flex; padding: 4px 10px; border-radius: 999px; background: var(--meow-yellow); border: 2px solid var(--meow-ink); font-weight: 900; }
     .time-card h3 { margin: 14px 0 8px; font-size: 1.32rem; line-height: 1.08; }
     .time-card p { margin: 0; color: var(--meow-muted); font-size: .93rem; }
+    .mini-count { display: inline-flex; width: max-content; margin-top: auto; padding-top: 16px; color: var(--meow-blue); font-weight: 900; font-size: .84rem; }
     .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
     .tag { border-radius: 999px; padding: 3px 9px; background: var(--meow-sky); color: #3153ae; font-size: .75rem; font-weight: 900; }
     .tag.pink { background: var(--meow-pink-soft); color: #b43c6b; }
@@ -304,6 +309,10 @@
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      color: inherit;
+      text-decoration: none;
+      display: flex;
+      flex-direction: column;
     }
     .branch-card::after {
       content: attr(data-index);
@@ -509,6 +518,21 @@
 .date-head { font-family: 'Baloo 2', 'Noto Sans SC', sans-serif; font-weight: 800; font-size: 1.15rem; margin: 28px 0 14px; color: var(--meow-ink); display: flex; align-items: center; gap: 8px; }
 .date-head:first-of-type { margin-top: 6px; }
 .archive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+.group-hero { margin-bottom: 18px; }
+.group-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 18px;
+  padding: 10px 14px;
+  border: 2px solid rgba(30,36,71,.12);
+  border-radius: 999px;
+  background: rgba(255,255,255,.72);
+  color: var(--meow-muted);
+  font-weight: 900;
+}
+.group-summary strong { font-family: 'Baloo 2'; color: var(--meow-blue); font-size: 1.28rem; line-height: 1; }
+.group-summary em { color: #b43c6b; font-style: normal; font-size: .82rem; }
 @media (max-width: 980px) { .archive-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .archive-grid { grid-template-columns: 1fr; } }
 

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>论文组 · VLA Radar</title>
+  <meta name="description" content="按 VLA 主线节点和分化方向聚合相关论文。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260623-groups" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/">
+        <span class="brand-badge">🐾</span>
+        <span>Meowsu · VLA Radar</span>
+      </a>
+      <div class="nav-links">
+        <a href="/vla-radar/#timeline">主线</a>
+        <a href="/vla-radar/#branches">分化</a>
+        <a href="/vla-radar/#finetune">微调</a>
+        <a href="/vla-radar/#daily">论文雷达</a>
+        <a href="/vla-radar/papers.html">论文库</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="section paper-wrap">
+      <div class="container">
+        <a class="paper-back" id="groupBack" href="/vla-radar/">← 回到雷达</a>
+        <div class="group-hero sticker-card card-pad">
+          <span class="badge" id="groupBadge">VLA 论文组</span>
+          <h1 class="paper-title" id="groupTitle">正在加载论文组 …</h1>
+          <p class="paper-meta" id="groupIntro"></p>
+          <div class="tag-row" id="groupTags"></div>
+        </div>
+        <div id="root"><div class="paper-state">正在加载相关论文 …</div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+
+  <script>
+    const GROUPS = {
+      'rt-1': {
+        kind: 'Mainline', anchor: 'timeline', title: 'RT-1',
+        intro: '从大规模真实机器人轨迹和行为克隆开始，Robot Transformer 把多任务机器人控制带入可扩展训练范式。',
+        tags: ['robot transformer', 'behavior cloning', 'action token'],
+        ids: ['2212.06817']
+      },
+      'palm-e-rt-2': {
+        kind: 'Mainline', anchor: 'timeline', title: 'PaLM-E / RT-2',
+        intro: 'VLM/LLM 的 web-scale 语义先验进入机器人：先把多模态观测接进语言模型，再把动作映射进 token 空间。',
+        tags: ['vlm backbone', 'web knowledge', 'grounding'],
+        ids: ['2303.03378', '2307.15818']
+      },
+      'open-x-rt-x': {
+        kind: 'Mainline', anchor: 'timeline', title: 'Open X-Embodiment / RT-X',
+        intro: '跨机构、跨机器人、跨任务的数据标准化，让 VLA 从单一平台走向跨 embodiment 训练。',
+        tags: ['cross-embodiment', 'dataset', 'rt-x'],
+        ids: ['2310.08864']
+      },
+      'octo-openvla': {
+        kind: 'Mainline', anchor: 'timeline', title: 'Octo / OpenVLA',
+        intro: '开放 generalist policy 与开源 7B VLA 让社区真正能复现、微调和比较 VLA 路线。',
+        tags: ['open source', 'generalist policy', 'fine-tuning'],
+        ids: ['2405.12213', '2406.09246']
+      },
+      'pi0-rdt': {
+        kind: 'Mainline', anchor: 'timeline', title: 'π0 / RDT',
+        intro: '动作表示从离散 token 扩展到 flow / diffusion action expert，连续动作块开始成为主流方向。',
+        tags: ['flow matching', 'diffusion', 'action expert'],
+        ids: ['2410.24164', '2410.07864']
+      },
+      fast: {
+        kind: 'Mainline', anchor: 'timeline', title: 'FAST',
+        intro: '把动作轨迹压成更适合自回归训练的 token，让离散 action token 路线更高效。',
+        tags: ['action tokenizer', 'frequency', 'hybrid'],
+        ids: ['2501.09747']
+      },
+      smolvla: {
+        kind: 'Mainline', anchor: 'timeline', title: 'SmolVLA',
+        intro: '小模型、社区数据、冻结 VLM 和异步推理，把 VLA 拉向更容易复现和部署的路线。',
+        tags: ['efficient-vla', 'community data', 'async inference'],
+        ids: ['2506.01844']
+      },
+      pi05: {
+        kind: 'Mainline', anchor: 'timeline', title: 'π0.5',
+        intro: '把开放世界泛化、高层 subtask 和低层 action 放进同一个 VLA，使长程任务不再完全 flat。',
+        tags: ['hierarchy', 'subtask', 'web data'],
+        ids: ['2504.16054']
+      },
+      'pi06-recap': {
+        kind: 'Mainline', anchor: 'timeline', title: 'π0.6-star / RECAP',
+        intro: '从只模仿演示走向部署后学习：rollout、纠正、reward、advantage 进入 VLA 改进闭环。',
+        tags: ['rl', 'experience', 'advantage conditioning'],
+        ids: ['2511.14759']
+      },
+      pi07: {
+        kind: 'Mainline', anchor: 'timeline', title: 'π0.7',
+        intro: '上下文成为 steer 接口：metadata、subgoal image、history 和 world model 共同影响策略行为。',
+        tags: ['steerable', 'context', 'world model'],
+        ids: ['2604.15483']
+      },
+      'action-representation': {
+        kind: '分化方向', anchor: 'branches', title: 'Action Representation',
+        intro: '看动作如何被表达：离散 token、FAST、flow matching、diffusion、以及连续动作 expert。',
+        tags: ['action token', 'flow', 'diffusion'],
+        ids: ['2307.15818', '2405.12213', '2406.09246', '2410.24164', '2410.07864', '2501.09747']
+      },
+      'backbone-expert': {
+        kind: '分化方向', anchor: 'branches', title: 'Backbone & Expert',
+        intro: '看语义 backbone 和动作 expert 如何分工：VLM/LLM 负责理解，action head 负责控制。',
+        tags: ['vlm backbone', 'action expert', 'grounding'],
+        ids: ['2303.03378', '2307.15818', '2406.09246', '2410.24164', '2506.01844']
+      },
+      'hierarchy-planning': {
+        kind: '分化方向', anchor: 'branches', title: 'Hierarchy & Planning',
+        intro: '看长程任务如何被拆成 subtask、goal image、semantic policy 或可 steer context。',
+        tags: ['subtask', 'goal image', 'planning'],
+        ids: ['2405.12213', '2504.16054', '2604.15483']
+      },
+      'data-mixture': {
+        kind: '分化方向', anchor: 'branches', title: 'Data Mixture',
+        intro: '看多机器人数据、web data、社区数据和上下文 metadata 如何被混进同一套训练体系。',
+        tags: ['cross-embodiment', 'web data', 'community data'],
+        ids: ['2310.08864', '2504.16054', '2506.01844', '2604.15483']
+      },
+      'experience-rl': {
+        kind: '分化方向', anchor: 'branches', title: 'Experience & RL',
+        intro: '看 VLA 如何从成功/失败/纠正/奖励中继续学习，而不是只停在静态演示模仿。',
+        tags: ['rl', 'intervention', 'reward feedback'],
+        ids: ['2511.14759']
+      },
+      'efficiency-deploy': {
+        kind: '分化方向', anchor: 'branches', title: 'Efficiency & Deploy',
+        intro: '看 VLA 如何变小、变快、变便宜：低延迟、小模型、冻结 VLM、consumer GPU 和异步执行。',
+        tags: ['efficient-vla', 'latency', 'deploy'],
+        ids: ['2409.12514', '2501.09747', '2506.01844', '2406.09246']
+      }
+    };
+
+    const FALLBACK = {
+      '2303.03378': { arxiv_id:'2303.03378', title:'PaLM-E: An Embodied Multimodal Language Model', published:'2023-03-06', tags:['embodied-llm','grounding'], problem:'把连续机器人观测接入 LLM 的 grounding 问题。' },
+      '2410.07864': { arxiv_id:'2410.07864', title:'RDT-1B: a Diffusion Foundation Model for Bimanual Manipulation', published:'2024-10-10', tags:['diffusion','bimanual'], problem:'双臂操作的多峰动作和跨机器人动作空间统一。' },
+      '2409.12514': { arxiv_id:'2409.12514', title:'TinyVLA: Towards Fast, Data-Efficient Vision-Language-Action Models for Robotic Manipulation', published:'2024-09-19', tags:['efficient-vla','latency'], problem:'大 VLA 推理慢、数据成本高，难以真实部署。' }
+    };
+
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id') || 'action-representation';
+    const group = GROUPS[id];
+    const root = document.getElementById('root');
+
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const setState = msg => {
+      root.innerHTML = `<div class="paper-state">${esc(msg)}</div>`;
+    };
+
+    if (!group) {
+      setState('没有找到这个论文组。');
+    } else {
+      document.title = `${group.title} · VLA Radar`;
+      document.getElementById('groupBack').href = `/vla-radar/#${group.anchor}`;
+      document.getElementById('groupBack').textContent = group.anchor === 'branches' ? '← 回到分化地图' : '← 回到主线';
+      document.getElementById('groupBadge').textContent = group.kind;
+      document.getElementById('groupTitle').textContent = group.title;
+      document.getElementById('groupIntro').textContent = group.intro;
+      document.getElementById('groupTags').innerHTML = group.tags.map(t => `<span class="tag">${esc(t)}</span>`).join('');
+      load();
+    }
+
+    const card = p => `
+      <a class="sticker-card paper-card paper-card-link" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}&from=group&group=${encodeURIComponent(id)}">
+        <span class="year">${esc((p.tags && p.tags[0]) || 'paper')}</span>
+        <h3>${esc(p.title || p.arxiv_id)}</h3>
+        <p>${esc(p.problem || p.abstract || '')}</p>
+        <div class="tag-row">${(p.tags || []).slice(0, 4).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
+      </a>`;
+
+    async function load() {
+      try {
+        const res = await fetch('/api/vla-radar/list?limit=200', { cache: 'no-store' });
+        const j = await res.json();
+        const map = new Map(((j && j.papers) || []).map(p => [p.arxiv_id, p]));
+        const papers = group.ids.map(pid => map.get(pid) || FALLBACK[pid]).filter(Boolean);
+        const missing = group.ids.filter(pid => !map.has(pid));
+        if (!papers.length) {
+          setState('这个方向还没有入库论文。');
+          return;
+        }
+        root.innerHTML = `
+          <div class="group-summary">
+            <strong>${papers.length}</strong>
+            <span>篇相关论文</span>
+            ${missing.length ? `<em>${missing.length} 篇刚补充，部署缓存刷新后会显示完整详情。</em>` : ''}
+          </div>
+          <div class="archive-grid">${papers.map(card).join('')}</div>`;
+      } catch (e) {
+        setState('加载出错：' + (e && e.message ? e.message : e));
+      }
+    }
+  </script>
+</body>
+</html>
