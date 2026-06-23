@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       const ids = await listPaperIds()
       res.setHeader(
         'Cache-Control',
-        'public, s-maxage=120, stale-while-revalidate=600'
+        'public, s-maxage=60, stale-while-revalidate=300'
       )
       return res.status(200).json({ ok: true, configured: true, ids })
     }
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
     const papers = await listPapers({ limit, q, tag })
     res.setHeader(
       'Cache-Control',
-      'public, s-maxage=300, stale-while-revalidate=600'
+      'public, s-maxage=30, stale-while-revalidate=120'
     )
     return res.status(200).json({ ok: true, configured: true, papers })
   } catch (error) {

@@ -26,7 +26,7 @@ export default async function handler(req, res) {
     }
     res.setHeader(
       'Cache-Control',
-      'public, s-maxage=300, stale-while-revalidate=600'
+      'public, s-maxage=30, stale-while-revalidate=120'
     )
     return res.status(200).json({ ok: true, configured: true, paper })
   } catch (error) {
