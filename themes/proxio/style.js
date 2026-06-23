@@ -191,6 +191,55 @@ const Style = () => {
       transform: translate(2px, 2px);
       box-shadow: 1px 1px 0 rgba(30, 36, 71, 0.9);
     }
+
+    /* 首页 VLA Radar 宽按钮：用于 Hero 红框区域 */
+    #theme-proxio .btn-meow-wide {
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: min(100%, 560px);
+      padding: 13px 18px;
+      border-radius: 1.25rem;
+      border: 2px solid var(--meow-ink);
+      background: radial-gradient(
+          circle at 8% 20%,
+          rgba(255, 212, 59, 0.34),
+          transparent 24%
+        ),
+        linear-gradient(
+          135deg,
+          #ffffff 0%,
+          var(--meow-cream) 50%,
+          var(--meow-sky) 100%
+        );
+      color: var(--meow-ink);
+      font-family: 'Baloo 2', 'PingFang SC', sans-serif;
+      box-shadow: 4px 4px 0 rgba(30, 36, 71, 0.9);
+      transition: transform 0.15s ease, box-shadow 0.15s ease,
+        background-color 0.15s ease;
+    }
+    #theme-proxio .btn-meow-wide:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 6px 6px 0 rgba(53, 99, 233, 0.86);
+    }
+    #theme-proxio .btn-meow-wide:active {
+      transform: translate(2px, 2px);
+      box-shadow: 1px 1px 0 rgba(30, 36, 71, 0.9);
+    }
+    #theme-proxio .btn-meow-wide-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 42px;
+      height: 42px;
+      flex: 0 0 42px;
+      border-radius: 9999px;
+      border: 2px solid var(--meow-ink);
+      background: var(--meow-yellow);
+      box-shadow: 2px 2px 0 rgba(30, 36, 71, 0.85);
+      font-size: 1.2rem;
+    }
     .dark #theme-proxio .btn-meow,
     .dark #theme-proxio .btn-meow-ghost {
       border-color: var(--meow-border-dark);
@@ -202,6 +251,15 @@ const Style = () => {
     }
     .dark #theme-proxio .btn-meow-ghost:hover {
       background: #1d2747;
+    }
+    .dark #theme-proxio .btn-meow-wide {
+      background: linear-gradient(135deg, var(--meow-card-dark), #1d2747);
+      border-color: var(--meow-border-dark);
+      color: #e7ecff;
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.55);
+    }
+    .dark #theme-proxio .btn-meow-wide-icon {
+      border-color: var(--meow-border-dark);
     }
 
     /* 圆点背景纹理 */

@@ -1,0 +1,834 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VLA Radar · Meowsu</title>
+  <meta name="description" content="VLA 发展历程、架构分化、训练数据、微调方法与每日论文雷达。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --meow-blue: #3563e9;
+      --meow-blue-deep: #2549c7;
+      --meow-pink: #f2699c;
+      --meow-pink-soft: #ffd8e6;
+      --meow-yellow: #ffd43b;
+      --meow-cream: #fff6e3;
+      --meow-sky: #eaf2ff;
+      --meow-sky-deep: #c9deff;
+      --meow-red: #ef5a5a;
+      --meow-ink: #1e2447;
+      --meow-muted: #64708a;
+      --meow-paper: #f7faff;
+      --meow-card: #ffffff;
+      --shadow: 6px 6px 0 rgba(30, 36, 71, 0.9);
+      --shadow-blue: 9px 9px 0 rgba(53, 99, 233, 0.82);
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --container: 1180px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--meow-ink);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255, 212, 59, 0.22), transparent 24%),
+        radial-gradient(circle at 86% 4%, rgba(242, 105, 156, 0.16), transparent 26%),
+        linear-gradient(180deg, var(--meow-sky) 0%, var(--meow-paper) 40%, #fff 100%);
+      font-family: 'Noto Sans SC', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      line-height: 1.72;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: -2;
+      background-image: radial-gradient(rgba(53, 99, 233, 0.13) 1.5px, transparent 1.5px);
+      background-size: 22px 22px;
+      mask-image: linear-gradient(180deg, #000, rgba(0,0,0,.5), transparent);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .container {
+      width: min(var(--container), calc(100% - 32px));
+      margin-inline: auto;
+    }
+
+    .font-display, h1, h2, h3 {
+      font-family: 'Baloo 2', 'Noto Sans SC', system-ui, sans-serif;
+      letter-spacing: 0.01em;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(14px);
+      background: rgba(247, 250, 255, .78);
+      border-bottom: 2px solid rgba(30, 36, 71, .08);
+    }
+    .nav-inner {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 900;
+      font-size: 1.1rem;
+    }
+    .brand-badge {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      border: 2px solid var(--meow-ink);
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 3px 3px 0 rgba(30, 36, 71, .85);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 800;
+      font-size: .95rem;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .nav-links a {
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--meow-ink);
+    }
+    .nav-links a:hover { background: #fff; box-shadow: 2px 2px 0 rgba(30,36,71,.15); }
+
+    .hero {
+      padding: 82px 0 54px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(330px, .95fr);
+      gap: 36px;
+      align-items: center;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 15px;
+      border: 2px solid rgba(30, 36, 71, .14);
+      border-radius: 999px;
+      background: #fff;
+      box-shadow: 2px 2px 0 rgba(30, 36, 71, .1);
+      font-weight: 900;
+      font-size: .92rem;
+    }
+    .badge::before { content: '✦'; color: var(--meow-yellow); -webkit-text-stroke: 1px rgba(30,36,71,.3); }
+    .hero h1 {
+      margin: 22px 0 16px;
+      font-size: clamp(2.6rem, 8vw, 5.8rem);
+      line-height: .94;
+      max-width: 780px;
+      font-weight: 900;
+    }
+    .hero h1 span { color: var(--meow-blue); }
+    .hero p {
+      max-width: 720px;
+      color: var(--meow-muted);
+      font-size: 1.08rem;
+      margin: 0 0 24px;
+    }
+    .hero-actions { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; }
+
+    .btn, .btn-ghost, .btn-soft {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      min-height: 48px;
+      padding: 12px 24px;
+      border: 2px solid var(--meow-ink);
+      border-radius: 999px;
+      font-weight: 900;
+      box-shadow: 4px 4px 0 rgba(30,36,71,.9);
+      transition: .16s ease;
+      cursor: pointer;
+    }
+    .btn { background: var(--meow-blue); color: #fff; }
+    .btn-ghost { background: #fff; color: var(--meow-ink); }
+    .btn-soft { background: var(--meow-cream); color: var(--meow-ink); }
+    .btn:hover, .btn-ghost:hover, .btn-soft:hover { transform: translate(-2px,-2px); box-shadow: 6px 6px 0 rgba(30,36,71,.9); }
+    .btn:active, .btn-ghost:active, .btn-soft:active { transform: translate(1px,1px); box-shadow: 2px 2px 0 rgba(30,36,71,.9); }
+
+    .hero-card {
+      position: relative;
+      min-height: 420px;
+      border: 2px solid var(--meow-ink);
+      border-radius: 34px;
+      background:
+        radial-gradient(circle at 80% 16%, rgba(255,212,59,.55), transparent 18%),
+        linear-gradient(145deg, #fff 0%, #f7fbff 48%, #dcecff 100%);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      overflow: hidden;
+      transform: rotate(1deg);
+    }
+    .orbit {
+      position: absolute;
+      inset: 36px;
+      border: 2px dashed rgba(53, 99, 233, .32);
+      border-radius: 50%;
+      animation: spin 24s linear infinite;
+    }
+    .orbit:nth-child(2) { inset: 72px 28px 58px 68px; animation-duration: 32s; animation-direction: reverse; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .radar-core {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      text-align: center;
+    }
+    .radar-logo {
+      width: 142px;
+      height: 142px;
+      display: grid;
+      place-items: center;
+      margin: 0 auto 18px;
+      border-radius: 34px;
+      border: 2px solid var(--meow-ink);
+      background: #fff;
+      box-shadow: 7px 7px 0 rgba(30,36,71,.82);
+      font-size: 64px;
+      transform: rotate(-4deg);
+    }
+    .mini-metric-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 22px; }
+    .mini-metric {
+      border: 2px solid rgba(30,36,71,.12);
+      border-radius: 18px;
+      background: rgba(255,255,255,.78);
+      padding: 10px;
+      font-weight: 900;
+    }
+    .mini-metric small { display: block; color: var(--meow-muted); font-weight: 700; font-size: .72rem; }
+
+    .quick-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin: 28px 0 0;
+    }
+    .stat-card {
+      background: #fff;
+      border: 2px solid var(--meow-ink);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: 4px 4px 0 rgba(30,36,71,.88);
+    }
+    .stat-card strong { display: block; font-family: 'Baloo 2'; font-size: 1.65rem; line-height: 1; color: var(--meow-blue); }
+    .stat-card span { color: var(--meow-muted); font-size: .9rem; font-weight: 700; }
+
+    .section { padding: 58px 0; }
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+    .section-title h2 {
+      margin: 10px 0 6px;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.02;
+    }
+    .section-title p { margin: 0; color: var(--meow-muted); max-width: 700px; }
+
+    .timeline-shell {
+      background: rgba(255,255,255,.58);
+      border: 2px solid rgba(30,36,71,.1);
+      border-radius: 30px;
+      padding: 18px;
+    }
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(10, minmax(230px, 1fr));
+      gap: 16px;
+      overflow-x: auto;
+      padding: 8px 8px 18px;
+      scroll-snap-type: x mandatory;
+    }
+    .time-card {
+      scroll-snap-align: start;
+      position: relative;
+      min-height: 260px;
+      background: #fff;
+      border: 2px solid var(--meow-ink);
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: 4px 4px 0 rgba(30,36,71,.85);
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .time-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-blue); }
+    .year { display: inline-flex; padding: 4px 10px; border-radius: 999px; background: var(--meow-yellow); border: 2px solid var(--meow-ink); font-weight: 900; }
+    .time-card h3 { margin: 14px 0 8px; font-size: 1.32rem; line-height: 1.08; }
+    .time-card p { margin: 0; color: var(--meow-muted); font-size: .93rem; }
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+    .tag { border-radius: 999px; padding: 3px 9px; background: var(--meow-sky); color: #3153ae; font-size: .75rem; font-weight: 900; }
+    .tag.pink { background: var(--meow-pink-soft); color: #b43c6b; }
+    .tag.cream { background: var(--meow-cream); color: #7d5a00; }
+
+    .split-grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 18px; align-items: start; }
+    .sticker-card {
+      background: var(--meow-card);
+      border: 2px solid var(--meow-ink);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+    .sticker-card:hover { transform: translate(-2px, -2px); box-shadow: var(--shadow-blue); }
+    .card-pad { padding: 24px; }
+
+    .branch-map {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .branch-card {
+      min-height: 220px;
+      padding: 20px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .branch-card::after {
+      content: attr(data-index);
+      position: absolute;
+      right: -8px;
+      bottom: -20px;
+      font-family: 'Baloo 2';
+      font-size: 6.6rem;
+      color: rgba(53, 99, 233, .08);
+      font-weight: 900;
+    }
+    .branch-icon {
+      width: 48px;
+      height: 48px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      border: 2px solid var(--meow-ink);
+      background: var(--meow-cream);
+      box-shadow: 3px 3px 0 rgba(30,36,71,.85);
+      font-size: 1.55rem;
+    }
+    .branch-card h3 { margin: 16px 0 8px; font-size: 1.28rem; }
+    .branch-card p { margin: 0; color: var(--meow-muted); font-size: .94rem; }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+    .list { margin: 16px 0 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .list li {
+      display: flex;
+      gap: 10px;
+      align-items: start;
+      padding: 12px 14px;
+      border: 2px solid rgba(30,36,71,.1);
+      border-radius: 18px;
+      background: rgba(247,250,255,.72);
+    }
+    .list b { color: var(--meow-blue); }
+
+    .filterbar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .filter-chip {
+      border: 2px solid rgba(30,36,71,.16);
+      border-radius: 999px;
+      background: #fff;
+      padding: 8px 13px;
+      color: var(--meow-ink);
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 2px 2px 0 rgba(30,36,71,.12);
+    }
+    .filter-chip.active {
+      border-color: var(--meow-ink);
+      background: var(--meow-yellow);
+      box-shadow: 3px 3px 0 rgba(30,36,71,.85);
+    }
+    .paper-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .paper-card { padding: 18px; min-height: 250px; display: flex; flex-direction: column; }
+    .paper-card h3 { margin: 12px 0 8px; font-size: 1.25rem; line-height: 1.12; }
+    .paper-card p { margin: 0; color: var(--meow-muted); font-size: .93rem; }
+    .paper-card .tag-row { margin-top: auto; padding-top: 16px; }
+
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; }
+    .tab-btn {
+      border: 2px solid var(--meow-ink);
+      border-radius: 16px;
+      background: #fff;
+      padding: 10px 14px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 3px 3px 0 rgba(30,36,71,.85);
+    }
+    .tab-btn.active { background: var(--meow-blue); color: #fff; }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .radar-layout { display: grid; grid-template-columns: .92fr 1.08fr; gap: 16px; }
+    .searchbox {
+      width: 100%;
+      border: 2px solid var(--meow-ink);
+      border-radius: 18px;
+      background: #fff;
+      min-height: 48px;
+      padding: 0 16px;
+      box-shadow: 3px 3px 0 rgba(30,36,71,.85);
+      color: var(--meow-ink);
+      font-weight: 700;
+      outline: none;
+    }
+    .daily-list { display: grid; gap: 12px; margin-top: 16px; }
+    .daily-item {
+      border: 2px solid rgba(30,36,71,.12);
+      border-radius: 20px;
+      background: rgba(255,255,255,.75);
+      padding: 14px;
+    }
+    .daily-item h4 { margin: 0 0 6px; font-size: 1rem; }
+    .daily-item p { margin: 0; color: var(--meow-muted); font-size: .9rem; }
+
+    .schema {
+      background: #10182f;
+      color: #eaf2ff;
+      border-radius: 24px;
+      padding: 20px;
+      overflow: auto;
+      border: 2px solid var(--meow-ink);
+      box-shadow: var(--shadow);
+      font-size: .86rem;
+    }
+    .schema code { white-space: pre; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+
+    .detail-drawer {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 60;
+      width: min(440px, calc(100vw - 36px));
+      transform: translateY(130%);
+      transition: transform .24s ease;
+    }
+    .detail-drawer.open { transform: translateY(0); }
+    .detail-card { padding: 20px; background: #fff; border: 2px solid var(--meow-ink); border-radius: 24px; box-shadow: 8px 8px 0 rgba(30,36,71,.9); }
+    .detail-card h3 { margin: 6px 0 8px; font-size: 1.4rem; }
+    .detail-card p { margin: 0 0 12px; color: var(--meow-muted); }
+    .drawer-close { float: right; border: 0; background: var(--meow-pink-soft); border-radius: 999px; width: 32px; height: 32px; cursor: pointer; font-weight: 900; }
+
+    .footer { padding: 48px 0 64px; color: var(--meow-muted); text-align: center; }
+    .stars { position: absolute; pointer-events: none; user-select: none; animation: twinkle 2.8s ease-in-out infinite; }
+    .stars.s1 { left: 6%; top: 22%; font-size: 2rem; }
+    .stars.s2 { right: 8%; top: 16%; font-size: 1.6rem; animation-delay: .9s; }
+    .stars.s3 { right: 19%; bottom: 20%; font-size: 2.2rem; animation-delay: 1.6s; }
+    @keyframes twinkle { 0%,100% { opacity: 1; transform: scale(1) rotate(0deg); } 50% { opacity: .46; transform: scale(.76) rotate(18deg); } }
+
+    @media (max-width: 980px) {
+      .hero-grid, .split-grid, .radar-layout { grid-template-columns: 1fr; }
+      .hero-card { min-height: 340px; }
+      .quick-stats { grid-template-columns: repeat(2, 1fr); }
+      .branch-map, .paper-grid { grid-template-columns: repeat(2, 1fr); }
+      .section-head { align-items: start; flex-direction: column; }
+    }
+    @media (max-width: 640px) {
+      .nav-inner { height: auto; padding: 12px 0; align-items: flex-start; flex-direction: column; }
+      .nav-links { justify-content: flex-start; }
+      .hero { padding-top: 48px; }
+      .quick-stats, .branch-map, .paper-grid, .compare-grid, .mini-metric-row { grid-template-columns: 1fr; }
+      .btn, .btn-ghost, .btn-soft { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/">
+        <span class="brand-badge">🐾</span>
+        <span>Meowsu · VLA Radar</span>
+      </a>
+      <div class="nav-links">
+        <a href="#timeline">主线</a>
+        <a href="#branches">分化</a>
+        <a href="#finetune">微调</a>
+        <a href="#daily">论文雷达</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <span class="stars s1">⭐</span><span class="stars s2">✨</span><span class="stars s3">⭐</span>
+    <div class="container hero-grid">
+      <div>
+        <span class="badge">VLA 发展地图 · 架构 / 数据 / 后训练</span>
+        <h1>看懂 VLA 的<br /><span>主线与分叉</span></h1>
+        <p>从 RT-1 的机器人 Transformer，到 RT-2 / OpenVLA 的 VLM 语义迁移，再到 π0、SmolVLA、π0.5、π0.6、π0.7 的连续动作、层次化、经验学习与可 steer 上下文。这不是论文列表，而是一个帮助你快速定位研究机会的地图。</p>
+        <div class="hero-actions">
+          <a class="btn" href="#timeline">开始看时间线 →</a>
+          <a class="btn-ghost" href="#daily">看每日论文雷达</a>
+          <a class="btn-soft" href="/archive">回学习记录</a>
+        </div>
+        <div class="quick-stats" aria-label="VLA radar stats">
+          <div class="stat-card"><strong>10+</strong><span>关键范式节点</span></div>
+          <div class="stat-card"><strong>6</strong><span>分化方向</span></div>
+          <div class="stat-card"><strong>3</strong><span>常用后训练策略</span></div>
+          <div class="stat-card"><strong>1</strong><span>每日 arXiv 飞轮</span></div>
+        </div>
+      </div>
+      <aside class="hero-card" aria-label="VLA radar illustration">
+        <div class="orbit"></div><div class="orbit"></div>
+        <div class="radar-core">
+          <div>
+            <div class="radar-logo">🤖</div>
+            <span class="badge">Robot Foundation Model Radar</span>
+            <h2 style="margin:16px 0 6px;font-size:2rem;line-height:1.05">Vision · Language · Action</h2>
+            <p style="margin:0;color:var(--meow-muted)">把论文拆成：问题 → 方法 → 改了哪里 → 结果 → 对我有什么 idea。</p>
+            <div class="mini-metric-row">
+              <div class="mini-metric">Action<small>token / flow / diffusion</small></div>
+              <div class="mini-metric">Data<small>robot / web / rollout</small></div>
+              <div class="mini-metric">Train<small>BC / LoRA / RL</small></div>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </header>
+
+  <main>
+    <section id="timeline" class="section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="badge">主线不是年份，是范式转移</span>
+            <h2>VLA Mainline</h2>
+            <p>每个节点都回答：它把 VLA 的哪一部分变成了新的默认设置？点击卡片可以看“问题、方法、影响”。</p>
+          </div>
+          <a class="btn-ghost" href="#branches">看分化地图 ↓</a>
+        </div>
+        <div class="timeline-shell">
+          <div class="timeline" id="timelineCards"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="changed" class="section">
+      <div class="container split-grid">
+        <div class="sticker-card card-pad">
+          <span class="badge">哪些真的变了？</span>
+          <h2 style="margin:12px 0 0;font-size:2.5rem;line-height:1.05">主流 VLA 的大变化</h2>
+          <ul class="list">
+            <li><span>🧠</span><div><b>Backbone 变了：</b>从机器人专用 Transformer，转向预训练 VLM / LLM 作为语义与感知骨干。</div></li>
+            <li><span>🦾</span><div><b>Action decoder 变了：</b>从离散 action token，转向 flow / diffusion action expert 或 token+flow hybrid。</div></li>
+            <li><span>🧭</span><div><b>Prompt 变了：</b>不再只是一句任务指令，而是 subtask、goal image、metadata、history、control mode。</div></li>
+            <li><span>🔁</span><div><b>数据飞轮变了：</b>从成功演示扩展到 web data、人类视频、失败、自主 rollout、intervention、reward。</div></li>
+          </ul>
+        </div>
+        <div class="sticker-card card-pad">
+          <span class="badge">哪些没怎么变？</span>
+          <h2 style="margin:12px 0 0;font-size:2.5rem;line-height:1.05">底层骨架仍然很稳</h2>
+          <ul class="list">
+            <li><span>🔷</span><div><b>Transformer 仍是主干：</b>变的是 token、attention、expert、context，不是基础范式。</div></li>
+            <li><span>👁️</span><div><b>输入核心没变：</b>RGB + proprioception + language 仍是最常见组合。</div></li>
+            <li><span>🎮</span><div><b>输出仍是控制命令：</b>joint、EEF、gripper、base velocity，然后接 PD / IK / chunk execution。</div></li>
+            <li><span>📦</span><div><b>机器人数据仍是瓶颈：</b>web 语义能迁移，但物理交互、接触、灵巧动作仍靠机器人经验。</div></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="branches" class="section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="badge">如今的攻坚方向</span>
+            <h2>VLA 分化地图</h2>
+            <p>新论文通常不是“重新做一个 VLA”，而是在下面某个支路上改进。这个地图可以帮你给每天的新论文自动打标签。</p>
+          </div>
+        </div>
+        <div class="branch-map" id="branchMap"></div>
+      </div>
+    </section>
+
+    <section id="works" class="section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="badge">代表作不是收藏，是坐标系</span>
+            <h2>Influential Works</h2>
+            <p>用统一视角看代表作：它解决了什么问题、动了哪一层、留下了什么短板。</p>
+          </div>
+          <div class="filterbar" id="filters"></div>
+        </div>
+        <div class="paper-grid" id="workGrid"></div>
+      </div>
+    </section>
+
+    <section id="finetune" class="section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="badge">后训练怎么选？</span>
+            <h2>全参微调 / LoRA / 冻结 VLM</h2>
+            <p>三者本质是对原始 VLA “动刀深度”不同：越深越能适配新域，也越容易破坏原始语义与泛化。</p>
+          </div>
+        </div>
+        <div class="sticker-card card-pad">
+          <div class="tabs" id="tabs">
+            <button class="tab-btn active" data-tab="full">全参微调</button>
+            <button class="tab-btn" data-tab="lora">LoRA</button>
+            <button class="tab-btn" data-tab="freeze">冻结 VLM</button>
+            <button class="tab-btn" data-tab="hybrid">推荐 Hybrid</button>
+          </div>
+          <div id="tab-full" class="tab-panel active">
+            <h3>全参微调：能力上限最高，破坏性最大</h3>
+            <p>适合新 embodiment / 新相机 / 新动作空间差异很大，且你有足够多样数据。风险是灾难性遗忘、语言跟随下降、VLM 语义空间被低层动作 loss 拉坏。</p>
+          </div>
+          <div id="tab-lora" class="tab-panel">
+            <h3>LoRA：原权重不动，给模型外挂任务偏置</h3>
+            <p>适合目标机器人接近预训练分布、数据量中小、希望保留 base 的通用能力。实践上常用 VLM/LLM LoRA + action expert/head 全参训练。</p>
+          </div>
+          <div id="tab-freeze" class="tab-panel">
+            <h3>冻结 VLM：最保护语义，最适合稳定复现</h3>
+            <p>把 VLM 当固定视觉语言特征库，只训练 action expert / projector。优点是小数据稳、显存低、语义不被破坏；缺点是固定特征若缺少几何/接触信息，上限会受限。</p>
+          </div>
+          <div id="tab-hybrid" class="tab-panel">
+            <h3>推荐路线：先冻结，再 LoRA，最后局部/全参</h3>
+            <p>SmolVLA 复现可以先冻结 VLM 验证数据与 action expert；再给后半层或 projector 加 LoRA；只有在有 replay、OOD 验证和足够多样数据时才做局部/全参。对 RL 后训练，尽量隔离高方差动作梯度。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="daily" class="section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="badge">自动化入口</span>
+            <h2>Daily arXiv VLA Watcher</h2>
+            <p>每日抓新论文后，统一拆成：针对什么问题、用了什么方法、改进了哪一层、结果是否可信、对我有什么 idea。</p>
+          </div>
+        </div>
+        <div class="radar-layout">
+          <div class="sticker-card card-pad">
+            <input class="searchbox" id="dailySearch" placeholder="搜索：flow / RL / OpenVLA / embodiment / efficient ..." />
+            <div class="daily-list" id="dailyList"></div>
+          </div>
+          <pre class="schema"><code>{
+  "title": "paper title",
+  "arxiv_id": "2506.xxxxx",
+  "problem": "它认为现有 VLA 卡在哪里？",
+  "method": "它改了架构 / 数据 / 训练 / 推理 / 评测哪一层？",
+  "delta": "相对 RT-2 / OpenVLA / π0 / SmolVLA 的具体变化",
+  "evidence": "真实机器人？仿真？消融？是否开源？",
+  "idea_signal": "对 SmolVLA 复现/改进有什么启发",
+  "tags": ["action-expert", "flow", "post-training"]
+}</code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="detail-drawer" id="detailDrawer" aria-live="polite">
+    <div class="detail-card">
+      <button class="drawer-close" id="drawerClose" aria-label="关闭">×</button>
+      <span class="badge" id="drawerBadge">VLA</span>
+      <h3 id="drawerTitle">Title</h3>
+      <p id="drawerText">Detail</p>
+      <div class="tag-row" id="drawerTags"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+
+  <script>
+    const timeline = [
+      {year:'2022', title:'RT-1', tags:['Robot Transformer','BC','Action Token'], text:'证明真实机器人多任务数据 + Transformer 可以扩展；动作多以离散 token 形式输出。', detail:'起点不是最强语义，而是把真实机器人轨迹规模化，用行为克隆训练一个能跨任务执行的机器人 Transformer。'},
+      {year:'2023', title:'PaLM-E / RT-2', tags:['VLM Backbone','Web Knowledge'], text:'VLM/LLM 语义先验进入机器人控制，动作被映射到语言 token 空间。', detail:'关键变化：机器人不再只从演示里学语义，而是继承互联网视觉语言知识，再用机器人数据把语义落地到动作。'},
+      {year:'2023', title:'Open X-Embodiment / RT-X', tags:['Cross-Embodiment','Dataset'], text:'把不同机构、机器人、任务标准化，开启 X-robot policy。', detail:'数据标准化成为 VLA 发展的基础设施：不同动作空间、相机、机器人形态要统一到可训练格式。'},
+      {year:'2024', title:'Octo / OpenVLA', tags:['Open Source','Generalist'], text:'开放 generalist policy 与 7B VLA 进入社区复现视野。', detail:'OpenVLA 代表离散 action token + VLM/LLM backbone 的开源路线；Octo 代表跨数据集、语言/目标图像条件的通用 policy。'},
+      {year:'2024', title:'π0 / RDT', tags:['Flow','Diffusion','Action Expert'], text:'连续动作块成为主流解法，action expert 从 backbone 中分离。', detail:'动作不再必须像文本一样逐 token 生成；flow/diffusion 更适合高频、连续、多峰、灵巧控制。'},
+      {year:'2025', title:'FAST', tags:['Action Tokenizer','Hybrid'], text:'用频域压缩 action token 改善离散动作表示，兼顾训练效率。', detail:'它不是完全否定 token，而是让 token 更像动作轨迹压缩码，缓解传统 binning 的低效与量化问题。'},
+      {year:'2025', title:'SmolVLA', tags:['Efficient','Frozen VLM','Community Data'], text:'小模型、冻结 VLM、训练 action expert，用社区低成本数据做可复现 VLA。', detail:'对个人复现非常重要：先把数据、相机顺序、action expert 和异步推理跑通，再考虑大模型。'},
+      {year:'2025', title:'π0.5', tags:['Hierarchy','Web Data','Subtask'], text:'同一模型内加入高层 subtask 与低层 action，强化开放世界泛化。', detail:'长程任务不只靠低层动作；高层语义预测、web data、verbal instruction 和多机器人数据共同提供泛化。'},
+      {year:'2025', title:'π0.6-star / RECAP', tags:['RL','Experience','Advantage'], text:'VLA 从演示学习走向部署后自我改进：rollout、reward、intervention 进入训练闭环。', detail:'关键是 value function + advantage conditioning：不只是模仿人类，而是利用成功/失败/纠正数据提升吞吐和鲁棒性。'},
+      {year:'2026', title:'π0.7', tags:['Steerable','Metadata','Subgoal Image'], text:'prompt/context 成为控制接口：metadata、subgoal image、world model、history 共同 steer 行为。', detail:'混合质量数据不再简单过滤，而是通过质量、速度、错误、目标图等上下文让模型知道“怎样做才是好策略”。'}
+    ];
+
+    const branches = [
+      {icon:'🦾', title:'Action Representation', text:'离散 action token、FAST、diffusion、flow matching、discrete diffusion、hybrid token+flow。'},
+      {icon:'🧠', title:'Backbone & Expert', text:'VLM/LLM backbone 负责语义与感知，action expert/head 负责连续动作与实时控制。'},
+      {icon:'🧭', title:'Hierarchy & Planning', text:'subtask、semantic policy、goal image、world model、memory，让长程任务不再完全 flat。'},
+      {icon:'📦', title:'Data Mixture', text:'robot demo、cross-embodiment、web VQA、egocentric video、failure、autonomous rollout、metadata。'},
+      {icon:'🔁', title:'Experience & RL', text:'value function、advantage conditioning、intervention、reward feedback、failure removal。'},
+      {icon:'⚡', title:'Efficiency & Deploy', text:'SmolVLA、TinyVLA、on-device、frozen VLM、async inference、consumer GPU。'}
+    ];
+
+    const works = [
+      {title:'RT-1', cat:'mainline', tags:['robot transformer','BC'], text:'早期大规模真实机器人 Transformer，证明多任务机器人数据扩展有效。'},
+      {title:'RT-2', cat:'vlm', tags:['VLM','action as token'], text:'把 web-scale VLM 迁移到机器人控制，显著增强语义泛化。'},
+      {title:'Open X-Embodiment / RT-X', cat:'data', tags:['cross-embodiment','dataset'], text:'把多机构、多机器人数据标准化，推动跨机器人 policy。'},
+      {title:'Octo', cat:'open', tags:['open generalist','goal image'], text:'开放 generalist policy，支持语言或目标图像条件，便于下游适配。'},
+      {title:'OpenVLA', cat:'open', tags:['7B','open source','LoRA'], text:'开源 7B VLA，离散 action token 路线的强代表。'},
+      {title:'π0', cat:'action', tags:['flow matching','action expert'], text:'用 flow action expert 输出连续动作块，适合灵巧和高频控制。'},
+      {title:'FAST', cat:'action', tags:['tokenizer','frequency'], text:'改进 action tokenization，提高离散 token 训练效率。'},
+      {title:'SmolVLA', cat:'efficient', tags:['frozen VLM','community data'], text:'小模型 + flow expert + community data + async inference，适合个人复现。'},
+      {title:'π0.5', cat:'hierarchy', tags:['subtask','web data'], text:'高层 subtask + 低层 action，同一模型实现长程任务分解。'},
+      {title:'π0.6-star / RECAP', cat:'rl', tags:['RL','advantage','intervention'], text:'部署后收集经验，用 value / advantage 让 VLA 从成功失败中改进。'},
+      {title:'π0.7', cat:'context', tags:['metadata','subgoal image','world model'], text:'用丰富 context steer 大规模混合数据，实现更强 out-of-box 与组合泛化。'}
+    ];
+
+    const daily = [
+      {title:'示例：Flow action expert 的新采样策略', tags:['flow','inference'], problem:'迭代采样慢，真实机器人延迟高。', method:'减少 denoising steps + RTC/async 执行。', signal:'可以直接用于 SmolVLA 低延迟优化。'},
+      {title:'示例：VLA with intervention preference', tags:['RL','intervention'], problem:'人类纠正数据不一定最优。', method:'用 value/uncertainty 区分好纠正与噪声纠正。', signal:'给失败样本打标签，而不是全量模仿。'},
+      {title:'示例：Community data normalization', tags:['data','efficient'], problem:'低成本机器人数据相机命名和任务描述混乱。', method:'VLM 自动重写 instruction + camera ordering 标准化。', signal:'复现前先做数据清洗 dashboard。'}
+    ];
+
+    const timelineEl = document.getElementById('timelineCards');
+    timelineEl.innerHTML = timeline.map((item, idx) => `
+      <article class="time-card" data-kind="timeline" data-index="${idx}">
+        <span class="year">${item.year}</span>
+        <h3>${item.title}</h3>
+        <p>${item.text}</p>
+        <div class="tag-row">${item.tags.map((t,i)=>`<span class="tag ${i%2?'pink':'cream'}">${t}</span>`).join('')}</div>
+      </article>`).join('');
+
+    const branchEl = document.getElementById('branchMap');
+    branchEl.innerHTML = branches.map((b, idx)=>`
+      <article class="sticker-card branch-card" data-kind="branch" data-index="${idx+1}">
+        <div class="branch-icon">${b.icon}</div>
+        <h3>${b.title}</h3>
+        <p>${b.text}</p>
+      </article>`).join('');
+
+    const cats = ['all','mainline','vlm','data','open','action','efficient','hierarchy','rl','context'];
+    const filters = document.getElementById('filters');
+    filters.innerHTML = cats.map(c=>`<button class="filter-chip ${c==='all'?'active':''}" data-cat="${c}">${c}</button>`).join('');
+
+    const workGrid = document.getElementById('workGrid');
+    function renderWorks(cat='all') {
+      workGrid.innerHTML = works.filter(w=>cat==='all'||w.cat===cat).map((w, idx)=>`
+        <article class="sticker-card paper-card" data-kind="work" data-index="${works.indexOf(w)}">
+          <span class="year">${w.cat}</span>
+          <h3>${w.title}</h3>
+          <p>${w.text}</p>
+          <div class="tag-row">${w.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+        </article>`).join('');
+    }
+    renderWorks();
+    filters.addEventListener('click', e => {
+      const btn = e.target.closest('[data-cat]');
+      if (!btn) return;
+      filters.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+      renderWorks(btn.dataset.cat);
+    });
+
+    document.getElementById('tabs').addEventListener('click', e => {
+      const btn = e.target.closest('[data-tab]');
+      if (!btn) return;
+      document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
+    });
+
+    const drawer = document.getElementById('detailDrawer');
+    const close = document.getElementById('drawerClose');
+    function openDrawer(title, badge, text, tags=[]) {
+      document.getElementById('drawerTitle').textContent = title;
+      document.getElementById('drawerBadge').textContent = badge;
+      document.getElementById('drawerText').textContent = text;
+      document.getElementById('drawerTags').innerHTML = tags.map(t=>`<span class="tag">${t}</span>`).join('');
+      drawer.classList.add('open');
+    }
+    document.body.addEventListener('click', e => {
+      const card = e.target.closest('[data-kind]');
+      if (!card) return;
+      const kind = card.dataset.kind;
+      const idx = Number(card.dataset.index);
+      if (kind === 'timeline') {
+        const item = timeline[idx]; openDrawer(item.title, `${item.year} · Mainline`, item.detail, item.tags);
+      }
+      if (kind === 'branch') {
+        const item = branches[idx-1]; openDrawer(item.title, '分化方向', item.text, ['problem space','idea mining']);
+      }
+      if (kind === 'work') {
+        const item = works[idx]; openDrawer(item.title, item.cat, item.text, item.tags);
+      }
+    });
+    close.addEventListener('click', () => drawer.classList.remove('open'));
+
+    const dailyList = document.getElementById('dailyList');
+    const search = document.getElementById('dailySearch');
+    function renderDaily(q='') {
+      const query = q.trim().toLowerCase();
+      dailyList.innerHTML = daily.filter(item => !query || JSON.stringify(item).toLowerCase().includes(query)).map(item => `
+        <article class="daily-item">
+          <h4>${item.title}</h4>
+          <p><b>问题：</b>${item.problem}</p>
+          <p><b>方法：</b>${item.method}</p>
+          <p><b>Idea：</b>${item.signal}</p>
+          <div class="tag-row">${item.tags.map(t=>`<span class="tag pink">${t}</span>`).join('')}</div>
+        </article>`).join('');
+    }
+    renderDaily();
+    search.addEventListener('input', e => renderDaily(e.target.value));
+
+    async function tryLoadExternalDaily() {
+      try {
+        const res = await fetch('/vla-radar/data/latest.json', { cache: 'no-store' });
+        if (!res.ok) return;
+        const payload = await res.json();
+        if (Array.isArray(payload.papers) && payload.papers.length) {
+          daily.splice(0, daily.length, ...payload.papers.map(p => ({
+            title: p.title || 'Untitled',
+            tags: p.tags || [],
+            problem: p.problem || p.summary || '待分析',
+            method: p.method || '待分析',
+            signal: p.idea_signal || '待提取'
+          })));
+          renderDaily(search.value);
+        }
+      } catch (e) {}
+    }
+    tryLoadExternalDaily();
+  </script>
+</body>
+</html>

@@ -25,6 +25,11 @@ export const Hero = props => {
     null,
     config
   )
+  const PROXIO_HERO_VLA_BUTTON_TEXT =
+    siteConfig('PROXIO_HERO_VLA_BUTTON_TEXT', null, config) || 'VLA 发展雷达'
+  const PROXIO_HERO_VLA_BUTTON_DESC =
+    siteConfig('PROXIO_HERO_VLA_BUTTON_DESC', null, config) ||
+    '从 RT-1 到 π0.7：架构、数据、后训练与新论文追踪'
 
   return (
     <>
@@ -98,6 +103,31 @@ export const Hero = props => {
                   </SmartLink>
                 </li>
               </ul>
+
+              {PROXIO_HERO_VLA_BUTTON_TEXT && (
+                <div className='mt-5 flex justify-center lg:justify-start'>
+                  <a
+                    href={siteConfig(
+                      'PROXIO_HERO_VLA_BUTTON_URL',
+                      '/vla-radar/index.html',
+                      config
+                    ) || '/vla-radar/index.html'}
+                    className='btn-meow-wide group'>
+                    <span className='btn-meow-wide-icon'>🛰️</span>
+                    <span className='min-w-0 flex-1 text-left'>
+                      <span className='block text-base font-extrabold leading-none'>
+                        {PROXIO_HERO_VLA_BUTTON_TEXT}
+                      </span>
+                      {PROXIO_HERO_VLA_BUTTON_DESC && (
+                        <span className='mt-1 block text-xs font-bold opacity-70 sm:text-sm'>
+                          {PROXIO_HERO_VLA_BUTTON_DESC}
+                        </span>
+                      )}
+                    </span>
+                    <i className='fa-solid fa-arrow-right transition-transform duration-200 group-hover:translate-x-1' />
+                  </a>
+                </div>
+              )}
             </div>
 
             {/* 右侧吉祥物贴纸卡 */}

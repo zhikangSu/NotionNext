@@ -1,0 +1,13 @@
+{
+  "updated": "2026-06-22",
+  "papers": [
+    {
+      "title": "Example Paper: Efficient Flow Matching VLA",
+      "arxiv_id": "demo.00001",
+      "problem": "Flow / diffusion VLA 在真实机器人上推理延迟高。",
+      "method": "减少 denoising steps，并用 action chunk overlap 与异步推理降低空窗。",
+      "idea_signal": "可作为 SmolVLA 部署优化方向：先测 chunk size、执行步数、异步阈值。",
+      "tags": ["flow", "inference", "deployment"]
+    }
+  ]
+}

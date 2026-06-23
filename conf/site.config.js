@@ -62,6 +62,9 @@ module.exports = {
   PROXIO_HERO_BUTTON_2_TEXT: '看我的 GitHub',
   PROXIO_HERO_BUTTON_2_URL: 'https://github.com/zhikangSu',
   PROXIO_HERO_BUTTON_2_ICON: '/images/starter/github.svg',
+  PROXIO_HERO_VLA_BUTTON_TEXT: 'VLA 发展雷达',
+  PROXIO_HERO_VLA_BUTTON_DESC: '从 RT-1 到 π0.7：架构、数据、后训练与新论文追踪',
+  PROXIO_HERO_VLA_BUTTON_URL: '/vla-radar/index.html',
 
   PROXIO_BLOG_TITLE: '学习记录',
   PROXIO_BLOG_TEXT_1: '最近的实验、笔记和项目进展',
