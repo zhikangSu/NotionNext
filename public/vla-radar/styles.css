@@ -517,6 +517,16 @@
 .fig-media { display: grid; place-items: center; width: 100%; height: clamp(150px, 16vw, 220px); border-radius: 10px; background: #f8fbff; overflow: hidden; }
 .fig img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; display: block; background: #fff; }
 .fig figcaption { margin-top: 7px; color: var(--meow-muted); font-size: .8rem; font-weight: 700; line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.figure-tables { display: grid; gap: 12px; margin-top: 12px; }
+.table-fig { padding: 12px; }
+.table-fig h4 { margin: 0 0 8px; font-size: .95rem; line-height: 1.35; }
+.fig-table-wrap { width: 100%; max-height: 260px; overflow: auto; border-radius: 10px; border: 1px solid rgba(30, 36, 71, .12); background: #fff; }
+.fig-table { width: 100%; min-width: 560px; border-collapse: collapse; font-size: .78rem; line-height: 1.35; }
+.fig-table th,
+.fig-table td { padding: 8px 10px; border-bottom: 1px solid rgba(30, 36, 71, .1); text-align: left; vertical-align: top; }
+.fig-table th { position: sticky; top: 0; z-index: 1; background: #f6f9ff; color: var(--meow-ink); font-weight: 900; }
+.fig-table td { color: var(--meow-muted); font-weight: 700; }
 @media (max-width: 640px) {
   .fig-media { height: 170px; }
+  .fig-table { min-width: 460px; }
 }

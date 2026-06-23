@@ -28,12 +28,14 @@ Codex 是真·无人值守（到点必跑，与你电脑是否开机无关），
 1. 打开并通读全文（不只摘要）：https://arxiv.org/abs/<id> 或 PDF https://arxiv.org/pdf/<id>，
    也可读 HTML 全文版 https://ar5iv.org/abs/<id>。
 2. 用中文写结构化分析：problem / method / delta / evidence / idea_signal / tags；
+   关键图表证据放在 `figures`：图片项用 `{url, caption}`，HTML 关键结果/消融表用
+   `{type:"table", title, columns, rows, caption}`。
    github_url、project_url 有就填、没有留空、不要编造。
 3. POST 覆盖：
    curl -sS -X POST "https://www.meowsu.xyz/api/vla-radar/ingest" \
      -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" \
      -H "Content-Type: application/json" \
-     -d '{"papers":[{"arxiv_id":"<id>","title":"...","authors":"...","published":"...","problem":"...","method":"...","delta":"...","evidence":"...","idea_signal":"...","tags":["..."],"github_url":"","project_url":""}]}'
+     -d '{"papers":[{"arxiv_id":"<id>","title":"...","authors":"...","published":"...","problem":"...","method":"...","delta":"...","evidence":"...","idea_signal":"...","tags":["..."],"github_url":"","project_url":"","figures":[{"url":"https://arxiv.org/html/<id>/x1.png","caption":"架构图"},{"type":"table","title":"主结果","columns":["Model","Avg"],"rows":[["SmolVLA","87.3"]],"caption":"只摘关键结果行"}]}]}'
 ```
 
 > 因为存的是「文本 + 链接」而不是 PDF，重析成本极低，想重析多少次都行。

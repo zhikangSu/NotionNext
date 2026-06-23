@@ -17,7 +17,7 @@ create table if not exists public.vla_papers (
   arxiv_url      text default '',
   github_url     text default '',
   project_url    text default '',
-  figures        jsonb default '[]'::jsonb,    -- 关键图表：[{url, caption}]，只存直链不存图片
+  figures        jsonb default '[]'::jsonb,    -- 关键图表证据：图片 {url, caption} 或表格 {type, title, columns, rows}
   deep_requested boolean default false,        -- 网页「全文重析」按钮排队标记；drain 处理后清零
   created_at     timestamptz default now(),
   updated_at     timestamptz default now()

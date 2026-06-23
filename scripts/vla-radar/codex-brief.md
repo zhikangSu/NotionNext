@@ -36,9 +36,9 @@ meowsu.xyz 的「VLA Radar」每天追踪 arXiv 上的 VLA(Vision-Language-Actio
 3. 对每篇相关论文，先打开 arXiv 全文通读再分析（推荐 HTML 版 https://arxiv.org/html/<id>，或 PDF https://arxiv.org/pdf/<id>），
    重点看 方法/实验/消融/主结果/局限。用中文写 problem / method / delta / evidence / idea_signal / tags（3-6 个英文小写），
    保留 arxiv_id / title / authors / published / abstract；github_url、project_url 有就填、没有留空、不要编造。
-   另外从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定。不要机械套固定类别，优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图或可视化。
-   放进 figures:[{"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}]，url 用 arxiv.org/html 绝对直链（即 HTML 里 <img> src 拼成绝对路径）；没有 HTML 版或没有可展示图片就留空数组，不要编造、不要用 PDF 截图。若关键证据是 HTML 表格而不是图片，把表格中的核心量化结论写进 evidence / idea_signal。
-   图片适配要求：figures 里只存 url 和短 caption，不要生成 <img>、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。caption 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 object-fit: contain 来适配原图尺寸。
+   另外从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定。不要机械套固定类别，优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图、表或可视化；如果论文有主结果表/消融表/效率对比表，至少补 1 个能代表量化结论的表格项。
+   放进 figures。图片项格式为 {"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}，url 用 arxiv.org/html 绝对直链（即 HTML 里 <img> src 拼成绝对路径）。HTML 表格项格式为 {"type":"table","title":"中文短标题","columns":["列1","列2"],"rows":[["值1","值2"]],"caption":"中文说明"}，只摘最关键列和行，避免全表搬运；没有 HTML 版、没有可展示图片或关键表格就留空数组，不要编造、不要用 PDF 截图。
+   适配要求：图片项只存 url 和短 caption；表格项只存 type/title/columns/rows/caption。不要生成 <img>、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。caption 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 object-fit: contain 适配图片，并用横向滚动表格适配量化表。
 4. 打成 /tmp/vla-payload.json={"papers":[...]} 后 POST：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" -H "Content-Type: application/json" -d @/tmp/vla-payload.json
    401→token 错；503→后端未配置；{"ok":true,"upserted":N}→成功。
@@ -59,9 +59,9 @@ meowsu.xyz 的「VLA Radar」每天追踪 arXiv 上的 VLA(Vision-Language-Actio
    得到 {"ok":true,"papers":[{arxiv_id,title,arxiv_url}]}；papers 为空 → 报告“队列为空”并结束。
 2. 每篇打开 arXiv 全文通读（推荐 HTML 版 https://arxiv.org/html/<id>，或 PDF https://arxiv.org/pdf/<id>），重点看 方法/实验/消融/主结果/局限。
    用中文写 problem / method / delta / evidence / idea_signal / tags；github_url、project_url 有就填、没有留空、不要编造。
-   另外从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定。不要机械套固定类别，优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图或可视化。
-   放进 figures:[{"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}]，url 用 arxiv.org/html 绝对直链；没有可展示图片就留空数组，不要编造、不要用 PDF 截图。若关键证据是 HTML 表格而不是图片，把表格中的核心量化结论写进 evidence / idea_signal。
-   图片适配要求：figures 里只存 url 和短 caption，不要生成 <img>、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。caption 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 object-fit: contain 来适配原图尺寸。
+   另外从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定。不要机械套固定类别，优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图、表或可视化；如果论文有主结果表/消融表/效率对比表，至少补 1 个能代表量化结论的表格项。
+   放进 figures。图片项格式为 {"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}，url 用 arxiv.org/html 绝对直链。HTML 表格项格式为 {"type":"table","title":"中文短标题","columns":["列1","列2"],"rows":[["值1","值2"]],"caption":"中文说明"}，只摘最关键列和行，避免全表搬运；没有可展示图片或关键表格就留空数组，不要编造、不要用 PDF 截图。
+   适配要求：图片项只存 url 和短 caption；表格项只存 type/title/columns/rows/caption。不要生成 <img>、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。caption 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 object-fit: contain 适配图片，并用横向滚动表格适配量化表。
 3. 打成 /tmp/vla-deep.json={"papers":[...]} 后 POST 覆盖（会自动清掉队列标记）：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" -H "Content-Type: application/json" -d @/tmp/vla-deep.json
 4. 报告处理了几篇。

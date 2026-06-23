@@ -127,22 +127,47 @@
       }, 20000);
     }
 
-    // 关键图表：arXiv HTML 直链图 + 说明；图加载失败就隐藏，不影响其它内容
+    const imageFigure = f => {
+      if (!f || !f.url) return '';
+      return `
+        <figure class="fig">
+          <a class="fig-media" href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">
+            <img src="${esc(f.url)}" alt="${esc(f.caption || 'figure')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.fig').style.display='none'" />
+          </a>
+          ${f.caption ? `<figcaption>${esc(f.caption)}</figcaption>` : ''}
+        </figure>`;
+    };
+
+    const tableFigure = f => {
+      const cols = Array.isArray(f.columns) ? f.columns : [];
+      const rows = Array.isArray(f.rows) ? f.rows : [];
+      if (!cols.length || !rows.length) return '';
+      return `
+        <figure class="fig table-fig">
+          ${f.title ? `<h4>${esc(f.title)}</h4>` : ''}
+          <div class="fig-table-wrap">
+            <table class="fig-table">
+              <thead><tr>${cols.map(c => `<th>${esc(c)}</th>`).join('')}</tr></thead>
+              <tbody>
+                ${rows.map(row => `<tr>${cols.map((_, i) => `<td>${esc(Array.isArray(row) ? row[i] : '')}</td>`).join('')}</tr>`).join('')}
+              </tbody>
+            </table>
+          </div>
+          ${f.caption ? `<figcaption>${esc(f.caption)}</figcaption>` : ''}
+        </figure>`;
+    };
+
+    // 关键图表：arXiv HTML 直链图 + 结构化关键表；图加载失败就隐藏，不影响其它内容
     const figuresBlock = p => {
-      const figs = Array.isArray(p.figures) ? p.figures : [];
-      if (!figs.length) return '';
+      const items = Array.isArray(p.figures) ? p.figures : [];
+      const images = items.filter(f => f && f.url);
+      const tables = items.filter(f => f && (f.type === 'table' || Array.isArray(f.columns)));
+      if (!images.length && !tables.length) return '';
       return `
         <div class="sticker-card card-pad" style="margin-top:16px">
           <span class="badge">关键图表</span>
-          <div class="figures">
-            ${figs.map(f => `
-              <figure class="fig">
-                <a class="fig-media" href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">
-                  <img src="${esc(f.url)}" alt="${esc(f.caption || 'figure')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.fig').style.display='none'" />
-                </a>
-                ${f.caption ? `<figcaption>${esc(f.caption)}</figcaption>` : ''}
-              </figure>`).join('')}
-          </div>
+          ${images.length ? `<div class="figures">${images.map(imageFigure).join('')}</div>` : ''}
+          ${tables.length ? `<div class="figure-tables">${tables.map(tableFigure).join('')}</div>` : ''}
         </div>`;
     };
 
