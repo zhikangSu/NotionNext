@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>论文详情 · VLA Radar</title>
+  <meta name="description" content="VLA 论文的结构化拆解：问题 / 方法 / 相对变化 / 证据 / idea。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/">
+        <span class="brand-badge">🐾</span>
+        <span>Meowsu · VLA Radar</span>
+      </a>
+      <div class="nav-links">
+        <a href="/vla-radar/#timeline">主线</a>
+        <a href="/vla-radar/#branches">分化</a>
+        <a href="/vla-radar/#finetune">微调</a>
+        <a href="/vla-radar/#daily">论文雷达</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="section paper-wrap">
+      <div class="container">
+        <a class="paper-back" href="/vla-radar/#daily">← 回到论文雷达</a>
+        <div id="paperRoot">
+          <div class="paper-state" id="paperState">正在加载论文分析 …</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+
+  <script>
+    const params = new URLSearchParams(location.search);
+    const id = (params.get('id') || '').trim();
+    const root = document.getElementById('paperRoot');
+
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const setState = msg => {
+      root.innerHTML = `<div class="paper-state">${esc(msg)}</div>`;
+    };
+
+    const linkButtons = p => {
+      const defs = [
+        {url: p.arxiv_url || (p.arxiv_id ? `https://arxiv.org/abs/${p.arxiv_id}` : ''), cls:'arxiv', icon:'📄', label:'arXiv 原文'},
+        {url: p.github_url, cls:'code', icon:'💻', label:'代码仓库'},
+        {url: p.project_url, cls:'project', icon:'🔗', label:'项目页'}
+      ];
+      const btns = defs.filter(d => d.url)
+        .map(d => `<a class="link-btn ${d.cls}" href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">${d.icon} ${d.label}</a>`)
+        .join('');
+      return btns ? `<div class="link-row">${btns}</div>` : '';
+    };
+
+    const analysisBlock = (icon, label, value) => {
+      if (!value) return '';
+      return `
+        <div class="analysis-item">
+          <h4><span class="pin">${icon}</span>${esc(label)}</h4>
+          <p>${esc(value)}</p>
+        </div>`;
+    };
+
+    const render = p => {
+      document.title = `${p.title || '论文'} · VLA Radar`;
+      const tags = (Array.isArray(p.tags) ? p.tags : []).map(t => `<span class="tag pink">${esc(t)}</span>`).join('');
+      const meta = [p.authors, (p.published || '').slice(0, 10)].filter(Boolean).map(esc).join(' · ');
+      const analysis = [
+        analysisBlock('🎯', '问题 · 它认为现有 VLA 卡在哪里', p.problem),
+        analysisBlock('🛠️', '方法 · 改了架构 / 数据 / 训练 / 推理 / 评测哪一层', p.method),
+        analysisBlock('📐', '相对变化 · 对 RT-2 / OpenVLA / π0 / SmolVLA', p.delta),
+        analysisBlock('🔬', '证据 · 真实机器人？仿真？消融？是否开源', p.evidence),
+        analysisBlock('💡', 'Idea 信号 · 对 SmolVLA 复现 / 改进的启发', p.idea_signal)
+      ].join('');
+      const abstract = p.abstract
+        ? `<div class="sticker-card card-pad" style="margin-top:16px">
+             <span class="badge">原始摘要</span>
+             <p style="margin:12px 0 0;color:var(--meow-muted);line-height:1.8">${esc(p.abstract)}</p>
+           </div>`
+        : '';
+
+      root.innerHTML = `
+        <span class="badge">论文雷达 · 结构化拆解</span>
+        <h1 class="paper-title">${esc(p.title || p.arxiv_id || '未命名论文')}</h1>
+        ${meta ? `<p class="paper-meta">${meta}</p>` : ''}
+        ${p.arxiv_id ? `<p class="paper-meta">arXiv: ${esc(p.arxiv_id)}</p>` : ''}
+        ${tags ? `<div class="tag-row" style="margin-top:10px">${tags}</div>` : ''}
+        ${linkButtons(p)}
+        <div class="sticker-card card-pad" style="margin-top:22px">
+          <div class="analysis">
+            ${analysis || '<div class="paper-state" style="padding:24px 0">这篇还没生成结构化分析，明早 9 点的抓取会补上。</div>'}
+          </div>
+        </div>
+        ${abstract}`;
+    };
+
+    async function load() {
+      if (!id) { setState('缺少论文 id。'); return; }
+      try {
+        const res = await fetch(`/api/vla-radar/paper?id=${encodeURIComponent(id)}`, { cache: 'no-store' });
+        if (res.status === 404) { setState('没找到这篇论文，可能还没入库。'); return; }
+        const payload = await res.json();
+        if (payload && payload.configured === false) {
+          setState('论文库还没接好（Supabase 未配置）。');
+          return;
+        }
+        if (!payload || !payload.ok || !payload.paper) { setState('加载失败，请稍后再试。'); return; }
+        render(payload.paper);
+      } catch (e) {
+        setState('加载出错：' + (e && e.message ? e.message : e));
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
