@@ -35,10 +35,10 @@
    - `idea_signal`：对 SmolVLA 复现 / 改进有什么启发
    - `tags`：3–6 个英文小写标签（flow / action-expert / rl / efficient / data / hierarchy / vlm ...）
    - `github_url` / `project_url`：摘要或 comment 里有就填，没有留空
-   - `figures`：从 HTML 版挑 1~3 张关键图（架构/方法图 + 主结果图），每张给
+   - `figures`：从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定，不要机械套固定类别。优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图或可视化。每张给
      `{"url":"...","caption":"中文说明"}`；url 用**绝对直链**（HTML 里 `<img>` 的 src 拼成
      `https://arxiv.org/html/<arxiv_id>/<src>`，如 `https://arxiv.org/html/2506.01844/x3.png`）。
-     只用 `arxiv.org/html` 直链；没有 HTML 版就留空数组 `[]`，不要编造、不要用 PDF 截图。
+     只用 `arxiv.org/html` 直链；没有 HTML 版或没有可展示图片就留空数组 `[]`，不要编造、不要用 PDF 截图。若关键证据是 HTML 表格而不是图片，把表格中的核心量化结论写进 `evidence` / `idea_signal`。
 
 4. 把所有分析好的论文打成 `/tmp/vla-payload.json`，形如 `{"papers":[ ... ]}`，一次性 POST：
    ```bash
