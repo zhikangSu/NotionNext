@@ -512,8 +512,11 @@
 @media (max-width: 640px) { .archive-grid { grid-template-columns: 1fr; } }
 
 /* 详情页关键图表 */
-.figures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 12px; }
-@media (max-width: 640px) { .figures { grid-template-columns: 1fr; } }
-.fig { margin: 0; border: 2px solid rgba(30, 36, 71, .12); border-radius: 16px; background: #fff; padding: 10px; }
-.fig img { width: 100%; height: auto; border-radius: 10px; display: block; background: #fff; }
+.figures { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 14px; margin-top: 12px; }
+.fig { margin: 0; min-width: 0; border: 2px solid rgba(30, 36, 71, .12); border-radius: 16px; background: #fff; padding: 10px; overflow: hidden; }
+.fig-media { display: grid; place-items: center; width: 100%; height: clamp(190px, 24vw, 320px); border-radius: 10px; background: #f8fbff; overflow: hidden; }
+.fig img { width: 100%; height: 100%; max-width: 100%; max-height: 100%; object-fit: contain; display: block; background: #fff; }
 .fig figcaption { margin-top: 8px; color: var(--meow-muted); font-size: .82rem; font-weight: 700; line-height: 1.5; }
+@media (max-width: 640px) {
+  .fig-media { height: 230px; }
+}

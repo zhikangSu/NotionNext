@@ -137,7 +137,9 @@
           <div class="figures">
             ${figs.map(f => `
               <figure class="fig">
-                <img src="${esc(f.url)}" alt="${esc(f.caption || 'figure')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.fig').style.display='none'" />
+                <a class="fig-media" href="${esc(f.url)}" target="_blank" rel="noopener noreferrer">
+                  <img src="${esc(f.url)}" alt="${esc(f.caption || 'figure')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.fig').style.display='none'" />
+                </a>
                 ${f.caption ? `<figcaption>${esc(f.caption)}</figcaption>` : ''}
               </figure>`).join('')}
           </div>
