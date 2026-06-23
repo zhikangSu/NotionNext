@@ -367,7 +367,7 @@
           <p><b>Idea：</b>${item.signal||'待提取'}</p>
           <div class="tag-row">${tags}</div>`;
         return item.arxiv_id
-          ? `<a class="daily-item clickable" href="paper.html?id=${encodeURIComponent(item.arxiv_id)}">${inner}</a>`
+          ? `<a class="daily-item clickable" href="/vla-radar/paper.html?id=${encodeURIComponent(item.arxiv_id)}">${inner}</a>`
           : `<article class="daily-item">${inner}</article>`;
       }).join('');
     }
