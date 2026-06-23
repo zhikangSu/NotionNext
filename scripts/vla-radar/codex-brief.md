@@ -38,6 +38,7 @@ meowsu.xyz 的「VLA Radar」每天追踪 arXiv 上的 VLA(Vision-Language-Actio
    保留 arxiv_id / title / authors / published / abstract；github_url、project_url 有就填、没有留空、不要编造。
    另外从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定。不要机械套固定类别，优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图或可视化。
    放进 figures:[{"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}]，url 用 arxiv.org/html 绝对直链（即 HTML 里 <img> src 拼成绝对路径）；没有 HTML 版或没有可展示图片就留空数组，不要编造、不要用 PDF 截图。若关键证据是 HTML 表格而不是图片，把表格中的核心量化结论写进 evidence / idea_signal。
+   图片适配要求：figures 里只存 url 和短 caption，不要生成 <img>、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。caption 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 object-fit: contain 来适配原图尺寸。
 4. 打成 /tmp/vla-payload.json={"papers":[...]} 后 POST：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" -H "Content-Type: application/json" -d @/tmp/vla-payload.json
    401→token 错；503→后端未配置；{"ok":true,"upserted":N}→成功。
@@ -60,6 +61,7 @@ meowsu.xyz 的「VLA Radar」每天追踪 arXiv 上的 VLA(Vision-Language-Actio
    用中文写 problem / method / delta / evidence / idea_signal / tags；github_url、project_url 有就填、没有留空、不要编造。
    另外从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定。不要机械套固定类别，优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图或可视化。
    放进 figures:[{"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}]，url 用 arxiv.org/html 绝对直链；没有可展示图片就留空数组，不要编造、不要用 PDF 截图。若关键证据是 HTML 表格而不是图片，把表格中的核心量化结论写进 evidence / idea_signal。
+   图片适配要求：figures 里只存 url 和短 caption，不要生成 <img>、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。caption 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 object-fit: contain 来适配原图尺寸。
 3. 打成 /tmp/vla-deep.json={"papers":[...]} 后 POST 覆盖（会自动清掉队列标记）：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" -H "Content-Type: application/json" -d @/tmp/vla-deep.json
 4. 报告处理了几篇。

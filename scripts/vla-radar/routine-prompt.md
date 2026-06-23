@@ -39,6 +39,7 @@
      `{"url":"...","caption":"中文说明"}`；url 用**绝对直链**（HTML 里 `<img>` 的 src 拼成
      `https://arxiv.org/html/<arxiv_id>/<src>`，如 `https://arxiv.org/html/2506.01844/x3.png`）。
      只用 `arxiv.org/html` 直链；没有 HTML 版或没有可展示图片就留空数组 `[]`，不要编造、不要用 PDF 截图。若关键证据是 HTML 表格而不是图片，把表格中的核心量化结论写进 `evidence` / `idea_signal`。
+     图片适配要求：`figures` 里只存 `url` 和短 `caption`，不要生成 `<img>`、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。`caption` 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 `object-fit: contain` 来适配原图尺寸。
 
 4. 把所有分析好的论文打成 `/tmp/vla-payload.json`，形如 `{"papers":[ ... ]}`，一次性 POST：
    ```bash
