@@ -21,11 +21,13 @@
    ```
    读 `/tmp/vla-new.json`。若为空数组 → 报告「今天没有新论文」并结束。
 
-2. 逐篇判断相关性：必须真的是 Vision-Language-Action / 机器人操作 policy / 机器人基础模型
-   方向。明显无关的丢掉（例如天文里的 "VLA"、纯 NLP、与机器人无关的 CV）。
+2. 先用标题+摘要逐篇判断相关性：必须真的是 Vision-Language-Action / 机器人操作 policy /
+   机器人基础模型方向。明显无关的丢掉（例如天文里的 "VLA"、纯 NLP、与机器人无关的 CV）。
 
-3. 对每篇相关论文，用**中文、简洁、证据优先**写出结构化分析（保留原 arxiv_id / title /
-   authors / published / abstract）：
+3. 对每篇相关论文，**先打开 arXiv 全文通读再分析（不要只看摘要）**：
+   读 PDF `https://arxiv.org/pdf/<arxiv_id>`，或 HTML 全文 `https://ar5iv.org/abs/<arxiv_id>`。
+   重点看：方法/架构图、实验设置、消融、主结果表、局限。然后用**中文、简洁、证据优先**写出
+   结构化分析（保留原 arxiv_id / title / authors / published / abstract）：
    - `problem`：它认为现有 VLA 卡在哪里
    - `method`：改了 架构 / 数据 / 训练 / 推理 / 评测 哪一层
    - `delta`：相对 RT-2 / OpenVLA / π0 / SmolVLA 的具体变化
