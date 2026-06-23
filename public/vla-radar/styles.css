@@ -370,6 +370,7 @@
     }
     .paper-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .paper-card { padding: 18px; min-height: 250px; display: flex; flex-direction: column; }
+    .paper-card-link { color: inherit; text-decoration: none; cursor: pointer; }
     .paper-card h3 { margin: 12px 0 8px; font-size: 1.25rem; line-height: 1.12; }
     .paper-card p { margin: 0; color: var(--meow-muted); font-size: .93rem; }
     .paper-card .tag-row { margin-top: auto; padding-top: 16px; }
