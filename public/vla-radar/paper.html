@@ -78,6 +78,36 @@
         </div>`;
     };
 
+    // 「全文重新解析」控件：已排队就显示状态，否则给一个按钮
+    const deepControl = p => {
+      if (p.deep_requested) {
+        return `<div class="deep-queued">⏳ 已在全文重析队列中，drain 任务跑完会自动更新本页</div>`;
+      }
+      return `
+        <div class="link-row"><button class="link-btn deep" id="deepBtn">🔬 全文重新解析</button></div>
+        <div class="deep-note" id="deepNote" hidden></div>`;
+    };
+
+    async function requestDeep(id, btn) {
+      const note = document.getElementById('deepNote');
+      btn.disabled = true;
+      btn.textContent = '提交中…';
+      try {
+        const res = await fetch(`/api/vla-radar/request?id=${encodeURIComponent(id)}`, { method: 'POST' });
+        const j = await res.json().catch(() => ({}));
+        if (res.ok && j.queued) {
+          btn.textContent = '✅ 已排队';
+          if (note) { note.hidden = false; note.textContent = '已加入全文重析队列，等下一次 drain 任务跑完会自动覆盖更新本页。'; }
+        } else {
+          btn.disabled = false; btn.textContent = '🔬 全文重新解析';
+          if (note) { note.hidden = false; note.textContent = '排队失败：' + (j.message || res.status); }
+        }
+      } catch (e) {
+        btn.disabled = false; btn.textContent = '🔬 全文重新解析';
+        if (note) { note.hidden = false; note.textContent = '排队出错：' + (e && e.message ? e.message : e); }
+      }
+    }
+
     const render = p => {
       document.title = `${p.title || '论文'} · VLA Radar`;
       const tags = (Array.isArray(p.tags) ? p.tags : []).map(t => `<span class="tag pink">${esc(t)}</span>`).join('');
@@ -103,12 +133,16 @@
         ${p.arxiv_id ? `<p class="paper-meta">arXiv: ${esc(p.arxiv_id)}</p>` : ''}
         ${tags ? `<div class="tag-row" style="margin-top:10px">${tags}</div>` : ''}
         ${linkButtons(p)}
+        ${deepControl(p)}
         <div class="sticker-card card-pad" style="margin-top:22px">
           <div class="analysis">
             ${analysis || '<div class="paper-state" style="padding:24px 0">这篇还没生成结构化分析，明早 9 点的抓取会补上。</div>'}
           </div>
         </div>
         ${abstract}`;
+
+      const deepBtn = document.getElementById('deepBtn');
+      if (deepBtn) deepBtn.addEventListener('click', () => requestDeep(p.arxiv_id, deepBtn));
     };
 
     async function load() {

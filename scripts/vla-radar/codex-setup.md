@@ -38,6 +38,29 @@ Codex 是真·无人值守（到点必跑，与你电脑是否开机无关），
 
 > 因为存的是「文本 + 链接」而不是 PDF，重析成本极低，想重析多少次都行。
 
+## 全文重析队列：第二个 Codex 任务（drain）
+
+网页详情页的「🔬 全文重新解析」按钮，会把该篇标记进队列（`POST /api/vla-radar/request`，不需要 key）。
+再建一个**高频** Codex scheduled task 把队列消化掉 —— 环境同上（指向仓库、开外网、配 `VLA_RADAR_INGEST_TOKEN`），
+**Schedule 设每小时一次**（你额度大，也可每 30 分钟，点完按钮很快就自动更新）。prompt：
+
+```text
+处理 meowsu.xyz「VLA Radar」的全文重析队列。环境：VLA_RADAR_INGEST_TOKEN 已配置；可访问外网。
+SITE = https://www.meowsu.xyz
+
+1. 取队列：
+   curl -sS "$SITE/api/vla-radar/pending" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN"
+   得到 {"ok":true,"papers":[{"arxiv_id","title","arxiv_url"}]}。若 papers 为空 → 报告「队列为空」并结束。
+2. 对每篇：打开 arXiv 全文通读（PDF https://arxiv.org/pdf/<arxiv_id>，或 HTML https://ar5iv.org/abs/<arxiv_id>），
+   重点看 方法/实验/消融/主结果/局限。用中文写 problem / method / delta / evidence / idea_signal / tags；
+   github_url、project_url 有就填、没有留空、不要编造。
+3. 打成 /tmp/vla-deep.json = {"papers":[ ... ]} 后 POST 覆盖（会自动清掉队列标记 deep_requested）：
+   curl -sS -X POST "$SITE/api/vla-radar/ingest" \
+     -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" \
+     -H "Content-Type: application/json" -d @/tmp/vla-deep.json
+4. 报告处理了几篇。
+```
+
 ## 排错
 - 任务报 `503`：Vercel 没配 `VLA_RADAR_INGEST_TOKEN` 或还没部署。
 - 任务报 `401`：Codex 里的 token 和 Vercel 不一致。
