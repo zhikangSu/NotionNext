@@ -2,6 +2,7 @@ import {
   upsertPapers,
   isVlaStoreConfigured
 } from '@/lib/server/vla-radar/store'
+import { mirrorPapersToNotion } from '@/lib/server/vla-radar/notion'
 
 // 受 token 保护的写入入口：定时 routine 分析完论文后 POST 到这里。
 // 沿用 contribution-refresh.js 的 token 模式，Supabase 密钥只留在服务端。
@@ -50,7 +51,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ ok: false, message: 'body.papers 为空' })
     }
     const upserted = await upsertPapers(papers)
-    return res.status(200).json({ ok: true, upserted })
+    // 顺手镜像到 Notion 存档（best-effort，未配置或失败都不影响网站入库）
+    let notion = { skipped: true }
+    try {
+      notion = await mirrorPapersToNotion(papers)
+    } catch (error) {
+      notion = { error: String(error?.message || error) }
+    }
+    return res.status(200).json({ ok: true, upserted, notion })
   } catch (error) {
     return res
       .status(400)
