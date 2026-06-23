@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260623-groups" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-benchmarks" />
 </head>
 <body>
   <nav class="nav">
@@ -18,6 +18,7 @@
         <span>Meowsu · VLA Radar</span>
       </a>
       <div class="nav-links">
+        <a href="/vla-radar/#benchmarks">Benchmark</a>
         <a href="/vla-radar/#timeline">主线</a>
         <a href="/vla-radar/#branches">分化</a>
         <a href="/vla-radar/#finetune">微调</a>
@@ -51,6 +52,60 @@
 
   <script>
     const GROUPS = {
+      'benchmark-libero': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: 'LIBERO',
+        intro: 'LIBERO 是当前 VLA 论文最常见的基础仿真 benchmark 之一，Spatial / Object / Goal / Long 经常作为主结果表的核心坐标。',
+        tags: ['libero', 'lifelong learning', 'language-conditioned'],
+        ids: ['2306.03310']
+      },
+      'benchmark-libero-stress': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: 'LIBERO-PRO / LIBERO-Para / LIBERO-Plus',
+        intro: '这一组专门反思标准 LIBERO 高分是否真的代表泛化：扰动物体、初始状态、语言表达、环境和视觉条件，观察模型是否只是记住了 benchmark。',
+        tags: ['stress test', 'paraphrase', 'robustness'],
+        ids: ['2510.03827', '2603.28301', '2510.13626']
+      },
+      'benchmark-simpler': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: 'SimplerEnv',
+        intro: '用仿真评估真实机器人策略，关注 simulated evaluation 和真实策略表现之间是否相关。',
+        tags: ['sim-to-real', 'simulation', 'policy evaluation'],
+        ids: ['2405.05941']
+      },
+      'benchmark-household': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: 'RoboCasa / RoboCasa365',
+        intro: '厨房和家庭场景的长程任务仿真 benchmark，适合看 household generalization、合成数据和长期任务组合。',
+        tags: ['household', 'long-horizon', 'simulation'],
+        ids: ['2406.02523', '2603.04356']
+      },
+      'benchmark-bimanual': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: 'RoboTwin / RoboTwin2.0',
+        intro: '双臂、数字孪生、合成数据和多 embodiment 设置，适合观察 bimanual VLA 与 diffusion transformer 路线。',
+        tags: ['bimanual', 'synthetic data', 'domain randomization'],
+        ids: ['2504.13059', '2506.18088', '2410.07864']
+      },
+      'benchmark-legacy': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: 'CALVIN / Meta-World / ManiSkill',
+        intro: 'CALVIN 是老牌长程语言条件操作 benchmark；Meta-World 和 ManiSkill 常作为小模型、空间 VLA 或泛化能力的辅助评估。',
+        tags: ['legacy benchmark', 'auxiliary', 'long-horizon'],
+        ids: ['2112.03227', '1910.10897', '2107.14483']
+      },
+      'benchmark-model-line': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: '从 ACT 到 π0.7 的模型对比线',
+        intro: '这些节点经常被放在同一批 benchmark 表格里比较：谁提升了成功率，谁提升了速度，谁在泛化或鲁棒性上仍然脆弱。',
+        tags: ['model line', 'baseline', 'benchmark reading'],
+        ids: ['2304.13705', '2303.04137', '2405.12213', '2406.09246', '2410.24164', '2501.09747', '2410.07864', '2502.19645', '2506.01844', '2510.13054', '2604.11757', '2602.18224', '2411.19650', '2508.07917', '2504.16054', '2511.14759', '2604.15483']
+      },
+      'benchmark-simple-vlas': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: 'StarVLA / SimVLA',
+        intro: '强简单 baseline 路线：用更少复杂技巧和统一 benchmark 重新检验 VLA 改动到底是不是必要。',
+        tags: ['simple baseline', 'efficient-vla', 'benchmark'],
+        ids: ['2604.11757', '2602.18224']
+      },
+      'benchmark-pi-series': {
+        kind: 'Benchmark Hub', anchor: 'benchmarks', title: 'π0.5 / π0.6 / π0.7',
+        intro: 'π 系列从 flow action expert 走向高层 subtask、经验学习和可 steer context，是当前 VLA 从 BC 到 generalist 控制的重要主线。',
+        tags: ['pi-series', 'hierarchy', 'experience learning'],
+        ids: ['2504.16054', '2511.14759', '2604.15483']
+      },
       'rt-1': {
         kind: 'Mainline', anchor: 'timeline', title: 'RT-1',
         intro: '从大规模真实机器人轨迹和行为克隆开始，Robot Transformer 把多任务机器人控制带入可扩展训练范式。',
@@ -87,6 +142,12 @@
         tags: ['action tokenizer', 'frequency', 'hybrid'],
         ids: ['2501.09747']
       },
+      'oft-vla0': {
+        kind: 'Mainline', anchor: 'timeline', title: 'OpenVLA-OFT / VLA-0',
+        intro: '围绕 OpenVLA 的慢推理、离散动作和复杂架构提出两种重要反思：一种是实用改造，一种是几乎不改 VLM 的强 baseline。',
+        tags: ['openvla', 'continuous action', 'simple baseline'],
+        ids: ['2502.19645', '2510.13054']
+      },
       smolvla: {
         kind: 'Mainline', anchor: 'timeline', title: 'SmolVLA',
         intro: '小模型、社区数据、冻结 VLM 和异步推理，把 VLA 拉向更容易复现和部署的路线。',
@@ -105,47 +166,77 @@
         tags: ['rl', 'experience', 'advantage conditioning'],
         ids: ['2511.14759']
       },
+      'star-simvla': {
+        kind: 'Mainline', anchor: 'timeline', title: 'StarVLA / SimVLA',
+        intro: '强简单 baseline 说明 VLA 社区正在重新审视：复杂架构是否真的必要，还是统一 benchmark 与合理实现已经足够强。',
+        tags: ['simple baseline', 'benchmark', 'efficient-vla'],
+        ids: ['2604.11757', '2602.18224']
+      },
       pi07: {
         kind: 'Mainline', anchor: 'timeline', title: 'π0.7',
         intro: '上下文成为 steer 接口：metadata、subgoal image、history 和 world model 共同影响策略行为。',
         tags: ['steerable', 'context', 'world model'],
         ids: ['2604.15483']
       },
+      'benchmark-generalization': {
+        kind: '分化方向', anchor: 'branches', title: 'Benchmark 真实性与泛化评测',
+        intro: '看标准 benchmark 是否真的测到泛化：是否被背题、换语言是否掉分、换物体/初始状态/环境是否崩掉、结果是否有统计意义。',
+        tags: ['benchmark audit', 'generalization', 'robustness'],
+        ids: ['2306.03310', '2510.03827', '2603.28301', '2510.13626', '2405.05941']
+      },
       'action-representation': {
-        kind: '分化方向', anchor: 'branches', title: 'Action Representation',
-        intro: '看动作如何被表达：离散 token、FAST、flow matching、diffusion、以及连续动作 expert。',
+        kind: '分化方向', anchor: 'branches', title: 'Action Decoder / Representation',
+        intro: '看动作如何被表达和解码：action chunking、离散 token、FAST、flow matching、diffusion、continuous action head 与 action expert。',
         tags: ['action token', 'flow', 'diffusion'],
-        ids: ['2307.15818', '2405.12213', '2406.09246', '2410.24164', '2410.07864', '2501.09747']
+        ids: ['2304.13705', '2303.04137', '2307.15818', '2405.12213', '2406.09246', '2410.24164', '2410.07864', '2501.09747', '2502.19645', '2411.19650']
+      },
+      'simple-baselines': {
+        kind: '分化方向', anchor: 'branches', title: '小模型 / 简单 Baseline / 可复现',
+        intro: '看 VLA 社区如何重新审视“大而复杂才强”的假设：更小模型、更简单改造、更低成本部署是否已经足够有竞争力。',
+        tags: ['simple baseline', 'efficient-vla', 'reproducible'],
+        ids: ['2409.12514', '2502.19645', '2506.01844', '2510.13054', '2604.11757', '2602.18224']
+      },
+      'reasoning-planning': {
+        kind: '分化方向', anchor: 'branches', title: 'High-level Reasoning / Subtask / Goal Image',
+        intro: '看 VLA 如何从低层动作扩展到阶段、目标、计划、中间状态和可解释的动作推理。',
+        tags: ['subtask', 'goal image', 'action reasoning'],
+        ids: ['2504.16054', '2604.15483', '2508.07917', '2605.02881']
+      },
+      'experience-rl': {
+        kind: '分化方向', anchor: 'branches', title: 'RL / Post-training / Experience',
+        intro: '看 VLA 如何从 deployment experience、reward feedback、intervention 和失败数据中继续学习，而不只停留在静态 BC。',
+        tags: ['rl', 'post-training', 'experience'],
+        ids: ['2511.14759']
+      },
+      'spatial-grounding': {
+        kind: '分化方向', anchor: 'branches', title: '3D / Spatial Grounding / Depth',
+        intro: '看 VLA 如何补足空间关系、深度、姿态和几何 grounding，这些常常是真实操作失败的关键原因。',
+        tags: ['3d', 'depth', 'geometry'],
+        ids: ['2501.15830', '2508.09071', '2510.13375', '2508.07917']
       },
       'backbone-expert': {
         kind: '分化方向', anchor: 'branches', title: 'Backbone & Expert',
-        intro: '看语义 backbone 和动作 expert 如何分工：VLM/LLM 负责理解，action head 负责控制。',
+        intro: '旧入口：看语义 backbone 和动作 expert 如何分工，已并入 Action Decoder / Reasoning 两条新线。',
         tags: ['vlm backbone', 'action expert', 'grounding'],
         ids: ['2303.03378', '2307.15818', '2406.09246', '2410.24164', '2506.01844']
       },
       'hierarchy-planning': {
         kind: '分化方向', anchor: 'branches', title: 'Hierarchy & Planning',
-        intro: '看长程任务如何被拆成 subtask、goal image、semantic policy 或可 steer context。',
+        intro: '旧入口：看长程任务如何被拆成 subtask、goal image、semantic policy 或可 steer context。',
         tags: ['subtask', 'goal image', 'planning'],
-        ids: ['2405.12213', '2504.16054', '2604.15483']
+        ids: ['2405.12213', '2504.16054', '2604.15483', '2508.07917']
       },
       'data-mixture': {
         kind: '分化方向', anchor: 'branches', title: 'Data Mixture',
-        intro: '看多机器人数据、web data、社区数据和上下文 metadata 如何被混进同一套训练体系。',
+        intro: '旧入口：看多机器人数据、web data、社区数据和上下文 metadata 如何被混进同一套训练体系。',
         tags: ['cross-embodiment', 'web data', 'community data'],
         ids: ['2310.08864', '2504.16054', '2506.01844', '2604.15483']
       },
-      'experience-rl': {
-        kind: '分化方向', anchor: 'branches', title: 'Experience & RL',
-        intro: '看 VLA 如何从成功/失败/纠正/奖励中继续学习，而不是只停在静态演示模仿。',
-        tags: ['rl', 'intervention', 'reward feedback'],
-        ids: ['2511.14759']
-      },
       'efficiency-deploy': {
         kind: '分化方向', anchor: 'branches', title: 'Efficiency & Deploy',
-        intro: '看 VLA 如何变小、变快、变便宜：低延迟、小模型、冻结 VLM、consumer GPU 和异步执行。',
+        intro: '旧入口：看 VLA 如何变小、变快、变便宜；已并入小模型 / 简单 baseline 方向。',
         tags: ['efficient-vla', 'latency', 'deploy'],
-        ids: ['2409.12514', '2501.09747', '2506.01844', '2406.09246']
+        ids: ['2409.12514', '2501.09747', '2506.01844', '2406.09246', '2502.19645']
       }
     };
 
@@ -173,7 +264,10 @@
     } else {
       document.title = `${group.title} · VLA Radar`;
       document.getElementById('groupBack').href = `/vla-radar/#${group.anchor}`;
-      document.getElementById('groupBack').textContent = group.anchor === 'branches' ? '← 回到分化地图' : '← 回到主线';
+      document.getElementById('groupBack').textContent =
+        group.anchor === 'benchmarks' ? '← 回到 Benchmark Hub' :
+        group.anchor === 'branches' ? '← 回到分化地图' :
+        '← 回到主线';
       document.getElementById('groupBadge').textContent = group.kind;
       document.getElementById('groupTitle').textContent = group.title;
       document.getElementById('groupIntro').textContent = group.intro;

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260623-groups" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-benchmarks" />
 
 </head>
 <body>
@@ -19,6 +19,7 @@
         <span>Meowsu · VLA Radar</span>
       </a>
       <div class="nav-links">
+        <a href="#benchmarks">Benchmark</a>
         <a href="#timeline">主线</a>
         <a href="#branches">分化</a>
         <a href="#finetune">微调</a>
@@ -35,16 +36,16 @@
       <div>
         <span class="badge">VLA 发展地图 · 架构 / 数据 / 后训练</span>
         <h1>看懂 VLA 的<br /><span>主线与分叉</span></h1>
-        <p>从 RT-1 的机器人 Transformer，到 RT-2 / OpenVLA 的 VLM 语义迁移，再到 π0、SmolVLA、π0.5、π0.6、π0.7 的连续动作、层次化、经验学习与可 steer 上下文。这不是论文列表，而是一个帮助你快速定位研究机会的地图。</p>
+        <p>从 LIBERO 这类 benchmark 如何影响结果解读，到 RT-1、RT-2、OpenVLA、π0、SmolVLA、π0.5、π0.6、π0.7 的架构与训练分化。这不是论文列表，而是一个帮助你快速定位研究机会的地图。</p>
         <div class="hero-actions">
-          <a class="btn" href="#timeline">开始看时间线 →</a>
+          <a class="btn" href="#benchmarks">先看 Benchmark Hub →</a>
           <a class="btn-ghost" href="#daily">看每日论文雷达</a>
           <a class="btn-soft" href="/archive">回学习记录</a>
         </div>
         <div class="quick-stats" aria-label="VLA radar stats">
-          <div class="stat-card"><strong>10+</strong><span>关键范式节点</span></div>
+          <div class="stat-card"><strong>15+</strong><span>关键模型节点</span></div>
+          <div class="stat-card"><strong>9</strong><span>benchmark / suite</span></div>
           <div class="stat-card"><strong>6</strong><span>分化方向</span></div>
-          <div class="stat-card"><strong>3</strong><span>常用后训练策略</span></div>
           <div class="stat-card"><strong>1</strong><span>每日 arXiv 飞轮</span></div>
         </div>
       </div>
@@ -68,6 +69,30 @@
   </header>
 
   <main>
+    <section id="benchmarks" class="section">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="badge">先看尺子，再看分数</span>
+            <h2>Benchmark Hub</h2>
+            <p>很多 VLA 论文的“提升”本质是在同一批 benchmark 上重新定义动作表示、推理速度、鲁棒性或泛化条件。这里先把尺子摆清楚，再进入模型时间线。</p>
+          </div>
+          <a class="btn-ghost" href="#timeline">看模型时间线 ↓</a>
+        </div>
+        <div class="benchmark-grid" id="benchmarkGrid"></div>
+        <div class="benchmark-line sticker-card">
+          <div class="benchmark-line-head">
+            <div>
+              <span class="badge">模型对比线</span>
+              <h3>从 ACT 到 π0.7：常被放进同一张表里的节点</h3>
+            </div>
+            <a class="btn-soft" href="/vla-radar/group.html?id=benchmark-model-line">看整条线 →</a>
+          </div>
+          <div class="model-rail" id="benchmarkModelLine"></div>
+        </div>
+      </div>
+    </section>
+
     <section id="timeline" class="section">
       <div class="container">
         <div class="section-head">
@@ -220,6 +245,32 @@
   </footer>
 
   <script>
+    const benchmarks = [
+      {id:'benchmark-libero', icon:'🧪', badge:'Main Benchmark', title:'LIBERO', paperIds:['2306.03310'], text:'当前 VLA 论文最常见的仿真评测之一，Spatial / Object / Goal / Long 四套件经常成为主结果表的核心坐标。'},
+      {id:'benchmark-libero-stress', icon:'🧨', badge:'Benchmark Stress Test', title:'LIBERO-PRO / Para / Plus', paperIds:['2510.03827','2603.28301','2510.13626'], text:'专门追问标准 LIBERO 高分是否真等于泛化：扰动物体、初始状态、指令、环境和 paraphrase，看模型是否只是背题。'},
+      {id:'benchmark-simpler', icon:'🔁', badge:'Sim-to-Real Proxy', title:'SimplerEnv', paperIds:['2405.05941'], text:'用仿真评估真实机器人策略，关注 simulated evaluation 和真实策略表现之间是否相关，是 VLA 实验常见补充。'},
+      {id:'benchmark-household', icon:'🍳', badge:'Long-horizon Household', title:'RoboCasa / RoboCasa365', paperIds:['2406.02523','2603.04356'], text:'面向厨房和家庭长程任务的大规模仿真环境，适合观察 household generalization、数据生成和长期任务组合。'},
+      {id:'benchmark-bimanual', icon:'🦾', badge:'Bimanual / Synthetic Data', title:'RoboTwin / RoboTwin2.0', paperIds:['2504.13059','2506.18088','2410.07864'], text:'双臂、数字孪生、强域随机化和合成数据评测，对 bimanual VLA 与 diffusion transformer 路线很关键。'},
+      {id:'benchmark-legacy', icon:'🧭', badge:'Legacy / Auxiliary', title:'CALVIN / Meta-World / ManiSkill', paperIds:['2112.03227','1910.10897','2107.14483'], text:'CALVIN 是老牌长程语言条件操作 benchmark；Meta-World / ManiSkill 常作为小模型、空间 VLA 或泛化能力的辅助评估。'}
+    ];
+
+    const benchmarkModelLine = [
+      {label:'ACT', id:'2304.13705'},
+      {label:'Diffusion Policy', id:'2303.04137'},
+      {label:'Octo', id:'2405.12213'},
+      {label:'OpenVLA', id:'2406.09246'},
+      {label:'π0', id:'2410.24164'},
+      {label:'FAST', id:'2501.09747'},
+      {label:'RDT-1B', id:'2410.07864'},
+      {label:'OpenVLA-OFT', id:'2502.19645'},
+      {label:'SmolVLA', id:'2506.01844'},
+      {label:'VLA-0', id:'2510.13054'},
+      {label:'StarVLA / SimVLA', group:'benchmark-simple-vlas'},
+      {label:'CogACT', id:'2411.19650'},
+      {label:'MolmoAct', id:'2508.07917'},
+      {label:'π0.5 / π0.6 / π0.7', group:'benchmark-pi-series'}
+    ];
+
     const timeline = [
       {id:'rt-1', year:'2022', title:'RT-1', paperIds:['2212.06817'], tags:['Robot Transformer','BC','Action Token'], text:'证明真实机器人多任务数据 + Transformer 可以扩展；动作多以离散 token 形式输出。', detail:'起点不是最强语义，而是把真实机器人轨迹规模化，用行为克隆训练一个能跨任务执行的机器人 Transformer。'},
       {id:'palm-e-rt-2', year:'2023', title:'PaLM-E / RT-2', paperIds:['2303.03378','2307.15818'], tags:['VLM Backbone','Web Knowledge'], text:'VLM/LLM 语义先验进入机器人控制，动作被映射到语言 token 空间。', detail:'关键变化：机器人不再只从演示里学语义，而是继承互联网视觉语言知识，再用机器人数据把语义落地到动作。'},
@@ -227,33 +278,54 @@
       {id:'octo-openvla', year:'2024', title:'Octo / OpenVLA', paperIds:['2405.12213','2406.09246'], tags:['Open Source','Generalist'], text:'开放 generalist policy 与 7B VLA 进入社区复现视野。', detail:'OpenVLA 代表离散 action token + VLM/LLM backbone 的开源路线；Octo 代表跨数据集、语言/目标图像条件的通用 policy。'},
       {id:'pi0-rdt', year:'2024', title:'π0 / RDT', paperIds:['2410.24164','2410.07864'], tags:['Flow','Diffusion','Action Expert'], text:'连续动作块成为主流解法，action expert 从 backbone 中分离。', detail:'动作不再必须像文本一样逐 token 生成；flow/diffusion 更适合高频、连续、多峰、灵巧控制。'},
       {id:'fast', year:'2025', title:'FAST', paperIds:['2501.09747'], tags:['Action Tokenizer','Hybrid'], text:'用频域压缩 action token 改善离散动作表示，兼顾训练效率。', detail:'它不是完全否定 token，而是让 token 更像动作轨迹压缩码，缓解传统 binning 的低效与量化问题。'},
+      {id:'oft-vla0', year:'2025', title:'OpenVLA-OFT / VLA-0', paperIds:['2502.19645','2510.13054'], tags:['Strong Baseline','Continuous Action'], text:'围绕 OpenVLA 的慢推理、离散动作和复杂架构提出强实用改造与反直觉 baseline。', detail:'OpenVLA-OFT 直接优化速度与成功率；VLA-0 则反问：几乎不改 VLM、用 text action 是否也能打很多复杂 VLA。'},
       {id:'smolvla', year:'2025', title:'SmolVLA', paperIds:['2506.01844'], tags:['Efficient','Frozen VLM','Community Data'], text:'小模型、冻结 VLM、训练 action expert，用社区低成本数据做可复现 VLA。', detail:'对个人复现非常重要：先把数据、相机顺序、action expert 和异步推理跑通，再考虑大模型。'},
       {id:'pi05', year:'2025', title:'π0.5', paperIds:['2504.16054'], tags:['Hierarchy','Web Data','Subtask'], text:'同一模型内加入高层 subtask 与低层 action，强化开放世界泛化。', detail:'长程任务不只靠低层动作；高层语义预测、web data、verbal instruction 和多机器人数据共同提供泛化。'},
       {id:'pi06-recap', year:'2025', title:'π0.6-star / RECAP', paperIds:['2511.14759'], tags:['RL','Experience','Advantage'], text:'VLA 从演示学习走向部署后自我改进：rollout、reward、intervention 进入训练闭环。', detail:'关键是 value function + advantage conditioning：不只是模仿人类，而是利用成功/失败/纠正数据提升吞吐和鲁棒性。'},
+      {id:'star-simvla', year:'2026', title:'StarVLA / SimVLA', paperIds:['2604.11757','2602.18224'], tags:['Simple Baseline','Benchmark'], text:'强简单 baseline 进入视野：小模型、统一 benchmark 和更少复杂技巧也能打出很强表现。', detail:'这条线提醒我们不能只被复杂架构吸引，还要用统一 benchmark 判断哪些改动真的贡献了收益。'},
       {id:'pi07', year:'2026', title:'π0.7', paperIds:['2604.15483'], tags:['Steerable','Metadata','Subgoal Image'], text:'prompt/context 成为控制接口：metadata、subgoal image、world model、history 共同 steer 行为。', detail:'混合质量数据不再简单过滤，而是通过质量、速度、错误、目标图等上下文让模型知道“怎样做才是好策略”。'}
     ];
 
     const branches = [
-      {id:'action-representation', icon:'🦾', title:'Action Representation', paperIds:['2307.15818','2405.12213','2406.09246','2410.24164','2410.07864','2501.09747'], text:'离散 action token、FAST、diffusion、flow matching、discrete diffusion、hybrid token+flow。'},
-      {id:'backbone-expert', icon:'🧠', title:'Backbone & Expert', paperIds:['2303.03378','2307.15818','2406.09246','2410.24164','2506.01844'], text:'VLM/LLM backbone 负责语义与感知，action expert/head 负责连续动作与实时控制。'},
-      {id:'hierarchy-planning', icon:'🧭', title:'Hierarchy & Planning', paperIds:['2405.12213','2504.16054','2604.15483'], text:'subtask、semantic policy、goal image、world model、memory，让长程任务不再完全 flat。'},
-      {id:'data-mixture', icon:'📦', title:'Data Mixture', paperIds:['2310.08864','2504.16054','2506.01844','2604.15483'], text:'robot demo、cross-embodiment、web VQA、egocentric video、failure、autonomous rollout、metadata。'},
-      {id:'experience-rl', icon:'🔁', title:'Experience & RL', paperIds:['2511.14759'], text:'value function、advantage conditioning、intervention、reward feedback、failure removal。'},
-      {id:'efficiency-deploy', icon:'⚡', title:'Efficiency & Deploy', paperIds:['2409.12514','2501.09747','2506.01844','2406.09246'], text:'SmolVLA、TinyVLA、on-device、frozen VLM、async inference、consumer GPU。'}
+      {id:'benchmark-generalization', icon:'🧪', title:'Benchmark 真实性与泛化评测', paperIds:['2306.03310','2510.03827','2603.28301','2510.13626','2405.05941'], text:'标准 LIBERO 是否被背题？换语言、物体、初始位置、环境后是否崩掉？结果是否真的测到泛化。'},
+      {id:'action-representation', icon:'🦾', title:'Action Decoder / Representation', paperIds:['2304.13705','2303.04137','2307.15818','2405.12213','2406.09246','2410.24164','2410.07864','2501.09747','2502.19645','2411.19650'], text:'离散 token、FAST、flow、diffusion、continuous action chunk、action expert，以及速度和稳定性的权衡。'},
+      {id:'simple-baselines', icon:'⚡', title:'小模型 / 简单 Baseline / 可复现', paperIds:['2409.12514','2502.19645','2506.01844','2510.13054','2604.11757','2602.18224'], text:'TinyVLA、SmolVLA、OpenVLA-OFT、VLA-0、StarVLA、SimVLA：重新审视复杂架构是否真的必要。'},
+      {id:'reasoning-planning', icon:'🧭', title:'High-level Reasoning / Subtask / Goal Image', paperIds:['2504.16054','2604.15483','2508.07917','2605.02881'], text:'VLA 不能只会输出低层动作，还要知道阶段、目标、质量、计划和中间状态。'},
+      {id:'experience-rl', icon:'🔁', title:'RL / Post-training / Experience', paperIds:['2511.14759'], text:'BC 到底不够在哪里？失败数据、reward feedback、人类 intervention 和部署经验如何让 VLA 继续变强。'},
+      {id:'spatial-grounding', icon:'📐', title:'3D / Spatial Grounding / Depth', paperIds:['2501.15830','2508.09071','2510.13375','2508.07917'], text:'很多失败不是语言不懂，而是空间关系、姿态、抓取几何和深度不准；这一支专门补几何感知。'}
     ];
 
     const works = [
+      {title:'ACT / ALOHA', arxiv_id:'2304.13705', cat:'action', tags:['action chunk','bimanual'], text:'用 action chunking 和低成本双臂硬件奠定很多后续 VLA/模仿学习 baseline 的控制形态。', arxiv:'https://arxiv.org/abs/2304.13705'},
+      {title:'Diffusion Policy', arxiv_id:'2303.04137', cat:'action', tags:['diffusion','visuomotor'], text:'把扩散模型用于视觉运动策略，成为连续、多峰动作建模的重要基线。', arxiv:'https://arxiv.org/abs/2303.04137'},
+      {title:'LIBERO', arxiv_id:'2306.03310', cat:'benchmark', tags:['benchmark','lifelong'], text:'当前 VLA 最常见仿真评测之一，很多新模型默认报告 Spatial / Object / Goal / Long。', arxiv:'https://arxiv.org/abs/2306.03310'},
+      {title:'Meta-World', arxiv_id:'1910.10897', cat:'benchmark', tags:['benchmark','multi-task'], text:'多任务和元强化学习操作 benchmark，常作为 VLA 之外的辅助 manipulation 尺子。', arxiv:'https://arxiv.org/abs/1910.10897'},
+      {title:'ManiSkill', arxiv_id:'2107.14483', cat:'benchmark', tags:['3d','simulation'], text:'3D 物理仿真操作技能 benchmark，适合观察空间、几何和低层 manipulation 能力。', arxiv:'https://arxiv.org/abs/2107.14483'},
+      {title:'RoboTwin', arxiv_id:'2504.13059', cat:'benchmark', tags:['bimanual','digital twin'], text:'用生成式数字孪生构建双臂 benchmark，是 RoboTwin2.0 和双臂 VLA 评测的重要基础。', arxiv:'https://arxiv.org/abs/2504.13059'},
       {title:'RT-1', arxiv_id:'2212.06817', cat:'mainline', tags:['robot transformer','BC'], text:'早期大规模真实机器人 Transformer，证明多任务机器人数据扩展有效。', arxiv:'https://arxiv.org/abs/2212.06817', github:'https://github.com/google-research/robotics_transformer'},
       {title:'RT-2', arxiv_id:'2307.15818', cat:'vlm', tags:['VLM','action as token'], text:'把 web-scale VLM 迁移到机器人控制，显著增强语义泛化。', arxiv:'https://arxiv.org/abs/2307.15818', project:'https://robotics-transformer2.github.io/'},
       {title:'Open X-Embodiment / RT-X', arxiv_id:'2310.08864', cat:'data', tags:['cross-embodiment','dataset'], text:'把多机构、多机器人数据标准化，推动跨机器人 policy。', arxiv:'https://arxiv.org/abs/2310.08864', project:'https://robotics-transformer-x.github.io/'},
       {title:'Octo', arxiv_id:'2405.12213', cat:'open', tags:['open generalist','goal image'], text:'开放 generalist policy，支持语言或目标图像条件，便于下游适配。', arxiv:'https://arxiv.org/abs/2405.12213', github:'https://github.com/octo-models/octo', project:'https://octo-models.github.io/'},
       {title:'OpenVLA', arxiv_id:'2406.09246', cat:'open', tags:['7B','open source','LoRA'], text:'开源 7B VLA，离散 action token 路线的强代表。', arxiv:'https://arxiv.org/abs/2406.09246', github:'https://github.com/openvla/openvla', project:'https://openvla.github.io/'},
       {title:'π0', arxiv_id:'2410.24164', cat:'action', tags:['flow matching','action expert'], text:'用 flow action expert 输出连续动作块，适合灵巧和高频控制。', arxiv:'https://arxiv.org/abs/2410.24164', github:'https://github.com/Physical-Intelligence/openpi', project:'https://www.pi.website/blog/pi0'},
+      {title:'RDT-1B', arxiv_id:'2410.07864', cat:'action', tags:['diffusion','bimanual'], text:'面向双臂操作的 diffusion foundation model，代表大 diffusion transformer / bimanual 路线。', arxiv:'https://arxiv.org/abs/2410.07864'},
       {title:'FAST', arxiv_id:'2501.09747', cat:'action', tags:['tokenizer','frequency'], text:'改进 action tokenization，提高离散 token 训练效率。', arxiv:'https://arxiv.org/abs/2501.09747', github:'https://github.com/Physical-Intelligence/openpi', project:'https://www.pi.website/research/fast'},
+      {title:'OpenVLA-OFT', arxiv_id:'2502.19645', cat:'efficient', tags:['continuous action','26x'], text:'针对 OpenVLA 慢推理和离散动作做实用改造，是近期很强的 open baseline。', arxiv:'https://arxiv.org/abs/2502.19645'},
       {title:'SmolVLA', arxiv_id:'2506.01844', cat:'efficient', tags:['frozen VLM','community data'], text:'小模型 + flow expert + community data + async inference，适合个人复现。', arxiv:'https://arxiv.org/abs/2506.01844', github:'https://github.com/huggingface/lerobot', project:'https://huggingface.co/blog/smolvla'},
+      {title:'VLA-0', arxiv_id:'2510.13054', cat:'baseline', tags:['text action','simple baseline'], text:'几乎不改 VLM、直接用 text action，却在 LIBERO 上打很多复杂 VLA，是反直觉 baseline。', arxiv:'https://arxiv.org/abs/2510.13054'},
+      {title:'StarVLA-alpha', arxiv_id:'2604.11757', cat:'baseline', tags:['simple-vla','strong baseline'], text:'用更简单的 VLA 系统挑战复杂架构，强调统一 benchmark 下的强简单方法。', arxiv:'https://arxiv.org/abs/2604.11757'},
+      {title:'SimVLA', arxiv_id:'2602.18224', cat:'baseline', tags:['simple-vla','benchmark'], text:'简单 VLA baseline，适合和 LIBERO、RoboTwin、RoboCasa 等近期 benchmark 放在一起看。', arxiv:'https://arxiv.org/abs/2602.18224'},
+      {title:'CogACT', arxiv_id:'2411.19650', cat:'reasoning', tags:['cognition','action module'], text:'把 VLM cognition 和 action 模块解耦，代表 componentized VLA 趋势。', arxiv:'https://arxiv.org/abs/2411.19650'},
+      {title:'MolmoAct', arxiv_id:'2508.07917', cat:'reasoning', tags:['spatial reasoning','trace'], text:'强调 action reasoning traces 和空间动作推理，让动作生成更可解释。', arxiv:'https://arxiv.org/abs/2508.07917'},
       {title:'π0.5', arxiv_id:'2504.16054', cat:'hierarchy', tags:['subtask','web data'], text:'高层 subtask + 低层 action，同一模型实现长程任务分解。', arxiv:'https://arxiv.org/abs/2504.16054', github:'https://github.com/Physical-Intelligence/openpi', project:'https://www.pi.website/blog/pi05'},
       {title:'π0.6-star / RECAP', arxiv_id:'2511.14759', cat:'rl', tags:['RL','advantage','intervention'], text:'部署后收集经验，用 value / advantage 让 VLA 从成功失败中改进。', arxiv:'https://arxiv.org/abs/2511.14759'},
-      {title:'π0.7', arxiv_id:'2604.15483', cat:'context', tags:['metadata','subgoal image','world model'], text:'用丰富 context steer 大规模混合数据，实现更强 out-of-box 与组合泛化。', arxiv:'https://arxiv.org/abs/2604.15483'}
+      {title:'π0.7', arxiv_id:'2604.15483', cat:'context', tags:['metadata','subgoal image','world model'], text:'用丰富 context steer 大规模混合数据，实现更强 out-of-box 与组合泛化。', arxiv:'https://arxiv.org/abs/2604.15483'},
+      {title:'LIBERO-PRO', arxiv_id:'2510.03827', cat:'benchmark', tags:['stress-test','memorization'], text:'指出标准 LIBERO 高分不代表真实泛化，扰动泛化设置会让部分模型接近崩掉。', arxiv:'https://arxiv.org/abs/2510.03827'},
+      {title:'LIBERO-Para', arxiv_id:'2603.28301', cat:'benchmark', tags:['paraphrase','language'], text:'专测指令改写鲁棒性，追问 VLA 是否真的跟随语言而不是记模板。', arxiv:'https://arxiv.org/abs/2603.28301'},
+      {title:'LIBERO-Plus', arxiv_id:'2510.13626', cat:'benchmark', tags:['robustness','perturbation'], text:'从语言、视觉、物体等维度做系统扰动，揭示 VLA 对非关键变化仍然敏感。', arxiv:'https://arxiv.org/abs/2510.13626'},
+      {title:'SpatialVLA', arxiv_id:'2501.15830', cat:'spatial', tags:['3d','spatial'], text:'把 3D spatial representations 接进 VLA，补足空间关系和姿态理解。', arxiv:'https://arxiv.org/abs/2501.15830'},
+      {title:'GeoVLA', arxiv_id:'2508.09071', cat:'spatial', tags:['point cloud','geometry'], text:'用 3D point cloud tokenization 强化几何 grounding。', arxiv:'https://arxiv.org/abs/2508.09071'},
+      {title:'DepthVLA', arxiv_id:'2510.13375', cat:'spatial', tags:['depth','spatial'], text:'把 depth-aware reasoning 接入 VLA，针对深度和空间控制误差。', arxiv:'https://arxiv.org/abs/2510.13375'}
     ];
 
     const daily = [
@@ -261,6 +333,24 @@
       {title:'示例：VLA with intervention preference', tags:['RL','intervention'], problem:'人类纠正数据不一定最优。', method:'用 value/uncertainty 区分好纠正与噪声纠正。', signal:'给失败样本打标签，而不是全量模仿。'},
       {title:'示例：Community data normalization', tags:['data','efficient'], problem:'低成本机器人数据相机命名和任务描述混乱。', method:'VLM 自动重写 instruction + camera ordering 标准化。', signal:'复现前先做数据清洗 dashboard。'}
     ];
+
+    const benchmarkGrid = document.getElementById('benchmarkGrid');
+    benchmarkGrid.innerHTML = benchmarks.map((b, idx) => `
+      <a class="sticker-card benchmark-card" href="/vla-radar/group.html?id=${encodeURIComponent(b.id)}" data-index="${idx+1}" aria-label="查看 ${b.title} benchmark 相关论文">
+        <div class="branch-icon">${b.icon}</div>
+        <span class="benchmark-badge">${b.badge}</span>
+        <h3>${b.title}</h3>
+        <p>${b.text}</p>
+        <span class="mini-count">${b.paperIds.length} 篇论文 →</span>
+      </a>`).join('');
+
+    const benchmarkLine = document.getElementById('benchmarkModelLine');
+    benchmarkLine.innerHTML = benchmarkModelLine.map(item => {
+      const href = item.group
+        ? `/vla-radar/group.html?id=${encodeURIComponent(item.group)}`
+        : `/vla-radar/paper.html?id=${encodeURIComponent(item.id)}&from=group&group=benchmark-model-line`;
+      return `<a class="model-pill" href="${href}">${item.label}</a>`;
+    }).join('');
 
     const timelineEl = document.getElementById('timelineCards');
     timelineEl.innerHTML = timeline.map(item => `
@@ -281,7 +371,7 @@
         <span class="mini-count">${b.paperIds.length} 篇论文 →</span>
       </a>`).join('');
 
-    const cats = ['all','mainline','vlm','data','open','action','efficient','hierarchy','rl','context'];
+    const cats = ['all','benchmark','mainline','vlm','data','open','action','efficient','baseline','reasoning','hierarchy','rl','context','spatial'];
     const filters = document.getElementById('filters');
     filters.innerHTML = cats.map(c=>`<button class="filter-chip ${c==='all'?'active':''}" data-cat="${c}">${c}</button>`).join('');
 
