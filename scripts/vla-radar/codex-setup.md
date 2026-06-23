@@ -61,6 +61,27 @@ SITE = https://www.meowsu.xyz
 4. 报告处理了几篇。
 ```
 
+## 让「全文重析」秒级触发（可选，推荐）
+
+每小时的 drain 任务时效差。Codex 支持**事件触发（webhook trigger）**，能让网页按钮点完**立刻**唤醒 Codex：
+
+1. 在 Codex 里新建一个 **Trigger（webhook 类型）**，任务内容用上面【任务②/drain】的同一段 prompt。
+2. 拿到该 trigger 的 **webhook URL**（以及密钥，如果有）。
+3. 在 Vercel 加环境变量并 Redeploy：
+   - `CODEX_TRIGGER_URL` = 那个 webhook URL
+   - `CODEX_TRIGGER_SECRET` = 密钥（Codex 没给就不填）
+4. 完成。
+
+之后点详情页「🔬 全文重新解析」时的链路：
+```
+网页按钮 → POST /api/vla-radar/request → 标记入队 + 立即 POST 唤醒 Codex webhook
+        → Codex 跑 drain：读 /pending → 全文重析 → POST /ingest 覆盖（自动清队列标记）
+        → 详情页每 20s 轮询，检测到标记清除即自动刷新（通常 1~3 分钟）
+```
+
+> 每小时的 scheduled drain 任务**保留作兜底**（万一某次 webhook 没成功）。
+> 没配 `CODEX_TRIGGER_URL` 时，按钮自动退回「排队 + 等每小时」模式，功能不受影响。
+
 ## 排错
 - 任务报 `503`：Vercel 没配 `VLA_RADAR_INGEST_TOKEN` 或还没部署。
 - 任务报 `401`：Codex 里的 token 和 Vercel 不一致。

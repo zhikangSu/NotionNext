@@ -96,8 +96,14 @@
         const res = await fetch(`/api/vla-radar/request?id=${encodeURIComponent(id)}`, { method: 'POST' });
         const j = await res.json().catch(() => ({}));
         if (res.ok && j.queued) {
-          btn.textContent = '✅ 已排队';
-          if (note) { note.hidden = false; note.textContent = '已加入全文重析队列，等下一次 drain 任务跑完会自动覆盖更新本页。'; }
+          btn.textContent = j.triggered ? '✅ 已触发 Codex' : '✅ 已排队';
+          if (note) {
+            note.hidden = false;
+            note.textContent = j.triggered
+              ? '已立即唤醒 Codex 做全文重析，通常 1~3 分钟内本页会自动刷新出新结果…'
+              : '已加入队列，等下一次 drain 任务跑完会自动更新本页。';
+          }
+          pollUntilUpdated(id);
         } else {
           btn.disabled = false; btn.textContent = '🔬 全文重新解析';
           if (note) { note.hidden = false; note.textContent = '排队失败：' + (j.message || res.status); }
@@ -106,6 +112,19 @@
         btn.disabled = false; btn.textContent = '🔬 全文重新解析';
         if (note) { note.hidden = false; note.textContent = '排队出错：' + (e && e.message ? e.message : e); }
       }
+    }
+
+    // 点完后轮询：检测到队列标记被清除（说明已重析完入库）就自动刷新本页
+    function pollUntilUpdated(id, tries = 18) {
+      let n = 0;
+      const iv = setInterval(async () => {
+        if (++n > tries) { clearInterval(iv); return; }
+        try {
+          const r = await fetch(`/api/vla-radar/paper?id=${encodeURIComponent(id)}&_=${Date.now()}`, { cache: 'no-store' });
+          const j = await r.json();
+          if (j && j.paper && j.paper.deep_requested === false) { clearInterval(iv); location.reload(); }
+        } catch (e) {}
+      }, 20000);
     }
 
     const render = p => {
