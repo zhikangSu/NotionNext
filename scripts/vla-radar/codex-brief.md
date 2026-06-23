@@ -33,9 +33,11 @@ meowsu.xyz 的「VLA Radar」每天追踪 arXiv 上的 VLA(Vision-Language-Actio
    VLA_RADAR_SITE_URL=$SITE node scripts/vla-radar/fetch-arxiv.mjs --days 2 --out /tmp/vla-new.json
    读 /tmp/vla-new.json；为空数组 → 报告“今天没有新论文”并结束。
 2. 先用标题+摘要筛相关性（必须是 VLA / 机器人操作 policy / 机器人基础模型；天文 VLA、纯 NLP 等丢弃）。
-3. 对每篇相关论文，先打开 arXiv 全文通读再分析（PDF https://arxiv.org/pdf/<id> 或 https://ar5iv.org/abs/<id>），
+3. 对每篇相关论文，先打开 arXiv 全文通读再分析（推荐 HTML 版 https://arxiv.org/html/<id>，或 PDF https://arxiv.org/pdf/<id>），
    重点看 方法/实验/消融/主结果/局限。用中文写 problem / method / delta / evidence / idea_signal / tags（3-6 个英文小写），
    保留 arxiv_id / title / authors / published / abstract；github_url、project_url 有就填、没有留空、不要编造。
+   另外从 HTML 版挑 1~3 张关键图（架构/方法图 + 主结果图）放进 figures:[{"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}]，
+   url 用 arxiv.org/html 绝对直链（即 HTML 里 <img> src 拼成绝对路径）；没有 HTML 版就留空数组，不要编造、不要用 PDF 截图。
 4. 打成 /tmp/vla-payload.json={"papers":[...]} 后 POST：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" -H "Content-Type: application/json" -d @/tmp/vla-payload.json
    401→token 错；503→后端未配置；{"ok":true,"upserted":N}→成功。
@@ -54,8 +56,9 @@ meowsu.xyz 的「VLA Radar」每天追踪 arXiv 上的 VLA(Vision-Language-Actio
 
 1. 取队列：curl -sS "$SITE/api/vla-radar/pending" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN"
    得到 {"ok":true,"papers":[{arxiv_id,title,arxiv_url}]}；papers 为空 → 报告“队列为空”并结束。
-2. 每篇打开 arXiv 全文通读（PDF https://arxiv.org/pdf/<id> 或 https://ar5iv.org/abs/<id>），重点看 方法/实验/消融/主结果/局限。
+2. 每篇打开 arXiv 全文通读（推荐 HTML 版 https://arxiv.org/html/<id>，或 PDF https://arxiv.org/pdf/<id>），重点看 方法/实验/消融/主结果/局限。
    用中文写 problem / method / delta / evidence / idea_signal / tags；github_url、project_url 有就填、没有留空、不要编造。
+   另外从 HTML 版挑 1~3 张关键图放进 figures:[{"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}]，url 用 arxiv.org/html 绝对直链；没有就留空、不要编造。
 3. 打成 /tmp/vla-deep.json={"papers":[...]} 后 POST 覆盖（会自动清掉队列标记）：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" -H "Content-Type: application/json" -d @/tmp/vla-deep.json
 4. 报告处理了几篇。

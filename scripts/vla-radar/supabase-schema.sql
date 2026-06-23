@@ -17,6 +17,7 @@ create table if not exists public.vla_papers (
   arxiv_url      text default '',
   github_url     text default '',
   project_url    text default '',
+  figures        jsonb default '[]'::jsonb,    -- 关键图表：[{url, caption}]，只存直链不存图片
   deep_requested boolean default false,        -- 网页「全文重析」按钮排队标记；drain 处理后清零
   created_at     timestamptz default now(),
   updated_at     timestamptz default now()
@@ -29,6 +30,8 @@ create index if not exists vla_papers_published_idx
 create index if not exists vla_papers_tags_idx
   on public.vla_papers using gin (tags);
 
--- 如果你在加 deep_requested 之前就建过表，跑这句补列（幂等）：
+-- 如果你之前就建过表，跑这两句补列（幂等）：
 alter table public.vla_papers
   add column if not exists deep_requested boolean default false;
+alter table public.vla_papers
+  add column if not exists figures jsonb default '[]'::jsonb;

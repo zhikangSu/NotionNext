@@ -510,3 +510,10 @@
 .archive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 @media (max-width: 980px) { .archive-grid { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 640px) { .archive-grid { grid-template-columns: 1fr; } }
+
+/* 详情页关键图表 */
+.figures { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 12px; }
+@media (max-width: 640px) { .figures { grid-template-columns: 1fr; } }
+.fig { margin: 0; border: 2px solid rgba(30, 36, 71, .12); border-radius: 16px; background: #fff; padding: 10px; }
+.fig img { width: 100%; height: auto; border-radius: 10px; display: block; background: #fff; }
+.fig figcaption { margin-top: 8px; color: var(--meow-muted); font-size: .82rem; font-weight: 700; line-height: 1.5; }

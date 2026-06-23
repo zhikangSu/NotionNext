@@ -25,7 +25,7 @@
    机器人基础模型方向。明显无关的丢掉（例如天文里的 "VLA"、纯 NLP、与机器人无关的 CV）。
 
 3. 对每篇相关论文，**先打开 arXiv 全文通读再分析（不要只看摘要）**：
-   读 PDF `https://arxiv.org/pdf/<arxiv_id>`，或 HTML 全文 `https://ar5iv.org/abs/<arxiv_id>`。
+   读 HTML 版 `https://arxiv.org/html/<arxiv_id>`（推荐，方便顺手取图），或 PDF `https://arxiv.org/pdf/<arxiv_id>`。
    重点看：方法/架构图、实验设置、消融、主结果表、局限。然后用**中文、简洁、证据优先**写出
    结构化分析（保留原 arxiv_id / title / authors / published / abstract）：
    - `problem`：它认为现有 VLA 卡在哪里
@@ -35,6 +35,10 @@
    - `idea_signal`：对 SmolVLA 复现 / 改进有什么启发
    - `tags`：3–6 个英文小写标签（flow / action-expert / rl / efficient / data / hierarchy / vlm ...）
    - `github_url` / `project_url`：摘要或 comment 里有就填，没有留空
+   - `figures`：从 HTML 版挑 1~3 张关键图（架构/方法图 + 主结果图），每张给
+     `{"url":"...","caption":"中文说明"}`；url 用**绝对直链**（HTML 里 `<img>` 的 src 拼成
+     `https://arxiv.org/html/<arxiv_id>/<src>`，如 `https://arxiv.org/html/2506.01844/x3.png`）。
+     只用 `arxiv.org/html` 直链；没有 HTML 版就留空数组 `[]`，不要编造、不要用 PDF 截图。
 
 4. 把所有分析好的论文打成 `/tmp/vla-payload.json`，形如 `{"papers":[ ... ]}`，一次性 POST：
    ```bash

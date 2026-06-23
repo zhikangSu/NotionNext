@@ -127,6 +127,23 @@
       }, 20000);
     }
 
+    // 关键图表：arXiv HTML 直链图 + 说明；图加载失败就隐藏，不影响其它内容
+    const figuresBlock = p => {
+      const figs = Array.isArray(p.figures) ? p.figures : [];
+      if (!figs.length) return '';
+      return `
+        <div class="sticker-card card-pad" style="margin-top:16px">
+          <span class="badge">关键图表</span>
+          <div class="figures">
+            ${figs.map(f => `
+              <figure class="fig">
+                <img src="${esc(f.url)}" alt="${esc(f.caption || 'figure')}" loading="lazy" referrerpolicy="no-referrer" onerror="this.closest('.fig').style.display='none'" />
+                ${f.caption ? `<figcaption>${esc(f.caption)}</figcaption>` : ''}
+              </figure>`).join('')}
+          </div>
+        </div>`;
+    };
+
     const render = p => {
       document.title = `${p.title || '论文'} · VLA Radar`;
       const tags = (Array.isArray(p.tags) ? p.tags : []).map(t => `<span class="tag pink">${esc(t)}</span>`).join('');
@@ -158,6 +175,7 @@
             ${analysis || '<div class="paper-state" style="padding:24px 0">这篇还没生成结构化分析，明早 9 点的抓取会补上。</div>'}
           </div>
         </div>
+        ${figuresBlock(p)}
         ${abstract}`;
 
       const deepBtn = document.getElementById('deepBtn');
