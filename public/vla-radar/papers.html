@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-benchmarks" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-collapse" />
 </head>
 <body>
   <nav class="nav">
@@ -37,6 +37,10 @@
         <h1 class="paper-title">全部 VLA 论文</h1>
         <p class="paper-meta" id="count"></p>
         <input class="searchbox" id="q" placeholder="搜索:flow / RL / OpenVLA / embodiment / efficient ..." style="margin:16px 0 6px" />
+        <div class="archive-actions">
+          <button class="archive-action" id="expandAll" type="button">展开全部</button>
+          <button class="archive-action" id="collapseAll" type="button">收起全部</button>
+        </div>
         <div id="root"><div class="paper-state">正在加载论文库 …</div></div>
       </div>
     </section>
@@ -52,7 +56,12 @@
     const root = document.getElementById('root');
     const countEl = document.getElementById('count');
     const q = document.getElementById('q');
+    const expandAll = document.getElementById('expandAll');
+    const collapseAll = document.getElementById('collapseAll');
     let all = [];
+    let visibleGroups = [];
+    let openDates = new Set();
+    let manualOpenState = false;
 
     const esc = s => String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -82,15 +91,34 @@
         root.innerHTML = '<div class="paper-state">没有匹配的论文,换个关键词试试。</div>';
         return;
       }
-      root.innerHTML = groupByDate(papers).map(([date, list]) => `
-        <div class="date-head">📅 ${esc(date)} · ${list.length} 篇</div>
-        <div class="archive-grid">${list.map(card).join('')}</div>`).join('');
+      visibleGroups = groupByDate(papers);
+      root.innerHTML = visibleGroups.map(([date, list], index) => {
+        const isOpen = openDates.has(date);
+        const panelId = `date-panel-${index}`;
+        return `
+          <section class="date-group ${isOpen ? 'open' : ''}">
+            <button class="date-head date-toggle" type="button" data-date="${esc(date)}" aria-expanded="${isOpen ? 'true' : 'false'}" aria-controls="${panelId}">
+              <span>📅 ${esc(date)} · ${list.length} 篇</span>
+              <span class="date-chevron" aria-hidden="true">⌄</span>
+            </button>
+            <div class="date-panel" id="${panelId}" ${isOpen ? '' : 'hidden'}>
+              <div class="archive-grid">${list.map(card).join('')}</div>
+            </div>
+          </section>`;
+      }).join('');
     };
 
     const applyFilter = () => {
       const query = q.value.trim().toLowerCase();
       const f = query ? all.filter(p => JSON.stringify(p).toLowerCase().includes(query)) : all;
       countEl.textContent = `共 ${all.length} 篇` + (query ? ` · 匹配 ${f.length} 篇` : '');
+      const groups = groupByDate(f);
+      if (query) {
+        openDates = new Set(groups.map(([date]) => date));
+        manualOpenState = false;
+      } else if (!manualOpenState && !openDates.size && groups.length) {
+        openDates = new Set([groups[0][0]]);
+      }
       render(f);
     };
 
@@ -114,6 +142,25 @@
       }
     }
     q.addEventListener('input', applyFilter);
+    root.addEventListener('click', e => {
+      const btn = e.target.closest('.date-toggle');
+      if (!btn) return;
+      const date = btn.dataset.date;
+      if (openDates.has(date)) openDates.delete(date);
+      else openDates.add(date);
+      manualOpenState = true;
+      applyFilter();
+    });
+    expandAll.addEventListener('click', () => {
+      openDates = new Set(visibleGroups.map(([date]) => date));
+      manualOpenState = true;
+      applyFilter();
+    });
+    collapseAll.addEventListener('click', () => {
+      openDates = new Set();
+      manualOpenState = true;
+      applyFilter();
+    });
     load();
   </script>
 </body>

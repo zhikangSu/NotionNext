@@ -594,8 +594,69 @@
 .deep-queued { margin-top: 14px; display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border: 2px dashed rgba(30,36,71,.25); border-radius: 999px; background: var(--meow-pink-soft); color: #b43c6b; font-weight: 900; font-size: .84rem; }
 
 /* 论文库 papers.html：按日期分组 */
-.date-head { font-family: 'Baloo 2', 'Noto Sans SC', sans-serif; font-weight: 800; font-size: 1.15rem; margin: 28px 0 14px; color: var(--meow-ink); display: flex; align-items: center; gap: 8px; }
-.date-head:first-of-type { margin-top: 6px; }
+.archive-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 10px 0 4px;
+}
+.archive-action {
+  border: 2px solid rgba(30,36,71,.18);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--meow-ink);
+  padding: 7px 12px;
+  font-weight: 900;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 rgba(30,36,71,.12);
+}
+.archive-action:hover {
+  border-color: var(--meow-ink);
+  box-shadow: 3px 3px 0 rgba(30,36,71,.85);
+}
+.date-group { margin-top: 22px; }
+.date-group:first-child { margin-top: 10px; }
+.date-head {
+  width: 100%;
+  font-family: 'Baloo 2', 'Noto Sans SC', sans-serif;
+  font-weight: 900;
+  font-size: 1.15rem;
+  margin: 0 0 12px;
+  color: var(--meow-ink);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 2px solid rgba(30,36,71,.14);
+  border-radius: 999px;
+  background: rgba(255,255,255,.78);
+  padding: 10px 14px;
+  cursor: pointer;
+  box-shadow: 2px 2px 0 rgba(30,36,71,.12);
+  text-align: left;
+}
+.date-head:hover {
+  border-color: var(--meow-ink);
+  box-shadow: 3px 3px 0 rgba(30,36,71,.85);
+}
+.date-chevron {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--meow-yellow);
+  border: 2px solid var(--meow-ink);
+  line-height: 1;
+  transition: transform .16s ease;
+}
+.date-group.open .date-chevron { transform: rotate(180deg); }
+.date-panel { animation: datePanelIn .16s ease; }
+@keyframes datePanelIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 .archive-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
 .group-hero { margin-bottom: 18px; }
 .group-summary {
