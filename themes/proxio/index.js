@@ -266,12 +266,109 @@ const LayoutSearch = props => {
  * @param {*} props
  * @returns
  */
-const LayoutArchive = props => (
-    <>
-        {/* 博文列表 */}
-        <Blog {...props} />
-    </>
-)
+const LayoutArchive = props => {
+    const router = useRouter()
+    const fromVla = router?.query?.from === 'vla-radar'
+    const posts = props?.posts || []
+    const archivePosts = props?.archivePosts || {}
+    const groups = Object.keys(archivePosts).length
+        ? Object.entries(archivePosts).sort(([a], [b]) => b.localeCompare(a))
+        : [['全部记录', posts]]
+
+    return (
+        <section className='dot-bg pb-16 pt-24 lg:pb-24 lg:pt-28'>
+            <div className='container mx-auto'>
+                <div className='mb-10 flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between'>
+                    <div className='max-w-2xl'>
+                        <span className='section-badge'>学习记录</span>
+                        <h1 className='mt-4 font-display text-4xl font-extrabold leading-tight text-dark dark:text-white sm:text-5xl'>
+                            文章归档
+                        </h1>
+                        <p className='mt-4 text-base leading-8 text-body-color'>
+                            最近的实验、笔记和项目进展都会沉在这里。当前共有 {posts.length} 篇记录。
+                        </p>
+                    </div>
+                    <div className='flex flex-wrap gap-3'>
+                        {fromVla && (
+                            <SmartLink href='/vla-radar/' className='btn-meow'>
+                                <i className='fa-solid fa-arrow-left' />
+                                回到 VLA Radar
+                            </SmartLink>
+                        )}
+                        {!fromVla && (
+                            <SmartLink href='/vla-radar/' className='btn-meow-ghost'>
+                                VLA Radar
+                                <i className='fa-solid fa-satellite-dish' />
+                            </SmartLink>
+                        )}
+                        <SmartLink href='/' className='btn-meow-ghost'>
+                            回到首页
+                            <i className='fa-solid fa-house' />
+                        </SmartLink>
+                    </div>
+                </div>
+
+                {posts.length === 0 && (
+                    <div className='sticker-card p-8 text-center text-body-color'>
+                        暂时还没有发布的学习记录。
+                    </div>
+                )}
+
+                <div className='space-y-8'>
+                    {groups.map(([month, list]) => (
+                        <section key={month} className='space-y-4'>
+                            <div className='flex items-center gap-3'>
+                                <span className='inline-flex rounded-full bg-meow-yellow px-4 py-1 font-display text-lg font-extrabold text-meow-ink ring-2 ring-meow-ink'>
+                                    {month}
+                                </span>
+                                <span className='text-sm font-bold text-body-color'>
+                                    {list.length} 篇
+                                </span>
+                            </div>
+                            <div className='grid grid-cols-1 gap-5 md:grid-cols-2'>
+                                {list.map(post => (
+                                    <SmartLink
+                                        key={post.id || post.href}
+                                        href={post.href}
+                                        className='sticker-card group block overflow-hidden p-5'>
+                                        <div className='flex items-start gap-4'>
+                                            <div className='dot-bg flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-meow-ink bg-meow-cream text-2xl shadow-[3px_3px_0_rgba(30,36,71,.85)]'>
+                                                {post.pageIcon || '📝'}
+                                            </div>
+                                            <div className='min-w-0 flex-1'>
+                                                <div className='mb-2 flex flex-wrap items-center gap-2'>
+                                                    {post.publishDay && (
+                                                        <span className='inline-flex items-center gap-1 rounded-full bg-meow-yellow px-3 py-0.5 text-xs font-bold text-meow-ink'>
+                                                            <i className='fa-regular fa-calendar' />
+                                                            {post.publishDay}
+                                                        </span>
+                                                    )}
+                                                    {post.category && (
+                                                        <span className='inline-flex rounded-full bg-meow-pink-soft px-3 py-0.5 text-xs font-bold text-meow-ink'>
+                                                            {post.category}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <h2 className='text-xl font-bold leading-snug text-dark group-hover:text-primary dark:text-white dark:group-hover:text-meow-sky-deep'>
+                                                    {post.title}
+                                                </h2>
+                                                {post.summary && (
+                                                    <p className='mt-2 line-clamp-2 text-sm leading-7 text-body-color'>
+                                                        {post.summary}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </SmartLink>
+                                ))}
+                            </div>
+                        </section>
+                    ))}
+                </div>
+            </div>
+        </section>
+    )
+}
 
 /**
  * 404页面
