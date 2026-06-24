@@ -48,6 +48,21 @@ const SmartLink = ({ href, children, ...rest }) => {
   }
 
   const isExternal = urlString.startsWith('http') && !urlString.startsWith(LINK)
+  const isStaticVlaRadar =
+    urlString === '/vla-radar' ||
+    urlString.startsWith('/vla-radar/') ||
+    urlString.startsWith('/vla-radar?')
+
+  const getAnchorHref = value => {
+    if (typeof value === 'string') return value
+    if (!value || typeof value !== 'object') return ''
+
+    const pathname = value.pathname || ''
+    const hash = value.hash || ''
+    const query = value.query || {}
+    const queryString = new URLSearchParams(query).toString()
+    return `${pathname}${queryString ? `?${queryString}` : ''}${hash || ''}`
+  }
 
   const getPersistedQuery = () => {
     if (typeof window === 'undefined') return {}
@@ -101,6 +116,14 @@ const SmartLink = ({ href, children, ...rest }) => {
         target='_blank'
         rel='noopener noreferrer'
         {...filterDOMProps(rest)}>
+        {children}
+      </a>
+    )
+  }
+
+  if (isStaticVlaRadar) {
+    return (
+      <a href={getAnchorHref(href)} {...filterDOMProps(rest)}>
         {children}
       </a>
     )
