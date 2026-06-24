@@ -79,7 +79,7 @@
     };
 
     const card = p => `
-      <a class="sticker-card paper-card" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}">
+      <a class="sticker-card paper-card" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}&from=papers">
         <span class="year">${esc((p.tags && p.tags[0]) || 'paper')}</span>
         <h3>${esc(p.title || p.arxiv_id)}</h3>
         <p>${esc(p.problem || p.abstract || '')}</p>

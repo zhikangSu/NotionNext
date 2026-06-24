@@ -54,6 +54,9 @@
     if (back && from === 'works') {
       back.href = '/vla-radar/#works';
       back.textContent = '← 回到代表作';
+    } else if (back && from === 'papers') {
+      back.href = '/vla-radar/papers.html';
+      back.textContent = '← 回到论文库';
     } else if (back && from === 'group') {
       const group = (params.get('group') || '').trim();
       back.href = group ? `/vla-radar/group.html?id=${encodeURIComponent(group)}` : '/vla-radar/';
