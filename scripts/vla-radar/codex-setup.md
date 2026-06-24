@@ -36,7 +36,7 @@ Codex 是真·无人值守（到点必跑，与你电脑是否开机无关），
    curl -sS -X POST "https://www.meowsu.xyz/api/vla-radar/ingest" \
      -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" \
      -H "Content-Type: application/json" \
-     -d '{"papers":[{"arxiv_id":"<id>","title":"...","authors":"...","published":"...","problem":"...","method":"...","delta":"...","evidence":"...","idea_signal":"...","tags":["..."],"github_url":"","project_url":"","figures":[{"url":"https://arxiv.org/html/<id>/x1.png","caption":"架构图"},{"type":"table","title":"主结果","columns":["Model","Avg"],"rows":[["SmolVLA","87.3"]],"caption":"只摘关键结果行"}]}]}'
+     -d '{"papers":[{"arxiv_id":"<id>","title":"...","authors":"...","published":"...","problem":"...","method":"...","delta":"...","evidence":"...","idea_signal":"...","tags":["..."],"github_url":"","project_url":"","figures":[{"url":"https://arxiv.org/html/<id>/x1.png","caption":"架构图"},{"type":"table","title":"主结果","columns":["Model","Avg"],"rows":[["SmolVLA","87.3"]],"caption":"只摘关键结果行"}],"diff":{"base":"OpenVLA","changes":["离散动作 token → continuous action chunk"],"baselines":["OpenVLA"],"benchmarks":[{"name":"LIBERO","metric":"平均成功率","before":"76.5","after":"97.1"}],"risk":"LIBERO 仿真提升明确，但仍需真机验证。"}}]}'
 ```
 
 > 因为存的是「文本 + 链接」而不是 PDF，重析成本极低，想重析多少次都行。
