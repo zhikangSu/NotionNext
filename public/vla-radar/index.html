@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-collapse" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-daily-one" />
 
 </head>
 <body>
@@ -205,12 +205,16 @@
             <h2>Daily arXiv VLA Watcher</h2>
             <p>每日抓新论文后，统一拆成：针对什么问题、用了什么方法、改进了哪一层、结果是否可信、对我有什么 idea。</p>
           </div>
-          <a class="btn-ghost" href="/vla-radar/papers.html">📚 查看全部论文 →</a>
+          <a class="btn-ghost" href="/vla-radar/papers.html">📚 查看更多文章 →</a>
         </div>
         <div class="radar-layout">
           <div class="sticker-card card-pad">
-            <input class="searchbox" id="dailySearch" placeholder="搜索：flow / RL / OpenVLA / embodiment / efficient ..." />
+            <div class="daily-feature-head">
+              <span class="badge">今日代表论文</span>
+              <span class="daily-feature-meta" id="dailyDate">正在选择最新代表论文 …</span>
+            </div>
             <div class="daily-list" id="dailyList"></div>
+            <a class="daily-more" href="/vla-radar/papers.html">查看更多文章 →</a>
           </div>
           <pre class="schema"><code>{
   "title": "paper title",
@@ -450,29 +454,56 @@
     close.addEventListener('click', () => drawer.classList.remove('open'));
 
     const dailyList = document.getElementById('dailyList');
-    const search = document.getElementById('dailySearch');
-    function renderDaily(q='') {
-      const query = q.trim().toLowerCase();
-      const items = daily.filter(item => !query || JSON.stringify(item).toLowerCase().includes(query));
-      if (!items.length) {
-        dailyList.innerHTML = `<div class="daily-empty">暂无匹配的论文。换个关键词，或等明早 9 点的新抓取 🛰️</div>`;
+    const dailyDate = document.getElementById('dailyDate');
+
+    const paperDay = item => String(item.published || '').slice(0, 10);
+    function representativeScore(item) {
+      const text = `${item.title || ''} ${(item.tags || []).join(' ')} ${item.problem || ''} ${item.method || ''} ${item.signal || ''}`.toLowerCase();
+      const weights = [
+        ['libero', 9], ['benchmark', 8], ['openvla', 7], ['smolvla', 7],
+        ['π', 6], ['pi0', 6], ['reinforcement', 6], ['rl', 6],
+        ['world model', 5], ['hierarch', 5], ['planning', 5],
+        ['action', 4], ['diffusion', 4], ['flow', 4],
+        ['safety', 4], ['robot', 3], ['manipulation', 3],
+        ['efficient', 2], ['latency', 2], ['data', 2]
+      ];
+      const keywordScore = weights.reduce((sum, [key, value]) => sum + (text.includes(key) ? value : 0), 0);
+      const evidenceScore = Math.min(Number(item.figureCount || 0), 4);
+      return keywordScore + evidenceScore;
+    }
+    function pickRepresentative(items) {
+      if (!items.length) return { item: null, day: '', count: 0 };
+      const days = items.map(paperDay).filter(Boolean).sort().reverse();
+      const day = days[0] || paperDay(items[0]) || '';
+      const candidates = day ? items.filter(item => paperDay(item) === day) : items;
+      const ranked = candidates
+        .map((item, index) => ({ item, index, score: representativeScore(item) }))
+        .sort((a, b) => b.score - a.score || a.index - b.index);
+      return { item: ranked[0]?.item || candidates[0], day, count: candidates.length };
+    }
+    function renderDaily() {
+      const picked = pickRepresentative(daily);
+      if (!picked.item) {
+        dailyDate.textContent = '';
+        dailyList.innerHTML = `<div class="daily-empty">暂无论文。等明早 9 点的新抓取，或去论文库看历史记录。</div>`;
         return;
       }
-      dailyList.innerHTML = items.map(item => {
-        const tags = (item.tags||[]).map(t=>`<span class="tag pink">${t}</span>`).join('');
-        const inner = `
-          <h4>${item.title}</h4>
-          <p><b>问题：</b>${item.problem||'待分析'}</p>
-          <p><b>方法：</b>${item.method||'待分析'}</p>
-          <p><b>Idea：</b>${item.signal||'待提取'}</p>
-          <div class="tag-row">${tags}</div>`;
-        return item.arxiv_id
-          ? `<a class="daily-item clickable" href="/vla-radar/paper.html?id=${encodeURIComponent(item.arxiv_id)}">${inner}</a>`
-          : `<article class="daily-item">${inner}</article>`;
-      }).join('');
+      const item = picked.item;
+      dailyDate.textContent = picked.day
+        ? `${picked.day} · 当天 ${picked.count} 篇，首页精选 1 篇`
+        : '首页精选 1 篇代表论文';
+      const tags = (item.tags||[]).map(t=>`<span class="tag pink">${t}</span>`).join('');
+      const inner = `
+        <h4>${item.title}</h4>
+        <p><b>问题：</b>${item.problem||'待分析'}</p>
+        <p><b>方法：</b>${item.method||'待分析'}</p>
+        <p><b>Idea：</b>${item.signal||'待提取'}</p>
+        <div class="tag-row">${tags}</div>`;
+      dailyList.innerHTML = item.arxiv_id
+        ? `<a class="daily-item clickable" href="/vla-radar/paper.html?id=${encodeURIComponent(item.arxiv_id)}">${inner}</a>`
+        : `<article class="daily-item">${inner}</article>`;
     }
     renderDaily();
-    search.addEventListener('input', e => renderDaily(e.target.value));
 
     function mapPaper(p) {
       return {
@@ -481,7 +512,9 @@
         problem: p.problem || p.summary || '待分析',
         method: p.method || '待分析',
         signal: p.idea_signal || p.signal || '待提取',
-        arxiv_id: p.arxiv_id || ''
+        arxiv_id: p.arxiv_id || '',
+        published: p.published || '',
+        figureCount: Array.isArray(p.figures) ? p.figures.length : 0
       };
     }
     // 优先读 Supabase（/api/vla-radar/list）；没接好就退回静态 json；再不行保留内置示例。
@@ -492,7 +525,7 @@
           const payload = await res.json();
           if (payload.configured && Array.isArray(payload.papers) && payload.papers.length) {
             daily.splice(0, daily.length, ...payload.papers.map(mapPaper));
-            renderDaily(search.value);
+            renderDaily();
             return;
           }
         }
@@ -503,7 +536,7 @@
         const payload = await res.json();
         if (Array.isArray(payload.papers) && payload.papers.length) {
           daily.splice(0, daily.length, ...payload.papers.map(mapPaper));
-          renderDaily(search.value);
+          renderDaily();
         }
       } catch (e) {}
     }
