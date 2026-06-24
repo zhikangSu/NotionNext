@@ -738,3 +738,16 @@
 .diag-row.idea .k { color: #7d5a00; background: var(--meow-cream); border-color: rgba(255,212,59,.5); }
 .diag-row.idea .v { font-weight: 700; }
 .diag-row.warn .k { color: #b43c6b; background: var(--meow-pink-soft); border-color: rgba(242,105,156,.4); }
+
+/* diff 行/卡:跟谁比、赢在哪、信不信、base */
+.diag-base { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem; font-weight: 700; color: var(--meow-muted); background: rgba(100,112,138,.1); border-radius: 6px; padding: 2px 7px; }
+.diag-row.win .k { color: #3b6d11; background: #eaf3de; border-color: rgba(99,153,34,.4); }
+.diag-row.win .v { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+.diff-card .diff-base { margin: 12px 0 0; color: var(--meow-muted); font-size: .92rem; }
+.diff-changes { margin: 12px 0 0; padding-left: 1.1em; display: grid; gap: 6px; }
+.diff-changes li { color: var(--meow-ink); font-size: .95rem; line-height: 1.55; }
+.diff-line { margin: 12px 0 0; color: var(--meow-ink); font-size: .95rem; line-height: 1.6; }
+.diff-line .dk { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .72rem; font-weight: 700; color: #3153ae; background: var(--meow-sky); border: 1.5px solid rgba(53,99,233,.18); border-radius: 7px; padding: 3px 8px; margin-right: 8px; }
+.diff-line.warn .dk { color: #b43c6b; background: var(--meow-pink-soft); border-color: rgba(242,105,156,.4); }
+.diff-card .fig-table-wrap { margin-top: 12px; }

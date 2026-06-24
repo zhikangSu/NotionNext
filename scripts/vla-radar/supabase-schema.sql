@@ -18,6 +18,7 @@ create table if not exists public.vla_papers (
   github_url     text default '',
   project_url    text default '',
   figures        jsonb default '[]'::jsonb,    -- 关键图表证据：图片 {url, caption} 或表格 {type, title, columns, rows}
+  diff           jsonb default '{}'::jsonb,    -- 结构化 diff：{base, changes[], baselines[], benchmarks[{name,metric,before,after}], risk}
   deep_requested boolean default false,        -- 网页「全文重析」按钮排队标记；drain 处理后清零
   created_at     timestamptz default now(),
   updated_at     timestamptz default now()
@@ -35,3 +36,5 @@ alter table public.vla_papers
   add column if not exists deep_requested boolean default false;
 alter table public.vla_papers
   add column if not exists figures jsonb default '[]'::jsonb;
+alter table public.vla_papers
+  add column if not exists diff jsonb default '{}'::jsonb;

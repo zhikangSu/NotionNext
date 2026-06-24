@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-diag" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-diff" />
 
 </head>
 <body>
@@ -42,10 +42,10 @@
           <a class="btn-soft" href="/archive?from=vla-radar">回学习记录</a>
         </div>
         <div class="quick-stats" aria-label="VLA radar stats">
-          <div class="stat-card"><strong>15+</strong><span>关键模型节点</span></div>
-          <div class="stat-card"><strong>9</strong><span>benchmark / suite</span></div>
-          <div class="stat-card"><strong>6</strong><span>分化方向</span></div>
-          <div class="stat-card"><strong>1</strong><span>每日 arXiv 飞轮</span></div>
+          <a class="stat-card" href="#timeline"><strong>15+</strong><span>关键模型节点</span></a>
+          <a class="stat-card" href="#benchmarks"><strong>9</strong><span>benchmark / suite</span></a>
+          <a class="stat-card" href="#branches"><strong>6</strong><span>分化方向</span></a>
+          <a class="stat-card" href="#daily"><strong>1</strong><span>每日 arXiv 飞轮</span></a>
         </div>
       </div>
       <aside class="hero-card" aria-label="VLA radar illustration">
@@ -215,8 +215,8 @@
             <div class="daily-list" id="dailyList"></div>
             <a class="daily-more" href="/vla-radar/papers.html">查看更多文章 →</a>
           </div>
-          <pre class="schema"><code>{
-  "title": "paper title",
+          <pre class="schema"><code id="dailyJson">{
+  "title": "正在载入今日代表论文…",
   "arxiv_id": "2506.xxxxx",
   "problem": "它认为现有 VLA 卡在哪里？",
   "method": "它改了架构 / 数据 / 训练 / 推理 / 评测哪一层？",
@@ -493,16 +493,34 @@
         : '首页精选 1 篇代表论文';
       const tags = (item.tags||[]).map(t=>`<span class="tag pink">${t}</span>`).join('');
       const row = (cls, k, v) => v ? `<div class="diag-row ${cls}"><span class="k">${k}</span><span class="v">${v}</span></div>` : '';
+      const d = item.diff || {};
+      const changes = (Array.isArray(d.changes) && d.changes.length) ? d.changes.join(' · ') : item.method;
+      const baselines = (Array.isArray(d.baselines) && d.baselines.length) ? d.baselines.join(' / ') : '';
+      const bench = (Array.isArray(d.benchmarks) && d.benchmarks.length)
+        ? d.benchmarks.map(b => `${b.name||''} ${b.before||''}→${b.after||''}`.trim()).join('；') : '';
       const inner = `
-        <div class="diag-head"><h4>${item.title}</h4><div class="tag-row">${tags}</div></div>
+        <div class="diag-head"><h4>${item.title}</h4>${d.base?`<span class="diag-base">base: ${d.base}</span>`:''}<div class="tag-row">${tags}</div></div>
         <div class="diag">
           ${row('', '打什么', item.problem)}
-          ${row('', '改哪里', item.method)}
+          ${row('', '改哪里', changes)}
+          ${baselines ? row('', '跟谁比', baselines) : ''}
+          ${bench ? row('win', '赢在哪', bench) : ''}
+          ${d.risk ? row('warn', '信不信', d.risk) : ''}
           ${row('idea', '能偷', item.signal)}
         </div>`;
       dailyList.innerHTML = item.arxiv_id
         ? `<a class="daily-item clickable" href="/vla-radar/paper.html?id=${encodeURIComponent(item.arxiv_id)}">${inner}</a>`
         : `<article class="daily-item">${inner}</article>`;
+
+      const jsonEl = document.getElementById('dailyJson');
+      if (jsonEl) {
+        const core = { title: item.title, arxiv_id: item.arxiv_id || '', problem: item.problem, method: item.method };
+        if (d && Object.keys(d).length) core.diff = d; else if (item.delta) core.delta = item.delta;
+        core.evidence = item.evidence || '';
+        core.idea_signal = item.signal;
+        core.tags = item.tags || [];
+        jsonEl.textContent = JSON.stringify(core, null, 2);
+      }
     }
     renderDaily();
 
@@ -512,7 +530,10 @@
         tags: p.tags || [],
         problem: p.problem || p.summary || '待分析',
         method: p.method || '待分析',
+        delta: p.delta || '',
+        evidence: p.evidence || '',
         signal: p.idea_signal || p.signal || '待提取',
+        diff: p.diff && typeof p.diff === 'object' ? p.diff : null,
         arxiv_id: p.arxiv_id || '',
         published: p.published || '',
         figureCount: Array.isArray(p.figures) ? p.figures.length : 0

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-diag" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-diff" />
 </head>
 <body>
   <nav class="nav">
@@ -89,6 +89,25 @@
         <div class="analysis-item">
           <h4><span class="pin">${icon}</span>${esc(label)}</h4>
           <p>${esc(value)}</p>
+        </div>`;
+    };
+
+    // diff 卡:它在谁的基础上改、改了什么、跟谁比、benchmark 前→后、信不信
+    const diffBlock = p => {
+      const d = (p.diff && typeof p.diff === 'object') ? p.diff : {};
+      const changes = Array.isArray(d.changes) ? d.changes.filter(Boolean) : [];
+      const baselines = Array.isArray(d.baselines) ? d.baselines.filter(Boolean) : [];
+      const benches = Array.isArray(d.benchmarks) ? d.benchmarks.filter(b => b && b.name) : [];
+      if (!d.base && !changes.length && !baselines.length && !benches.length && !d.risk) return '';
+      const benchRows = benches.map(b => `<tr><td>${esc(b.name)}</td><td>${esc(b.metric||'')}</td><td>${esc(b.before||'')}</td><td><b>${esc(b.after||'')}</b></td></tr>`).join('');
+      return `
+        <div class="sticker-card card-pad diff-card" style="margin-top:16px">
+          <span class="badge">改了什么 · diff</span>
+          ${d.base ? `<p class="diff-base">在 <b>${esc(d.base)}</b> 基础上改</p>` : ''}
+          ${changes.length ? `<ul class="diff-changes">${changes.map(c => `<li>${esc(c)}</li>`).join('')}</ul>` : ''}
+          ${baselines.length ? `<p class="diff-line"><span class="dk">跟谁比</span>${baselines.map(esc).join(' / ')}</p>` : ''}
+          ${benchRows ? `<div class="fig-table-wrap"><table class="fig-table"><thead><tr><th>benchmark</th><th>指标</th><th>before</th><th>after</th></tr></thead><tbody>${benchRows}</tbody></table></div>` : ''}
+          ${d.risk ? `<p class="diff-line warn"><span class="dk">信不信</span>${esc(d.risk)}</p>` : ''}
         </div>`;
     };
 
@@ -211,6 +230,7 @@
         ${tags ? `<div class="tag-row" style="margin-top:10px">${tags}</div>` : ''}
         ${linkButtons(p)}
         ${deepControl(p)}
+        ${diffBlock(p)}
         <div class="sticker-card card-pad" style="margin-top:22px">
           <div class="analysis">
             ${analysis || '<div class="paper-state" style="padding:24px 0">这篇还没生成结构化分析，明早 9 点的抓取会补上。</div>'}
