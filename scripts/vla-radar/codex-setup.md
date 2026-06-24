@@ -30,6 +30,7 @@ Codex 是真·无人值守（到点必跑，与你电脑是否开机无关），
 2. 用中文写结构化分析：problem / method / delta / evidence / idea_signal / tags；
    关键图表证据放在 `figures`：图片项用 `{url, caption}`，HTML 关键结果/消融表用
    `{type:"table", title, columns, rows, caption}`。
+   结构化 diff 放在 `diff`：{base, changes:["before → after",...], baselines:[...], benchmarks:[{name,metric,before,after}], risk}，没对应信息留空、不编造数字。
    github_url、project_url 有就填、没有留空、不要编造。
 3. POST 覆盖：
    curl -sS -X POST "https://www.meowsu.xyz/api/vla-radar/ingest" \
@@ -53,9 +54,11 @@ SITE = https://www.meowsu.xyz
 1. 取队列：
    curl -sS "$SITE/api/vla-radar/pending" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN"
    得到 {"ok":true,"papers":[{"arxiv_id","title","arxiv_url"}]}。若 papers 为空 → 报告「队列为空」并结束。
-2. 对每篇：打开 arXiv 全文通读（PDF https://arxiv.org/pdf/<arxiv_id>，或 HTML https://ar5iv.org/abs/<arxiv_id>），
+2. 对每篇：打开 arXiv HTML 全文通读（https://arxiv.org/html/<arxiv_id>，或 PDF https://arxiv.org/pdf/<arxiv_id>），
    重点看 方法/实验/消融/主结果/局限。用中文写 problem / method / delta / evidence / idea_signal / tags；
    github_url、project_url 有就填、没有留空、不要编造。
+   figures：1~6 个关键图/表证据（图片 {url,caption} 用 arxiv.org/html 直链；关键结果表 {type:"table",title,columns,rows,caption}）。
+   diff：{base, changes:["before → after",...], baselines:[...], benchmarks:[{name,metric,before,after}], risk}，没对应信息留空、不编造数字。
 3. 打成 /tmp/vla-deep.json = {"papers":[ ... ]} 后 POST 覆盖（会自动清掉队列标记 deep_requested）：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" \
      -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" \

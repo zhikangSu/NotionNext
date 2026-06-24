@@ -41,6 +41,12 @@
      HTML 表格项给 `{"type":"table","title":"中文短标题","columns":["列1","列2"],"rows":[["值1","值2"]],"caption":"中文说明"}`，只摘最关键列和行，避免全表搬运。
      只用 `arxiv.org/html` 图片直链；没有 HTML 版、没有可展示图片或关键表格就留空数组 `[]`，不要编造、不要用 PDF 截图。
      适配要求：图片项只存 `url` 和短 `caption`；表格项只存 `type/title/columns/rows/caption`。不要生成 `<img>`、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。`caption` 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 `object-fit: contain` 适配图片，并用横向滚动表格适配量化表。
+   - `diff`：结构化「它改了什么」，没有对应信息的字段就留空 / 空数组，**绝不编造数字**：
+     - `base`：它在哪个已有模型 / 方法基础上改的（如 OpenVLA；没有就 `""`）
+     - `changes`：`["before → after", ...]` 3–5 条最关键改动（动作表示 / 解码 / 数据 / 训练 / 上下文等）
+     - `baselines`：`["和谁比的模型", ...]`
+     - `benchmarks`：`[{"name":"LIBERO","metric":"平均成功率","before":"76.5","after":"97.1"}]`，仅 1–3 个最关键、有明确数字才填
+     - `risk`：一句话结果可信度（仿真为主？需真机？可能刷榜？）
 
 4. 把所有分析好的论文打成 `/tmp/vla-payload.json`，形如 `{"papers":[ ... ]}`，一次性 POST：
    ```bash

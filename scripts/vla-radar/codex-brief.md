@@ -39,6 +39,7 @@ meowsu.xyz 的「VLA Radar」每天追踪 arXiv 上的 VLA(Vision-Language-Actio
    另外从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定。不要机械套固定类别，优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图、表或可视化；如果论文有主结果表/消融表/效率对比表，至少补 1 个能代表量化结论的表格项。
    放进 figures。图片项格式为 {"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}，url 用 arxiv.org/html 绝对直链（即 HTML 里 <img> src 拼成绝对路径）。HTML 表格项格式为 {"type":"table","title":"中文短标题","columns":["列1","列2"],"rows":[["值1","值2"]],"caption":"中文说明"}，只摘最关键列和行，避免全表搬运；没有 HTML 版、没有可展示图片或关键表格就留空数组，不要编造、不要用 PDF 截图。
    适配要求：图片项只存 url 和短 caption；表格项只存 type/title/columns/rows/caption。不要生成 <img>、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。caption 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 object-fit: contain 适配图片，并用横向滚动表格适配量化表。
+   另外产出 diff（结构化“它改了什么”，没对应信息留空/空数组、绝不编造数字）：base（在哪个已有模型基础上改，没有就空）、changes（["before → after", ...] 3-5 条最关键改动）、baselines（["和谁比的模型", ...]）、benchmarks（[{"name":"LIBERO","metric":"平均成功率","before":"76.5","after":"97.1"}]，仅有明确数字的 1-3 个）、risk（一句话结果可信度：仿真为主？需真机？可能刷榜？）。
 4. 打成 /tmp/vla-payload.json={"papers":[...]} 后 POST：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" -H "Content-Type: application/json" -d @/tmp/vla-payload.json
    401→token 错；503→后端未配置；{"ok":true,"upserted":N}→成功。
@@ -62,6 +63,7 @@ meowsu.xyz 的「VLA Radar」每天追踪 arXiv 上的 VLA(Vision-Language-Actio
    另外从 HTML 版选择 3~6 个最关键的图表证据项，数量由论文内容决定。不要机械套固定类别，优先选择能说明核心方法/系统/数据/训练流程、相对已有工作改动、主结果/消融/效率/泛化/真实机器人证据的图、表或可视化；如果论文有主结果表/消融表/效率对比表，至少补 1 个能代表量化结论的表格项。
    放进 figures。图片项格式为 {"url":"https://arxiv.org/html/<id>/xN.png","caption":"中文说明"}，url 用 arxiv.org/html 绝对直链。HTML 表格项格式为 {"type":"table","title":"中文短标题","columns":["列1","列2"],"rows":[["值1","值2"]],"caption":"中文说明"}，只摘最关键列和行，避免全表搬运；没有可展示图片或关键表格就留空数组，不要编造、不要用 PDF 截图。
    适配要求：图片项只存 url 和短 caption；表格项只存 type/title/columns/rows/caption。不要生成 <img>、HTML、style、width、height、base64 或本地截图路径；不要因为原图尺寸很大就裁剪、缩放、转存或改成 PDF 截图。caption 尽量控制在 80 个中文字符左右，避免撑高卡片。网页会统一用响应式卡片、最大高度和 object-fit: contain 适配图片，并用横向滚动表格适配量化表。
+   另外产出 diff（结构化“它改了什么”，没对应信息留空/空数组、绝不编造数字）：base、changes（["before → after", ...] 3-5 条）、baselines（["和谁比", ...]）、benchmarks（[{"name","metric","before","after"}]，仅有明确数字的 1-3 个）、risk（一句话可信度）。
 3. 打成 /tmp/vla-deep.json={"papers":[...]} 后 POST 覆盖（会自动清掉队列标记）：
    curl -sS -X POST "$SITE/api/vla-radar/ingest" -H "Authorization: Bearer $VLA_RADAR_INGEST_TOKEN" -H "Content-Type: application/json" -d @/tmp/vla-deep.json
 4. 报告处理了几篇。
