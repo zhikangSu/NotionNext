@@ -721,3 +721,20 @@
   .fig-media { height: 170px; }
   .fig-table { min-width: 460px; }
 }
+
+/* 诊断/diff 卡:标签→值 行式,像研究笔记而非 AI 摘要 */
+.diag-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 10px; margin-bottom: 14px; }
+.diag-head h4 { margin: 0; font-size: 1.15rem; line-height: 1.2; flex: 1 1 auto; }
+.diag { display: grid; gap: 11px; }
+.diag-row { display: grid; grid-template-columns: max-content 1fr; gap: 12px; align-items: start; }
+.diag-row .k {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: .72rem; font-weight: 700; letter-spacing: .02em;
+  color: #3153ae; background: var(--meow-sky);
+  border: 1.5px solid rgba(53,99,233,.18); border-radius: 7px;
+  padding: 3px 8px; white-space: nowrap; margin-top: 1px;
+}
+.diag-row .v { color: var(--meow-ink); font-size: .95rem; line-height: 1.62; }
+.diag-row.idea .k { color: #7d5a00; background: var(--meow-cream); border-color: rgba(255,212,59,.5); }
+.diag-row.idea .v { font-weight: 700; }
+.diag-row.warn .k { color: #b43c6b; background: var(--meow-pink-soft); border-color: rgba(242,105,156,.4); }

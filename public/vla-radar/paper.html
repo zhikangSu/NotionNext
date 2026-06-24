@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-textfix" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-diag" />
 </head>
 <body>
   <nav class="nav">
@@ -190,11 +190,11 @@
       const tags = (Array.isArray(p.tags) ? p.tags : []).map(t => `<span class="tag pink">${esc(t)}</span>`).join('');
       const meta = [p.authors, (p.published || '').slice(0, 10)].filter(Boolean).map(esc).join(' · ');
       const analysis = [
-        analysisBlock('🎯', '问题 · 它认为现有 VLA 卡在哪里', p.problem),
-        analysisBlock('🛠️', '方法 · 改了架构 / 数据 / 训练 / 推理 / 评测哪一层', p.method),
-        analysisBlock('📐', '相对变化 · 对 RT-2 / OpenVLA / π0 / SmolVLA', p.delta),
-        analysisBlock('🔬', '证据 · 真实机器人？仿真？消融？是否开源', p.evidence),
-        analysisBlock('💡', 'Idea 信号 · 对 SmolVLA 复现 / 改进的启发', p.idea_signal)
+        analysisBlock('🎯', '它在打什么问题', p.problem),
+        analysisBlock('🔧', '它改了哪一层', p.method),
+        analysisBlock('📐', '相对 SOTA 变了什么', p.delta),
+        analysisBlock('🔬', '结果可信吗', p.evidence),
+        analysisBlock('💡', '我能偷什么 idea', p.idea_signal)
       ].join('');
       const abstract = p.abstract
         ? `<div class="sticker-card card-pad" style="margin-top:16px">

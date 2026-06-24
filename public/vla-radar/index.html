@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-textfix" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-diag" />
 
 </head>
 <body>
@@ -31,7 +31,6 @@
   </nav>
 
   <header class="hero">
-    <span class="stars s1">⭐</span><span class="stars s2">✨</span><span class="stars s3">⭐</span>
     <div class="container hero-grid">
       <div>
         <span class="badge">VLA 发展地图 · 架构 / 数据 / 后训练</span>
@@ -493,12 +492,14 @@
         ? `${picked.day} · 当天 ${picked.count} 篇，首页精选 1 篇`
         : '首页精选 1 篇代表论文';
       const tags = (item.tags||[]).map(t=>`<span class="tag pink">${t}</span>`).join('');
+      const row = (cls, k, v) => v ? `<div class="diag-row ${cls}"><span class="k">${k}</span><span class="v">${v}</span></div>` : '';
       const inner = `
-        <h4>${item.title}</h4>
-        <p><b>问题：</b>${item.problem||'待分析'}</p>
-        <p><b>方法：</b>${item.method||'待分析'}</p>
-        <p><b>Idea：</b>${item.signal||'待提取'}</p>
-        <div class="tag-row">${tags}</div>`;
+        <div class="diag-head"><h4>${item.title}</h4><div class="tag-row">${tags}</div></div>
+        <div class="diag">
+          ${row('', '打什么', item.problem)}
+          ${row('', '改哪里', item.method)}
+          ${row('idea', '能偷', item.signal)}
+        </div>`;
       dailyList.innerHTML = item.arxiv_id
         ? `<a class="daily-item clickable" href="/vla-radar/paper.html?id=${encodeURIComponent(item.arxiv_id)}">${inner}</a>`
         : `<article class="daily-item">${inner}</article>`;
