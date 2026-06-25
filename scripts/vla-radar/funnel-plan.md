@@ -78,4 +78,5 @@ SQL 见 `supabase-schema.sql`。`store.js` 缺列时**逐个剥离重试**，任
 
 - 代码宽限期：默认 **3 个月**
 - 雷达窗口：默认最近 **30 天 / ~50 张**
-- 四象限阈值：默认 relevance≥2 且 quality≥2 → Tier 2；低×低 → Tier 0；其余 → Tier 1
+- 进地图阈值（已实现于 store.js deriveTier）：relevance==3 且 quality==3 且 **发表满 3 个月** → Tier 2；relevance≤1 且 quality≤1 → Tier 0；其余 → Tier 1。新论文(<3 月)再强也先进雷达，靠手动(set-tiers)/重判升级 —— 体现「proves out 才进地图」。
+- 手动升降级闸门：`POST /api/vla-radar/set-tiers`（token 鉴权，局部更新只改分诊列不碰解析）。
