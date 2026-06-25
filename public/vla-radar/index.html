@@ -4,18 +4,49 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VLA Radar · Meowsu</title>
-  <meta name="description" content="VLA 发展历程、架构分化、训练数据、微调方法与每日论文雷达。" />
+  <meta name="description" content="一张按 8 个开放问题组织的 VLA 研究地图：每条问题挂着最有料的代表作，每日新论文先进雷达、证明过自己再升级。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
   <style>
+    /* ===== 多视角入口带 ===== */
     .lens-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-top:8px; }
     .lens-pill { display:flex; flex-direction:column; gap:3px; padding:16px 18px; background:var(--meow-card); border:2px solid var(--meow-ink); border-radius:var(--radius-lg); box-shadow:var(--shadow); text-decoration:none; color:inherit; transition:transform .12s ease, box-shadow .12s ease; }
     .lens-pill:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-blue); }
     .lens-pill .lens-ico { font-size:1.5rem; }
     .lens-pill b { font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.05rem; }
     .lens-pill small { color:var(--meow-muted); }
+
+    /* ===== 雷达条 ===== */
+    .radar-strip { display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; margin-top:18px; padding:14px 20px;
+      background:var(--meow-ink); color:#fff; border-radius:var(--radius-lg); box-shadow:var(--shadow); }
+    .radar-strip .rs-dot { width:9px; height:9px; border-radius:50%; background:var(--meow-yellow); box-shadow:0 0 0 4px rgba(255,212,59,.25); }
+    .radar-strip b { font-weight:800; }
+    .radar-strip .rs-sep { opacity:.35; }
+    .radar-strip a { margin-left:auto; font-weight:800; color:var(--meow-ink); background:var(--meow-yellow); padding:6px 14px; border-radius:999px; }
+    .radar-strip a:hover { background:#fff; }
+
+    /* ===== 8 条开放问题地图 ===== */
+    .map-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-top:8px; }
+    .prob-card { display:flex; flex-direction:column; gap:12px; padding:22px 22px 18px; }
+    .prob-head { display:flex; gap:14px; align-items:flex-start; }
+    .prob-ic { flex:0 0 auto; width:46px; height:46px; display:grid; place-items:center; font-size:1.5rem; border:2px solid var(--meow-ink); border-radius:14px; background:var(--meow-cream); }
+    .prob-head h3 { margin:0; font-size:1.3rem; }
+    .prob-head p { margin:2px 0 0; color:var(--meow-muted); font-size:.92rem; line-height:1.5; }
+    .prob-meta { display:flex; flex-wrap:wrap; gap:8px 12px; font-size:.86rem; font-weight:700; }
+    .prob-meta .m-map { color:var(--meow-blue); }
+    .prob-meta .m-radar { color:var(--meow-muted); }
+    .prob-open { color:var(--meow-pink); font-weight:800; }
+    .prob-papers { display:flex; flex-direction:column; gap:2px; }
+    .pl-paper { display:flex; gap:9px; align-items:baseline; padding:7px 8px; margin:0 -8px; border-radius:10px; text-decoration:none; color:inherit; }
+    .pl-paper:hover { background:var(--meow-sky); }
+    .pl-paper .pl-yr { flex:0 0 auto; font-size:.72rem; font-weight:800; color:var(--meow-muted); width:50px; }
+    .pl-paper .pl-t { font-weight:600; line-height:1.35; }
+    .prob-foot { margin-top:auto; }
+    .prob-foot a { font-weight:800; color:var(--meow-ink); font-size:.85rem; border-bottom:2px solid var(--meow-yellow); }
+    .prob-card.empty { background:linear-gradient(180deg,#fff,rgba(242,105,156,.06)); border-style:dashed; }
+    @media (max-width:760px){ .map-grid { grid-template-columns:1fr; } .radar-strip a { margin-left:0; } }
   </style>
 </head>
 <body>
@@ -26,11 +57,9 @@
         <span>Meowsu · VLA Radar</span>
       </a>
       <div class="nav-links">
-        <a href="#benchmarks">Benchmark</a>
-        <a href="#timeline">主线</a>
-        <a href="#branches">分化</a>
+        <a href="#map">开放问题</a>
+        <a href="/vla-radar/radar.html">雷达</a>
         <a href="#finetune">微调</a>
-        <a href="#daily">论文雷达</a>
         <a href="/vla-radar/views.html">视角</a>
         <a href="/vla-radar/papers.html">论文库</a>
         <a href="/">返回博客</a>
@@ -41,19 +70,19 @@
   <header class="hero">
     <div class="container hero-grid">
       <div>
-        <span class="badge">VLA 发展地图 · 架构 / 数据 / 后训练</span>
-        <h1>看懂 VLA 的<br /><span>主线与分叉</span></h1>
-        <p>从 LIBERO 这类 benchmark 如何影响结果解读，到 RT-1、RT-2、OpenVLA、π0、SmolVLA、π0.5、π0.6、π0.7 的架构与训练分化。这不是论文列表，而是一个帮助你快速定位研究机会的地图。</p>
+        <span class="badge">VLA 研究地图 · 按开放问题组织</span>
+        <h1>VLA 现在卡在哪，<br /><span>哪条线在动</span></h1>
+        <p>这不是论文列表，是一张按 <b>8 个开放问题</b>组织的地图：每条问题挂着最有料的代表作，空着的地方就是研究机会。每天的新论文先进<b>雷达</b>，证明过自己才升级进<b>地图</b>。</p>
         <div class="hero-actions">
-          <a class="btn" href="#benchmarks">先看 Benchmark Hub →</a>
-          <a class="btn-ghost" href="#daily">看每日论文雷达</a>
+          <a class="btn" href="#map">看 8 条开放问题 →</a>
+          <a class="btn-ghost" href="/vla-radar/radar.html">看每日雷达</a>
           <a class="btn-soft" href="/archive?from=vla-radar">回学习记录</a>
         </div>
         <div class="quick-stats" aria-label="VLA radar stats">
-          <a class="stat-card" href="#timeline"><strong>15+</strong><span>关键模型节点</span></a>
-          <a class="stat-card" href="#benchmarks"><strong>9</strong><span>benchmark / suite</span></a>
-          <a class="stat-card" href="#branches"><strong>6</strong><span>分化方向</span></a>
-          <a class="stat-card" href="#daily"><strong>1</strong><span>每日 arXiv 飞轮</span></a>
+          <a class="stat-card" href="#map"><strong>8</strong><span>开放问题</span></a>
+          <a class="stat-card" href="#map"><strong id="statMap">·</strong><span>地图论文</span></a>
+          <a class="stat-card" href="/vla-radar/radar.html"><strong id="statRadar">·</strong><span>雷达在追</span></a>
+          <a class="stat-card" href="/vla-radar/views.html"><strong>5</strong><span>分析视角</span></a>
         </div>
       </div>
       <aside class="hero-card" aria-label="VLA radar illustration">
@@ -63,11 +92,11 @@
             <div class="radar-logo">🤖</div>
             <span class="badge">Robot Foundation Model Radar</span>
             <h2 style="margin:16px 0 6px;font-size:2rem;line-height:1.05">Vision · Language · Action</h2>
-            <p style="margin:0;color:var(--meow-muted)">把论文拆成：问题 → 方法 → 改了哪里 → 结果 → 对我有什么 idea。</p>
+            <p style="margin:0;color:var(--meow-muted)">每篇论文回答：它在打哪个开放问题、改了哪一层、证据信不信、我能偷什么 idea。</p>
             <div class="mini-metric-row">
-              <div class="mini-metric">Action<small>token / flow / diffusion</small></div>
-              <div class="mini-metric">Data<small>robot / web / rollout</small></div>
-              <div class="mini-metric">Train<small>BC / LoRA / RL</small></div>
+              <div class="mini-metric">地图<small>证明过的地标</small></div>
+              <div class="mini-metric">雷达<small>新论文·待沉淀</small></div>
+              <div class="mini-metric">档案<small>全量·可搜</small></div>
             </div>
           </div>
         </div>
@@ -76,63 +105,20 @@
   </header>
 
   <main>
-    <section class="section lens-entry">
+    <section id="map" class="section">
       <div class="container">
         <div class="section-head">
           <div class="section-title">
-            <span class="badge">同一批论文，多个角度</span>
-            <h2>多视角 · Lenses</h2>
-            <p>除了往下滚这张发展地图，你还可以换一个角度切进同一批每日论文。以后还会有更多视角加进来。</p>
+            <span class="badge">先看问题，再看论文</span>
+            <h2>VLA 的 8 条开放问题</h2>
+            <p>每条问题挂着已经"证明过自己"的代表作（地图）。挤的地方说明这条线很卷，<b>空的地方就是你的机会</b>。还在被验证的新论文都在雷达里排队。</p>
           </div>
-          <a class="btn-ghost" href="/vla-radar/views.html">看全部视角 →</a>
+          <a class="btn-ghost" href="/vla-radar/radar.html">看雷达里的新论文 →</a>
         </div>
-        <div class="lens-row">
-          <a class="lens-pill" href="/vla-radar/series.html"><span class="lens-ico">🧬</span><b>版本演进</b><small>π / OpenVLA 版本链</small></a>
-          <a class="lens-pill" href="/vla-radar/explorer.html"><span class="lens-ico">🔬</span><b>组件透视</b><small>这篇动了哪一层</small></a>
-          <a class="lens-pill" href="/vla-radar/flow.html"><span class="lens-ico">🔀</span><b>推理流程</b><small>画面到动作的链路</small></a>
-          <a class="lens-pill" href="/vla-radar/bench.html"><span class="lens-ico">🎯</span><b>Benchmark 可信度</b><small>分数能不能信</small></a>
-          <a class="lens-pill" href="/vla-radar/metro.html"><span class="lens-ico">🗺️</span><b>研究拓扑</b><small>主线与分叉地铁图</small></a>
+        <div class="radar-strip" id="radarStrip">
+          <span class="rs-dot"></span><span>正在统计今日雷达 …</span>
         </div>
-      </div>
-    </section>
-
-    <section id="benchmarks" class="section">
-      <div class="container">
-        <div class="section-head">
-          <div class="section-title">
-            <span class="badge">先看尺子，再看分数</span>
-            <h2>Benchmark Hub</h2>
-            <p>很多 VLA 论文的“提升”本质是在同一批 benchmark 上重新定义动作表示、推理速度、鲁棒性或泛化条件。这里先把尺子摆清楚，再进入模型时间线。</p>
-          </div>
-          <a class="btn-ghost" href="#timeline">看模型时间线 ↓</a>
-        </div>
-        <div class="benchmark-grid" id="benchmarkGrid"></div>
-        <div class="benchmark-line sticker-card">
-          <div class="benchmark-line-head">
-            <div>
-              <span class="badge">模型对比线</span>
-              <h3>从 ACT 到 π0.7：常被放进同一张表里的节点</h3>
-            </div>
-            <a class="btn-soft" href="/vla-radar/group.html?id=benchmark-model-line">看整条线 →</a>
-          </div>
-          <div class="model-rail" id="benchmarkModelLine"></div>
-        </div>
-      </div>
-    </section>
-
-    <section id="timeline" class="section">
-      <div class="container">
-        <div class="section-head">
-          <div class="section-title">
-            <span class="badge">主线不是年份，是范式转移</span>
-            <h2>VLA Mainline</h2>
-            <p>每个节点都回答：它把 VLA 的哪一部分变成了新的默认设置？点击卡片先看相关论文，再进单篇结构化解析。</p>
-          </div>
-          <a class="btn-ghost" href="#branches">看分化地图 ↓</a>
-        </div>
-        <div class="timeline-shell">
-          <div class="timeline" id="timelineCards"></div>
-        </div>
+        <div class="map-grid" id="mapGrid"></div>
       </div>
     </section>
 
@@ -161,40 +147,13 @@
       </div>
     </section>
 
-    <section id="branches" class="section">
-      <div class="container">
-        <div class="section-head">
-          <div class="section-title">
-            <span class="badge">如今的攻坚方向</span>
-            <h2>VLA 分化地图</h2>
-            <p>新论文通常不是“重新做一个 VLA”，而是在下面某个支路上改进。点击方向卡片可以看这个支路下的代表论文。</p>
-          </div>
-        </div>
-        <div class="branch-map" id="branchMap"></div>
-      </div>
-    </section>
-
-    <section id="works" class="section">
-      <div class="container">
-        <div class="section-head">
-          <div class="section-title">
-            <span class="badge">代表作不是收藏，是坐标系</span>
-            <h2>Influential Works</h2>
-            <p>用统一视角看代表作：它解决了什么问题、动了哪一层、留下了什么短板。</p>
-          </div>
-          <div class="filterbar" id="filters"></div>
-        </div>
-        <div class="paper-grid" id="workGrid"></div>
-      </div>
-    </section>
-
     <section id="finetune" class="section">
       <div class="container">
         <div class="section-head">
           <div class="section-title">
             <span class="badge">后训练怎么选？</span>
             <h2>全参微调 / LoRA / 冻结 VLM</h2>
-            <p>三者本质是对原始 VLA “动刀深度”不同：越深越能适配新域，也越容易破坏原始语义与泛化。</p>
+            <p>三者本质是对原始 VLA "动刀深度"不同：越深越能适配新域，也越容易破坏原始语义与泛化。</p>
           </div>
         </div>
         <div class="sticker-card card-pad">
@@ -224,50 +183,26 @@
       </div>
     </section>
 
-    <section id="daily" class="section">
+    <section id="views" class="section">
       <div class="container">
         <div class="section-head">
           <div class="section-title">
-            <span class="badge">自动化入口</span>
-            <h2>Daily arXiv VLA Watcher</h2>
-            <p>每日抓新论文后，统一拆成：针对什么问题、用了什么方法、改进了哪一层、结果是否可信、对我有什么 idea。</p>
+            <span class="badge">同一批论文，换个角度</span>
+            <h2>深入 · 5 个分析视角</h2>
+            <p>地图给你"哪条线"，下面这些视角给你"怎么看同一批论文"。主线、分化、Benchmark、代表作都搬进了对应视角。</p>
           </div>
-          <a class="btn-ghost" href="/vla-radar/papers.html">📚 查看更多文章 →</a>
+          <a class="btn-ghost" href="/vla-radar/views.html">视角总览 →</a>
         </div>
-        <div class="radar-layout">
-          <div class="sticker-card card-pad">
-            <div class="daily-feature-head">
-              <span class="badge">今日代表论文</span>
-              <span class="daily-feature-meta" id="dailyDate">正在选择最新代表论文 …</span>
-            </div>
-            <div class="daily-list" id="dailyList"></div>
-            <a class="daily-more" href="/vla-radar/papers.html">查看更多文章 →</a>
-          </div>
-          <pre class="schema"><code id="dailyJson">{
-  "title": "正在载入今日代表论文…",
-  "arxiv_id": "2506.xxxxx",
-  "problem": "它认为现有 VLA 卡在哪里？",
-  "method": "它改了架构 / 数据 / 训练 / 推理 / 评测哪一层？",
-  "delta": "相对 RT-2 / OpenVLA / π0 / SmolVLA 的具体变化",
-  "evidence": "真实机器人？仿真？消融？是否开源？",
-  "idea_signal": "对 SmolVLA 复现/改进有什么启发",
-  "tags": ["action-expert", "flow", "post-training"]
-}</code></pre>
+        <div class="lens-row">
+          <a class="lens-pill" href="/vla-radar/series.html"><span class="lens-ico">🧬</span><b>版本演进</b><small>π / OpenVLA 版本链</small></a>
+          <a class="lens-pill" href="/vla-radar/explorer.html"><span class="lens-ico">🔬</span><b>组件透视</b><small>这篇动了哪一层</small></a>
+          <a class="lens-pill" href="/vla-radar/flow.html"><span class="lens-ico">🔀</span><b>推理流程</b><small>画面到动作的链路</small></a>
+          <a class="lens-pill" href="/vla-radar/bench.html"><span class="lens-ico">🎯</span><b>Benchmark 可信度</b><small>分数能不能信</small></a>
+          <a class="lens-pill" href="/vla-radar/metro.html"><span class="lens-ico">🗺️</span><b>研究拓扑</b><small>主线与分叉地铁图</small></a>
         </div>
       </div>
     </section>
   </main>
-
-  <div class="detail-drawer" id="detailDrawer" aria-live="polite">
-    <div class="detail-card">
-      <button class="drawer-close" id="drawerClose" aria-label="关闭">×</button>
-      <span class="badge" id="drawerBadge">VLA</span>
-      <h3 id="drawerTitle">Title</h3>
-      <p id="drawerText">Detail</p>
-      <div class="tag-row" id="drawerTags"></div>
-      <div class="link-row" id="drawerLinks"></div>
-    </div>
-  </div>
 
   <footer class="footer">
     <div class="container">
@@ -275,322 +210,93 @@
     </div>
   </footer>
 
+  <script src="/vla-radar/data/curated.js"></script>
   <script>
-    const benchmarks = [
-      {id:'benchmark-libero', icon:'🧪', badge:'Main Benchmark', title:'LIBERO', paperIds:['2306.03310'], text:'当前 VLA 论文最常见的仿真评测之一，Spatial / Object / Goal / Long 四套件经常成为主结果表的核心坐标。'},
-      {id:'benchmark-libero-stress', icon:'🧨', badge:'Benchmark Stress Test', title:'LIBERO-PRO / Para / Plus', paperIds:['2510.03827','2603.28301','2510.13626'], text:'专门追问标准 LIBERO 高分是否真等于泛化：扰动物体、初始状态、指令、环境和 paraphrase，看模型是否只是背题。'},
-      {id:'benchmark-simpler', icon:'🔁', badge:'Sim-to-Real Proxy', title:'SimplerEnv', paperIds:['2405.05941'], text:'用仿真评估真实机器人策略，关注 simulated evaluation 和真实策略表现之间是否相关，是 VLA 实验常见补充。'},
-      {id:'benchmark-household', icon:'🍳', badge:'Long-horizon Household', title:'RoboCasa / RoboCasa365', paperIds:['2406.02523','2603.04356'], text:'面向厨房和家庭长程任务的大规模仿真环境，适合观察 household generalization、数据生成和长期任务组合。'},
-      {id:'benchmark-bimanual', icon:'🦾', badge:'Bimanual / Synthetic Data', title:'RoboTwin / RoboTwin2.0', paperIds:['2504.13059','2506.18088','2410.07864'], text:'双臂、数字孪生、强域随机化和合成数据评测，对 bimanual VLA 与 diffusion transformer 路线很关键。'},
-      {id:'benchmark-legacy', icon:'🧭', badge:'Legacy / Auxiliary', title:'CALVIN / Meta-World / ManiSkill', paperIds:['2112.03227','1910.10897','2107.14483'], text:'CALVIN 是老牌长程语言条件操作 benchmark；Meta-World / ManiSkill 常作为小模型、空间 VLA 或泛化能力的辅助评估。'}
-    ];
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const yr = p => (p.published || '').slice(0, 7);
+    const cleanTitle = t => String(t || '')
+      .replace(/\$/g, '').replace(/\\[a-zA-Z]+/g, '').replace(/[{}^_]/g, '')
+      .replace(/:.*$/, '').trim();
 
-    const benchmarkModelLine = [
-      {label:'ACT', id:'2304.13705'},
-      {label:'Diffusion Policy', id:'2303.04137'},
-      {label:'Octo', id:'2405.12213'},
-      {label:'OpenVLA', id:'2406.09246'},
-      {label:'π0', id:'2410.24164'},
-      {label:'FAST', id:'2501.09747'},
-      {label:'RDT-1B', id:'2410.07864'},
-      {label:'OpenVLA-OFT', id:'2502.19645'},
-      {label:'SmolVLA', id:'2506.01844'},
-      {label:'VLA-0', id:'2510.13054'},
-      {label:'StarVLA / SimVLA', group:'benchmark-simple-vlas'},
-      {label:'CogACT', id:'2411.19650'},
-      {label:'MolmoAct', id:'2508.07917'},
-      {label:'π0.5 / π0.6 / π0.7', group:'benchmark-pi-series'}
-    ];
-
-    const timeline = [
-      {id:'rt-1', year:'2022', title:'RT-1', paperIds:['2212.06817'], tags:['Robot Transformer','BC','Action Token'], text:'证明真实机器人多任务数据 + Transformer 可以扩展；动作多以离散 token 形式输出。', detail:'起点不是最强语义，而是把真实机器人轨迹规模化，用行为克隆训练一个能跨任务执行的机器人 Transformer。'},
-      {id:'palm-e-rt-2', year:'2023', title:'PaLM-E / RT-2', paperIds:['2303.03378','2307.15818'], tags:['VLM Backbone','Web Knowledge'], text:'VLM/LLM 语义先验进入机器人控制，动作被映射到语言 token 空间。', detail:'关键变化：机器人不再只从演示里学语义，而是继承互联网视觉语言知识，再用机器人数据把语义落地到动作。'},
-      {id:'open-x-rt-x', year:'2023', title:'Open X-Embodiment / RT-X', paperIds:['2310.08864'], tags:['Cross-Embodiment','Dataset'], text:'把不同机构、机器人、任务标准化，开启 X-robot policy。', detail:'数据标准化成为 VLA 发展的基础设施：不同动作空间、相机、机器人形态要统一到可训练格式。'},
-      {id:'octo-openvla', year:'2024', title:'Octo / OpenVLA', paperIds:['2405.12213','2406.09246'], tags:['Open Source','Generalist'], text:'开放 generalist policy 与 7B VLA 进入社区复现视野。', detail:'OpenVLA 代表离散 action token + VLM/LLM backbone 的开源路线；Octo 代表跨数据集、语言/目标图像条件的通用 policy。'},
-      {id:'pi0-rdt', year:'2024', title:'π0 / RDT', paperIds:['2410.24164','2410.07864'], tags:['Flow','Diffusion','Action Expert'], text:'连续动作块成为主流解法，action expert 从 backbone 中分离。', detail:'动作不再必须像文本一样逐 token 生成；flow/diffusion 更适合高频、连续、多峰、灵巧控制。'},
-      {id:'fast', year:'2025', title:'FAST', paperIds:['2501.09747'], tags:['Action Tokenizer','Hybrid'], text:'用频域压缩 action token 改善离散动作表示，兼顾训练效率。', detail:'它不是完全否定 token，而是让 token 更像动作轨迹压缩码，缓解传统 binning 的低效与量化问题。'},
-      {id:'oft-vla0', year:'2025', title:'OpenVLA-OFT / VLA-0', paperIds:['2502.19645','2510.13054'], tags:['Strong Baseline','Continuous Action'], text:'围绕 OpenVLA 的慢推理、离散动作和复杂架构提出强实用改造与反直觉 baseline。', detail:'OpenVLA-OFT 直接优化速度与成功率；VLA-0 则反问：几乎不改 VLM、用 text action 是否也能打很多复杂 VLA。'},
-      {id:'smolvla', year:'2025', title:'SmolVLA', paperIds:['2506.01844'], tags:['Efficient','Frozen VLM','Community Data'], text:'小模型、冻结 VLM、训练 action expert，用社区低成本数据做可复现 VLA。', detail:'对个人复现非常重要：先把数据、相机顺序、action expert 和异步推理跑通，再考虑大模型。'},
-      {id:'pi05', year:'2025', title:'π0.5', paperIds:['2504.16054'], tags:['Hierarchy','Web Data','Subtask'], text:'同一模型内加入高层 subtask 与低层 action，强化开放世界泛化。', detail:'长程任务不只靠低层动作；高层语义预测、web data、verbal instruction 和多机器人数据共同提供泛化。'},
-      {id:'pi06-recap', year:'2025', title:'π0.6-star / RECAP', paperIds:['2511.14759'], tags:['RL','Experience','Advantage'], text:'VLA 从演示学习走向部署后自我改进：rollout、reward、intervention 进入训练闭环。', detail:'关键是 value function + advantage conditioning：不只是模仿人类，而是利用成功/失败/纠正数据提升吞吐和鲁棒性。'},
-      {id:'star-simvla', year:'2026', title:'StarVLA / SimVLA', paperIds:['2604.11757','2602.18224'], tags:['Simple Baseline','Benchmark'], text:'强简单 baseline 进入视野：小模型、统一 benchmark 和更少复杂技巧也能打出很强表现。', detail:'这条线提醒我们不能只被复杂架构吸引，还要用统一 benchmark 判断哪些改动真的贡献了收益。'},
-      {id:'pi07', year:'2026', title:'π0.7', paperIds:['2604.15483'], tags:['Steerable','Metadata','Subgoal Image'], text:'prompt/context 成为控制接口：metadata、subgoal image、world model、history 共同 steer 行为。', detail:'混合质量数据不再简单过滤，而是通过质量、速度、错误、目标图等上下文让模型知道“怎样做才是好策略”。'}
-    ];
-
-    const branches = [
-      {id:'benchmark-generalization', icon:'🧪', title:'Benchmark 真实性与泛化评测', paperIds:['2306.03310','2510.03827','2603.28301','2510.13626','2405.05941'], text:'标准 LIBERO 是否被背题？换语言、物体、初始位置、环境后是否崩掉？结果是否真的测到泛化。'},
-      {id:'action-representation', icon:'🦾', title:'Action Decoder / Representation', paperIds:['2304.13705','2303.04137','2307.15818','2405.12213','2406.09246','2410.24164','2410.07864','2501.09747','2502.19645','2411.19650'], text:'离散 token、FAST、flow、diffusion、continuous action chunk、action expert，以及速度和稳定性的权衡。'},
-      {id:'simple-baselines', icon:'⚡', title:'小模型 / 简单 Baseline / 可复现', paperIds:['2409.12514','2502.19645','2506.01844','2510.13054','2604.11757','2602.18224'], text:'TinyVLA、SmolVLA、OpenVLA-OFT、VLA-0、StarVLA、SimVLA：重新审视复杂架构是否真的必要。'},
-      {id:'reasoning-planning', icon:'🧭', title:'High-level Reasoning / Subtask / Goal Image', paperIds:['2504.16054','2604.15483','2508.07917','2605.02881'], text:'VLA 不能只会输出低层动作，还要知道阶段、目标、质量、计划和中间状态。'},
-      {id:'experience-rl', icon:'🔁', title:'RL / Post-training / Experience', paperIds:['2511.14759'], text:'BC 到底不够在哪里？失败数据、reward feedback、人类 intervention 和部署经验如何让 VLA 继续变强。'},
-      {id:'spatial-grounding', icon:'📐', title:'3D / Spatial Grounding / Depth', paperIds:['2501.15830','2508.09071','2510.13375','2508.07917'], text:'很多失败不是语言不懂，而是空间关系、姿态、抓取几何和深度不准；这一支专门补几何感知。'}
-    ];
-
-    const works = [
-      {title:'ACT / ALOHA', arxiv_id:'2304.13705', cat:'action', tags:['action chunk','bimanual'], text:'用 action chunking 和低成本双臂硬件奠定很多后续 VLA/模仿学习 baseline 的控制形态。', arxiv:'https://arxiv.org/abs/2304.13705'},
-      {title:'Diffusion Policy', arxiv_id:'2303.04137', cat:'action', tags:['diffusion','visuomotor'], text:'把扩散模型用于视觉运动策略，成为连续、多峰动作建模的重要基线。', arxiv:'https://arxiv.org/abs/2303.04137'},
-      {title:'LIBERO', arxiv_id:'2306.03310', cat:'benchmark', tags:['benchmark','lifelong'], text:'当前 VLA 最常见仿真评测之一，很多新模型默认报告 Spatial / Object / Goal / Long。', arxiv:'https://arxiv.org/abs/2306.03310'},
-      {title:'Meta-World', arxiv_id:'1910.10897', cat:'benchmark', tags:['benchmark','multi-task'], text:'多任务和元强化学习操作 benchmark，常作为 VLA 之外的辅助 manipulation 尺子。', arxiv:'https://arxiv.org/abs/1910.10897'},
-      {title:'ManiSkill', arxiv_id:'2107.14483', cat:'benchmark', tags:['3d','simulation'], text:'3D 物理仿真操作技能 benchmark，适合观察空间、几何和低层 manipulation 能力。', arxiv:'https://arxiv.org/abs/2107.14483'},
-      {title:'RoboTwin', arxiv_id:'2504.13059', cat:'benchmark', tags:['bimanual','digital twin'], text:'用生成式数字孪生构建双臂 benchmark，是 RoboTwin2.0 和双臂 VLA 评测的重要基础。', arxiv:'https://arxiv.org/abs/2504.13059'},
-      {title:'RT-1', arxiv_id:'2212.06817', cat:'mainline', tags:['robot transformer','BC'], text:'早期大规模真实机器人 Transformer，证明多任务机器人数据扩展有效。', arxiv:'https://arxiv.org/abs/2212.06817', github:'https://github.com/google-research/robotics_transformer'},
-      {title:'RT-2', arxiv_id:'2307.15818', cat:'vlm', tags:['VLM','action as token'], text:'把 web-scale VLM 迁移到机器人控制，显著增强语义泛化。', arxiv:'https://arxiv.org/abs/2307.15818', project:'https://robotics-transformer2.github.io/'},
-      {title:'Open X-Embodiment / RT-X', arxiv_id:'2310.08864', cat:'data', tags:['cross-embodiment','dataset'], text:'把多机构、多机器人数据标准化，推动跨机器人 policy。', arxiv:'https://arxiv.org/abs/2310.08864', project:'https://robotics-transformer-x.github.io/'},
-      {title:'Octo', arxiv_id:'2405.12213', cat:'open', tags:['open generalist','goal image'], text:'开放 generalist policy，支持语言或目标图像条件，便于下游适配。', arxiv:'https://arxiv.org/abs/2405.12213', github:'https://github.com/octo-models/octo', project:'https://octo-models.github.io/'},
-      {title:'OpenVLA', arxiv_id:'2406.09246', cat:'open', tags:['7B','open source','LoRA'], text:'开源 7B VLA，离散 action token 路线的强代表。', arxiv:'https://arxiv.org/abs/2406.09246', github:'https://github.com/openvla/openvla', project:'https://openvla.github.io/'},
-      {title:'π0', arxiv_id:'2410.24164', cat:'action', tags:['flow matching','action expert'], text:'用 flow action expert 输出连续动作块，适合灵巧和高频控制。', arxiv:'https://arxiv.org/abs/2410.24164', github:'https://github.com/Physical-Intelligence/openpi', project:'https://www.pi.website/blog/pi0'},
-      {title:'RDT-1B', arxiv_id:'2410.07864', cat:'action', tags:['diffusion','bimanual'], text:'面向双臂操作的 diffusion foundation model，代表大 diffusion transformer / bimanual 路线。', arxiv:'https://arxiv.org/abs/2410.07864'},
-      {title:'FAST', arxiv_id:'2501.09747', cat:'action', tags:['tokenizer','frequency'], text:'改进 action tokenization，提高离散 token 训练效率。', arxiv:'https://arxiv.org/abs/2501.09747', github:'https://github.com/Physical-Intelligence/openpi', project:'https://www.pi.website/research/fast'},
-      {title:'OpenVLA-OFT', arxiv_id:'2502.19645', cat:'efficient', tags:['continuous action','26x'], text:'针对 OpenVLA 慢推理和离散动作做实用改造，是近期很强的 open baseline。', arxiv:'https://arxiv.org/abs/2502.19645'},
-      {title:'SmolVLA', arxiv_id:'2506.01844', cat:'efficient', tags:['frozen VLM','community data'], text:'小模型 + flow expert + community data + async inference，适合个人复现。', arxiv:'https://arxiv.org/abs/2506.01844', github:'https://github.com/huggingface/lerobot', project:'https://huggingface.co/blog/smolvla'},
-      {title:'VLA-0', arxiv_id:'2510.13054', cat:'baseline', tags:['text action','simple baseline'], text:'几乎不改 VLM、直接用 text action，却在 LIBERO 上打很多复杂 VLA，是反直觉 baseline。', arxiv:'https://arxiv.org/abs/2510.13054'},
-      {title:'StarVLA-alpha', arxiv_id:'2604.11757', cat:'baseline', tags:['simple-vla','strong baseline'], text:'用更简单的 VLA 系统挑战复杂架构，强调统一 benchmark 下的强简单方法。', arxiv:'https://arxiv.org/abs/2604.11757'},
-      {title:'SimVLA', arxiv_id:'2602.18224', cat:'baseline', tags:['simple-vla','benchmark'], text:'简单 VLA baseline，适合和 LIBERO、RoboTwin、RoboCasa 等近期 benchmark 放在一起看。', arxiv:'https://arxiv.org/abs/2602.18224'},
-      {title:'CogACT', arxiv_id:'2411.19650', cat:'reasoning', tags:['cognition','action module'], text:'把 VLM cognition 和 action 模块解耦，代表 componentized VLA 趋势。', arxiv:'https://arxiv.org/abs/2411.19650'},
-      {title:'MolmoAct', arxiv_id:'2508.07917', cat:'reasoning', tags:['spatial reasoning','trace'], text:'强调 action reasoning traces 和空间动作推理，让动作生成更可解释。', arxiv:'https://arxiv.org/abs/2508.07917'},
-      {title:'π0.5', arxiv_id:'2504.16054', cat:'hierarchy', tags:['subtask','web data'], text:'高层 subtask + 低层 action，同一模型实现长程任务分解。', arxiv:'https://arxiv.org/abs/2504.16054', github:'https://github.com/Physical-Intelligence/openpi', project:'https://www.pi.website/blog/pi05'},
-      {title:'π0.6-star / RECAP', arxiv_id:'2511.14759', cat:'rl', tags:['RL','advantage','intervention'], text:'部署后收集经验，用 value / advantage 让 VLA 从成功失败中改进。', arxiv:'https://arxiv.org/abs/2511.14759'},
-      {title:'π0.7', arxiv_id:'2604.15483', cat:'context', tags:['metadata','subgoal image','world model'], text:'用丰富 context steer 大规模混合数据，实现更强 out-of-box 与组合泛化。', arxiv:'https://arxiv.org/abs/2604.15483'},
-      {title:'LIBERO-PRO', arxiv_id:'2510.03827', cat:'benchmark', tags:['stress-test','memorization'], text:'指出标准 LIBERO 高分不代表真实泛化，扰动泛化设置会让部分模型接近崩掉。', arxiv:'https://arxiv.org/abs/2510.03827'},
-      {title:'LIBERO-Para', arxiv_id:'2603.28301', cat:'benchmark', tags:['paraphrase','language'], text:'专测指令改写鲁棒性，追问 VLA 是否真的跟随语言而不是记模板。', arxiv:'https://arxiv.org/abs/2603.28301'},
-      {title:'LIBERO-Plus', arxiv_id:'2510.13626', cat:'benchmark', tags:['robustness','perturbation'], text:'从语言、视觉、物体等维度做系统扰动，揭示 VLA 对非关键变化仍然敏感。', arxiv:'https://arxiv.org/abs/2510.13626'},
-      {title:'SpatialVLA', arxiv_id:'2501.15830', cat:'spatial', tags:['3d','spatial'], text:'把 3D spatial representations 接进 VLA，补足空间关系和姿态理解。', arxiv:'https://arxiv.org/abs/2501.15830'},
-      {title:'GeoVLA', arxiv_id:'2508.09071', cat:'spatial', tags:['point cloud','geometry'], text:'用 3D point cloud tokenization 强化几何 grounding。', arxiv:'https://arxiv.org/abs/2508.09071'},
-      {title:'DepthVLA', arxiv_id:'2510.13375', cat:'spatial', tags:['depth','spatial'], text:'把 depth-aware reasoning 接入 VLA，针对深度和空间控制误差。', arxiv:'https://arxiv.org/abs/2510.13375'}
-    ];
-
-    const daily = [
-      {title:'示例：Flow action expert 的新采样策略', tags:['flow','inference'], problem:'迭代采样慢，真实机器人延迟高。', method:'减少 denoising steps + RTC/async 执行。', signal:'可以直接用于 SmolVLA 低延迟优化。'},
-      {title:'示例：VLA with intervention preference', tags:['RL','intervention'], problem:'人类纠正数据不一定最优。', method:'用 value/uncertainty 区分好纠正与噪声纠正。', signal:'给失败样本打标签，而不是全量模仿。'},
-      {title:'示例：Community data normalization', tags:['data','efficient'], problem:'低成本机器人数据相机命名和任务描述混乱。', method:'VLM 自动重写 instruction + camera ordering 标准化。', signal:'复现前先做数据清洗 dashboard。'}
-    ];
-
-    const benchmarkGrid = document.getElementById('benchmarkGrid');
-    benchmarkGrid.innerHTML = benchmarks.map((b, idx) => `
-      <a class="sticker-card benchmark-card" href="/vla-radar/group.html?id=${encodeURIComponent(b.id)}" data-index="${idx+1}" aria-label="查看 ${b.title} benchmark 相关论文">
-        <div class="branch-icon">${b.icon}</div>
-        <span class="benchmark-badge">${b.badge}</span>
-        <h3>${b.title}</h3>
-        <p>${b.text}</p>
-        <span class="mini-count">${b.paperIds.length} 篇论文 →</span>
-      </a>`).join('');
-
-    const benchmarkLine = document.getElementById('benchmarkModelLine');
-    benchmarkLine.innerHTML = benchmarkModelLine.map(item => {
-      const href = item.group
-        ? `/vla-radar/group.html?id=${encodeURIComponent(item.group)}`
-        : `/vla-radar/paper.html?id=${encodeURIComponent(item.id)}&from=group&group=benchmark-model-line`;
-      return `<a class="model-pill" href="${href}">${item.label}</a>`;
-    }).join('');
-
-    const timelineEl = document.getElementById('timelineCards');
-    timelineEl.innerHTML = timeline.map(item => `
-      <a class="time-card time-card-link" href="/vla-radar/group.html?id=${encodeURIComponent(item.id)}" aria-label="查看 ${item.title} 相关论文">
-        <span class="year">${item.year}</span>
-        <h3>${item.title}</h3>
-        <p>${item.text}</p>
-        <span class="mini-count">${item.paperIds.length} 篇论文 →</span>
-        <div class="tag-row">${item.tags.map((t,i)=>`<span class="tag ${i%2?'pink':'cream'}">${t}</span>`).join('')}</div>
-      </a>`).join('');
-
-    const branchEl = document.getElementById('branchMap');
-    branchEl.innerHTML = branches.map((b, idx)=>`
-      <a class="sticker-card branch-card branch-card-link" href="/vla-radar/group.html?id=${encodeURIComponent(b.id)}" data-index="${idx+1}" aria-label="查看 ${b.title} 方向相关论文">
-        <div class="branch-icon">${b.icon}</div>
-        <h3>${b.title}</h3>
-        <p>${b.text}</p>
-        <span class="mini-count">${b.paperIds.length} 篇论文 →</span>
-      </a>`).join('');
-
-    const cats = ['all','benchmark','mainline','vlm','data','open','action','efficient','baseline','reasoning','hierarchy','rl','context','spatial'];
-    const filters = document.getElementById('filters');
-    filters.innerHTML = cats.map(c=>`<button class="filter-chip ${c==='all'?'active':''}" data-cat="${c}">${c}</button>`).join('');
-
-    const workGrid = document.getElementById('workGrid');
-    function workDetailHref(w) {
-      return w.arxiv_id ? `/vla-radar/paper.html?id=${encodeURIComponent(w.arxiv_id)}&from=works` : '';
-    }
-    function workCard(w, idx) {
-      const inner = `
-          <span class="year">${w.cat}</span>
-          <h3>${w.title}</h3>
-          <p>${w.text}</p>
-          <div class="tag-row">${w.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>`;
-      const href = workDetailHref(w);
-      return href
-        ? `<a class="sticker-card paper-card paper-card-link" href="${href}" aria-label="查看 ${w.title} 的结构化论文详情">${inner}</a>`
-        : `<article class="sticker-card paper-card" data-kind="work" data-index="${idx}">${inner}</article>`;
-    }
-    function renderWorks(cat='all') {
-      workGrid.innerHTML = works.filter(w=>cat==='all'||w.cat===cat).map(w => workCard(w, works.indexOf(w))).join('');
-    }
-    renderWorks();
-    filters.addEventListener('click', e => {
-      const btn = e.target.closest('[data-cat]');
-      if (!btn) return;
-      filters.querySelectorAll('.filter-chip').forEach(x=>x.classList.remove('active'));
-      btn.classList.add('active');
-      renderWorks(btn.dataset.cat);
-    });
-
+    // 微调 tabs
     document.getElementById('tabs').addEventListener('click', e => {
       const btn = e.target.closest('[data-tab]');
       if (!btn) return;
-      document.querySelectorAll('.tab-btn').forEach(x=>x.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(x => x.classList.remove('active'));
+      document.querySelectorAll('.tab-panel').forEach(x => x.classList.remove('active'));
       btn.classList.add('active');
       document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active');
     });
 
-    const drawer = document.getElementById('detailDrawer');
-    const close = document.getElementById('drawerClose');
-    function renderLinkButtons(links={}) {
-      const defs = [
-        {key:'arxiv',   cls:'arxiv',   icon:'📄', label:'arXiv'},
-        {key:'github',  cls:'code',    icon:'💻', label:'代码'},
-        {key:'project', cls:'project', icon:'🔗', label:'项目页'}
-      ];
-      return defs
-        .filter(d => links[d.key])
-        .map(d => `<a class="link-btn ${d.cls}" href="${links[d.key]}" target="_blank" rel="noopener noreferrer">${d.icon} ${d.label}</a>`)
-        .join('');
-    }
-    function openDrawer(title, badge, text, tags=[], links={}) {
-      document.getElementById('drawerTitle').textContent = title;
-      document.getElementById('drawerBadge').textContent = badge;
-      document.getElementById('drawerText').textContent = text;
-      document.getElementById('drawerTags').innerHTML = tags.map(t=>`<span class="tag">${t}</span>`).join('');
-      document.getElementById('drawerLinks').innerHTML = renderLinkButtons(links);
-      drawer.classList.add('open');
-    }
-    document.body.addEventListener('click', e => {
-      const card = e.target.closest('[data-kind]');
-      if (!card) return;
-      const kind = card.dataset.kind;
-      const idx = Number(card.dataset.index);
-      if (kind === 'timeline') {
-        const item = timeline[idx]; openDrawer(item.title, `${item.year} · Mainline`, item.detail, item.tags);
-      }
-      if (kind === 'branch') {
-        const item = branches[idx-1]; openDrawer(item.title, '分化方向', item.text, ['problem space','idea mining']);
-      }
-      if (kind === 'work') {
-        const item = works[idx]; openDrawer(item.title, item.cat, item.text, item.tags, {arxiv:item.arxiv, github:item.github, project:item.project});
-      }
-    });
-    close.addEventListener('click', () => drawer.classList.remove('open'));
+    const PAIN = (window.VLA_CURATED && window.VLA_CURATED.painPoints) || [];
+    const mapGrid = document.getElementById('mapGrid');
+    const radarStrip = document.getElementById('radarStrip');
 
-    const dailyList = document.getElementById('dailyList');
-    const dailyDate = document.getElementById('dailyDate');
-
-    const paperDay = item => String(item.published || '').slice(0, 10);
-    function representativeScore(item) {
-      const text = `${item.title || ''} ${(item.tags || []).join(' ')} ${item.problem || ''} ${item.method || ''} ${item.signal || ''}`.toLowerCase();
-      const weights = [
-        ['libero', 9], ['benchmark', 8], ['openvla', 7], ['smolvla', 7],
-        ['π', 6], ['pi0', 6], ['reinforcement', 6], ['rl', 6],
-        ['world model', 5], ['hierarch', 5], ['planning', 5],
-        ['action', 4], ['diffusion', 4], ['flow', 4],
-        ['safety', 4], ['robot', 3], ['manipulation', 3],
-        ['efficient', 2], ['latency', 2], ['data', 2]
-      ];
-      const keywordScore = weights.reduce((sum, [key, value]) => sum + (text.includes(key) ? value : 0), 0);
-      const evidenceScore = Math.min(Number(item.figureCount || 0), 4);
-      return keywordScore + evidenceScore;
-    }
-    function pickRepresentative(items) {
-      if (!items.length) return { item: null, day: '', count: 0 };
-      const days = items.map(paperDay).filter(Boolean).sort().reverse();
-      const day = days[0] || paperDay(items[0]) || '';
-      const candidates = day ? items.filter(item => paperDay(item) === day) : items;
-      const ranked = candidates
-        .map((item, index) => ({ item, index, score: representativeScore(item) }))
-        .sort((a, b) => b.score - a.score || a.index - b.index);
-      return { item: ranked[0]?.item || candidates[0], day, count: candidates.length };
-    }
-    function renderDaily() {
-      const picked = pickRepresentative(daily);
-      if (!picked.item) {
-        dailyDate.textContent = '';
-        dailyList.innerHTML = `<div class="daily-empty">暂无论文。等明早 9 点的新抓取，或去论文库看历史记录。</div>`;
-        return;
-      }
-      const item = picked.item;
-      dailyDate.textContent = picked.day
-        ? `${picked.day} · 当天 ${picked.count} 篇，首页精选 1 篇`
-        : '首页精选 1 篇代表论文';
-      const tags = (item.tags||[]).map(t=>`<span class="tag pink">${t}</span>`).join('');
-      const row = (cls, k, v) => v ? `<div class="diag-row ${cls}"><span class="k">${k}</span><span class="v">${v}</span></div>` : '';
-      const d = item.diff || {};
-      const changes = (Array.isArray(d.changes) && d.changes.length) ? d.changes.join(' · ') : item.method;
-      const baselines = (Array.isArray(d.baselines) && d.baselines.length) ? d.baselines.join(' / ') : '';
-      const bench = (Array.isArray(d.benchmarks) && d.benchmarks.length)
-        ? d.benchmarks.map(b => `${b.name||''} ${b.before||''}→${b.after||''}`.trim()).join('；') : '';
-      const inner = `
-        <div class="diag-head"><h4>${item.title}</h4>${d.base?`<span class="diag-base">base: ${d.base}</span>`:''}<div class="tag-row">${tags}</div></div>
-        <div class="diag">
-          ${row('', '打什么', item.problem)}
-          ${row('', '改哪里', changes)}
-          ${baselines ? row('', '跟谁比', baselines) : ''}
-          ${bench ? row('win', '赢在哪', bench) : ''}
-          ${d.risk ? row('warn', '信不信', d.risk) : ''}
-          ${row('idea', '能偷', item.signal)}
-        </div>`;
-      dailyList.innerHTML = item.arxiv_id
-        ? `<a class="daily-item clickable" href="/vla-radar/paper.html?id=${encodeURIComponent(item.arxiv_id)}">${inner}</a>`
-        : `<article class="daily-item">${inner}</article>`;
-
-      const jsonEl = document.getElementById('dailyJson');
-      if (jsonEl) {
-        const core = { title: item.title, arxiv_id: item.arxiv_id || '', problem: item.problem, method: item.method };
-        if (d && Object.keys(d).length) core.diff = d; else if (item.delta) core.delta = item.delta;
-        core.evidence = item.evidence || '';
-        core.idea_signal = item.signal;
-        core.tags = item.tags || [];
-        jsonEl.textContent = JSON.stringify(core, null, 2);
-      }
-    }
-    renderDaily();
-
-    function mapPaper(p) {
-      return {
-        title: p.title || 'Untitled',
-        tags: p.tags || [],
-        problem: p.problem || p.summary || '待分析',
-        method: p.method || '待分析',
-        delta: p.delta || '',
-        evidence: p.evidence || '',
-        signal: p.idea_signal || p.signal || '待提取',
-        diff: p.diff && typeof p.diff === 'object' ? p.diff : null,
-        arxiv_id: p.arxiv_id || '',
-        published: p.published || '',
-        figureCount: Array.isArray(p.figures) ? p.figures.length : 0
-      };
-    }
-    // 优先读 Supabase（/api/vla-radar/list）；没接好就退回静态 json；再不行保留内置示例。
-    async function loadDaily() {
-      try {
-        const res = await fetch('/api/vla-radar/list?limit=60', { cache: 'no-store' });
-        if (res.ok) {
-          const payload = await res.json();
-          if (payload.configured && Array.isArray(payload.papers) && payload.papers.length) {
-            daily.splice(0, daily.length, ...payload.papers.map(mapPaper));
-            renderDaily();
-            return;
-          }
+    function renderMap(papers) {
+      const byPain = {};
+      for (const pp of PAIN) byPain[pp.key] = { map: [], radar: 0 };
+      let t2 = 0, t1 = 0;
+      for (const p of papers) {
+        if (p.tier === 2) t2++; else if (p.tier === 1) t1++;
+        const pts = Array.isArray(p.pain_points) ? p.pain_points : [];
+        for (const k of pts) {
+          if (!byPain[k]) continue;
+          if (p.tier === 2) byPain[k].map.push(p);
+          else if (p.tier === 1) byPain[k].radar++;
         }
-      } catch (e) {}
-      try {
-        const res = await fetch('/vla-radar/data/latest.json', { cache: 'no-store' });
-        if (!res.ok) return;
-        const payload = await res.json();
-        if (Array.isArray(payload.papers) && payload.papers.length) {
-          daily.splice(0, daily.length, ...payload.papers.map(mapPaper));
-          renderDaily();
-        }
-      } catch (e) {}
+      }
+      // 头部统计
+      document.getElementById('statMap').textContent = t2;
+      document.getElementById('statRadar').textContent = t1;
+      radarStrip.innerHTML =
+        `<span class="rs-dot"></span><span>已收录 <b>${papers.length}</b> 篇</span>` +
+        `<span class="rs-sep">·</span><span>地图 <b>${t2}</b> 篇地标</span>` +
+        `<span class="rs-sep">·</span><span>雷达 <b>${t1}</b> 篇在追</span>` +
+        `<a href="/vla-radar/radar.html">看雷达 →</a>`;
+
+      // 按地图论文数排序：卷的在前，空的在后（空=机会，放末尾但显眼）
+      const order = [...PAIN].sort((a, b) => byPain[b.key].map.length - byPain[a.key].map.length);
+      mapGrid.innerHTML = order.map(pp => {
+        const b = byPain[pp.key];
+        const maps = b.map.sort((x, y) => (y.published || '').localeCompare(x.published || ''));
+        const empty = !maps.length;
+        const papersHtml = maps.slice(0, 5).map(p =>
+          `<a class="pl-paper" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}&from=home">
+            <span class="pl-yr">${esc(yr(p))}</span><span class="pl-t">${esc(cleanTitle(p.title))}</span></a>`
+        ).join('');
+        const meta = empty
+          ? `<span class="prob-open">还没出地标 · 这儿有空子 🕳️</span>` +
+            (b.radar ? `<span class="m-radar">雷达 ${b.radar} 篇在试</span>` : '')
+          : `<span class="m-map">${maps.length} 篇地图地标</span>` +
+            (b.radar ? `<span class="m-radar">· 雷达 ${b.radar} 篇在追</span>` : '');
+        const foot = b.radar
+          ? `<div class="prob-foot"><a href="/vla-radar/radar.html?pain=${encodeURIComponent(pp.key)}">看这条线的雷达 →</a></div>`
+          : '';
+        return `<section class="sticker-card prob-card${empty ? ' empty' : ''}">
+          <div class="prob-head"><span class="prob-ic">${pp.icon}</span><div><h3>${esc(pp.name)}</h3><p>${esc(pp.short)}</p></div></div>
+          <div class="prob-meta">${meta}</div>
+          ${papersHtml ? `<div class="prob-papers">${papersHtml}</div>` : ''}
+          ${foot}
+        </section>`;
+      }).join('');
     }
-    loadDaily();
+
+    async function load() {
+      try {
+        const res = await fetch('/api/vla-radar/list?limit=300', { cache: 'no-store' });
+        const j = await res.json();
+        if (j && j.configured === false) {
+          radarStrip.innerHTML = '<span class="rs-dot"></span><span>论文库还没接好（Supabase 未配置）。</span>';
+          return;
+        }
+        renderMap((j && j.papers) || []);
+      } catch (e) {
+        radarStrip.innerHTML = `<span class="rs-dot"></span><span>加载出错：${esc(e && e.message ? e.message : e)}</span>`;
+      }
+    }
+    load();
   </script>
 </body>
 </html>

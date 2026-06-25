@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>雷达 · VLA Radar</title>
+  <meta name="description" content="每日新论文先进雷达分诊；证明过自己才升级进地图。这里是还在被验证的 VLA 新论文流。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+  <style>
+    .rd-filter { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0 6px; }
+    .rd-chip { padding:6px 13px; border:2px solid rgba(30,36,71,.16); border-radius:999px; background:#fff; color:var(--meow-ink);
+      font-weight:700; font-size:.86rem; cursor:pointer; text-decoration:none; transition:.14s ease; }
+    .rd-chip:hover { transform:translate(-1px,-1px); }
+    .rd-chip.active { background:var(--meow-ink); color:#fff; border-color:var(--meow-ink); }
+    .rd-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; margin-top:14px; }
+    .rd-card { display:flex; flex-direction:column; gap:9px; padding:18px; text-decoration:none; color:inherit; }
+    .rd-card:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-blue); }
+    .rd-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+    .rd-date { font-size:.76rem; font-weight:800; color:var(--meow-muted); }
+    .rd-hot { font-size:.72rem; font-weight:800; color:var(--meow-ink); background:var(--meow-yellow); padding:2px 8px; border-radius:999px; }
+    .rd-card h3 { margin:0; font-size:1.06rem; line-height:1.3; }
+    .rd-card p { margin:0; color:var(--meow-muted); font-size:.9rem; line-height:1.55; }
+    .rd-pp { display:flex; flex-wrap:wrap; gap:5px; }
+    .rd-pp span { font-size:.72rem; font-weight:700; color:var(--meow-blue); background:var(--meow-sky); padding:2px 8px; border-radius:8px; }
+    .rd-arch { margin-top:24px; padding:16px 20px; border:2px dashed rgba(30,36,71,.22); border-radius:var(--radius-lg); color:var(--meow-muted); }
+    .rd-arch a { font-weight:800; color:var(--meow-ink); border-bottom:2px solid var(--meow-yellow); }
+    .rd-state { padding:40px 8px; color:var(--meow-muted); }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/"><span class="brand-badge">🐾</span><span>Meowsu · VLA Radar</span></a>
+            <div class="nav-links">
+        <a href="/vla-radar/#map">开放问题</a>
+        <a href="/vla-radar/radar.html">雷达</a>
+        <a href="/vla-radar/#finetune">微调</a>
+        <a href="/vla-radar/views.html">视角</a>
+        <a href="/vla-radar/papers.html">论文库</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="section paper-wrap">
+      <div class="container">
+        <a class="paper-back" href="/vla-radar/">← 回到地图</a>
+        <span class="badge">雷达 · Radar</span>
+        <h1 class="paper-title">今天的论文，先在这儿排队</h1>
+        <p class="paper-meta">新论文先进雷达做分诊：相关但还没证明过自己的，都在这里。<b>地标级 + 沉淀够</b>的会升级进地图；标「高潜」的是已经很能打、只差时间沉淀的。</p>
+        <div class="rd-filter" id="filter"></div>
+        <div class="rd-grid" id="grid"><div class="rd-state">正在加载雷达 …</div></div>
+        <div class="rd-arch" id="arch" hidden></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+
+  <script src="/vla-radar/data/curated.js"></script>
+  <script>
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    const PAIN = (window.VLA_CURATED && window.VLA_CURATED.painPoints) || [];
+    const painName = k => (PAIN.find(p => p.key === k) || {}).name || k;
+    const painIcon = k => (PAIN.find(p => p.key === k) || {}).icon || '·';
+    const grid = document.getElementById('grid');
+    const filterEl = document.getElementById('filter');
+    const archEl = document.getElementById('arch');
+    const params = new URLSearchParams(location.search);
+    let activePain = (params.get('pain') || '').trim();
+    let radarPapers = [];
+    let archiveCount = 0;
+
+    function renderFilter() {
+      const chip = (key, label, n) =>
+        `<a class="rd-chip ${activePain === key ? 'active' : ''}" href="${key ? '?pain=' + encodeURIComponent(key) : '/vla-radar/radar.html'}">${label}${n != null ? ` <b>${n}</b>` : ''}</a>`;
+      const counts = {};
+      for (const p of radarPapers) for (const k of (p.pain_points || [])) counts[k] = (counts[k] || 0) + 1;
+      filterEl.innerHTML =
+        chip('', `全部 ${radarPapers.length}`) +
+        PAIN.map(pp => counts[pp.key] ? chip(pp.key, `${pp.icon} ${pp.name}`, counts[pp.key]) : '').join('');
+    }
+
+    function render() {
+      let list = radarPapers;
+      if (activePain) list = list.filter(p => (p.pain_points || []).includes(activePain));
+      list = list.slice().sort((a, b) => (b.published || '').localeCompare(a.published || ''));
+      if (!list.length) {
+        grid.innerHTML = `<div class="rd-state">这条线的雷达暂时空着 —— 换个筛选，或去 <a href="/vla-radar/papers.html">论文库</a> 看全部。</div>`;
+        return;
+      }
+      grid.innerHTML = list.map(p => {
+        const hot = p.relevance >= 3 && p.quality >= 3; // tier1 里的「高潜·待沉淀」
+        const line = p.headline || p.problem || p.method || '';
+        const pps = (p.pain_points || []).slice(0, 3).map(k => `<span>${painIcon(k)} ${esc(painName(k))}</span>`).join('');
+        return `<a class="sticker-card rd-card" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}&from=radar">
+          <div class="rd-top"><span class="rd-date">${esc((p.published || '').slice(0, 10))}</span>${hot ? '<span class="rd-hot">⚡ 高潜·待沉淀</span>' : ''}</div>
+          <h3>${esc(p.title || p.arxiv_id)}</h3>
+          ${line ? `<p>${esc(line)}</p>` : ''}
+          ${pps ? `<div class="rd-pp">${pps}</div>` : ''}
+        </a>`;
+      }).join('');
+    }
+
+    async function load() {
+      try {
+        const res = await fetch('/api/vla-radar/list?limit=300', { cache: 'no-store' });
+        const j = await res.json();
+        if (j && j.configured === false) { grid.innerHTML = '<div class="rd-state">论文库还没接好。</div>'; return; }
+        const all = (j && j.papers) || [];
+        radarPapers = all.filter(p => p.tier === 1);
+        archiveCount = all.filter(p => p.tier === 0).length;
+        renderFilter();
+        render();
+        archEl.hidden = false;
+        archEl.innerHTML = `🗄️ 另有 <b>${archiveCount}</b> 篇仅存档（与你方向较远，不在雷达推送，但仍可搜）→ <a href="/vla-radar/papers.html">全部论文库</a>`;
+      } catch (e) {
+        grid.innerHTML = `<div class="rd-state">加载出错：${esc(e && e.message ? e.message : e)}</div>`;
+      }
+    }
+    filterEl.addEventListener('click', e => {
+      const a = e.target.closest('.rd-chip');
+      if (!a) return;
+      e.preventDefault();
+      const url = new URL(a.getAttribute('href'), location.origin);
+      activePain = (new URLSearchParams(url.search)).get('pain') || '';
+      history.replaceState(null, '', activePain ? '?pain=' + encodeURIComponent(activePain) : '/vla-radar/radar.html');
+      renderFilter(); render();
+    });
+    load();
+  </script>
+</body>
+</html>

@@ -17,12 +17,10 @@
         <span class="brand-badge">🐾</span>
         <span>Meowsu · VLA Radar</span>
       </a>
-            <div class="nav-links">
-        <a href="/vla-radar/#benchmarks">Benchmark</a>
-        <a href="/vla-radar/#timeline">主线</a>
-        <a href="/vla-radar/#branches">分化</a>
+                  <div class="nav-links">
+        <a href="/vla-radar/#map">开放问题</a>
+        <a href="/vla-radar/radar.html">雷达</a>
         <a href="/vla-radar/#finetune">微调</a>
-        <a href="/vla-radar/#daily">论文雷达</a>
         <a href="/vla-radar/views.html">视角</a>
         <a href="/vla-radar/papers.html">论文库</a>
         <a href="/">返回博客</a>
@@ -33,7 +31,7 @@
   <main>
     <section class="section paper-wrap">
       <div class="container">
-        <a class="paper-back" id="paperBack" href="/vla-radar/#daily">← 回到论文雷达</a>
+        <a class="paper-back" id="paperBack" href="/vla-radar/">← 回到地图</a>
         <div id="paperRoot">
           <div class="paper-state" id="paperState">正在加载论文分析 …</div>
         </div>
@@ -54,8 +52,8 @@
     const root = document.getElementById('paperRoot');
     const back = document.getElementById('paperBack');
     if (back && from === 'works') {
-      back.href = '/vla-radar/#works';
-      back.textContent = '← 回到代表作';
+      back.href = '/vla-radar/';
+      back.textContent = '← 回到地图';
     } else if (back && from === 'papers') {
       back.href = '/vla-radar/papers.html';
       back.textContent = '← 回到论文库';
@@ -78,6 +76,12 @@
     } else if (back && from === 'metro') {
       back.href = '/vla-radar/metro.html';
       back.textContent = '← 回到研究拓扑';
+    } else if (back && from === 'radar') {
+      back.href = '/vla-radar/radar.html';
+      back.textContent = '← 回到雷达';
+    } else if (back && from === 'home') {
+      back.href = '/vla-radar/#map';
+      back.textContent = '← 回到地图';
     }
 
     const esc = s => String(s == null ? '' : s)
