@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>模型演进 · VLA Radar</title>
+  <meta name="description" content="VLA 模型家族的版本演进:每一版相对上一版改了什么、为什么。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/">
+        <span class="brand-badge">🐾</span>
+        <span>Meowsu · VLA Radar</span>
+      </a>
+      <div class="nav-links">
+        <a href="/vla-radar/#benchmarks">Benchmark</a>
+        <a href="/vla-radar/#timeline">主线</a>
+        <a href="/vla-radar/#branches">分化</a>
+        <a href="/vla-radar/#daily">论文雷达</a>
+        <a href="/vla-radar/series.html">演进</a>
+        <a href="/vla-radar/papers.html">论文库</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="section paper-wrap">
+      <div class="container">
+        <a class="paper-back" href="/vla-radar/#daily">← 回到论文雷达</a>
+        <span class="badge">模型演进 · Series</span>
+        <h1 class="paper-title">一个家族是怎么一版版长起来的</h1>
+        <p class="paper-meta">不是孤立看每篇,而是看 OpenVLA→OFT、π0→π0.5→π*0.6→π0.7 这样的版本链:<b>每一跳相对上一版改了什么</b>(取自每篇的结构化 diff)。</p>
+        <div id="root"><div class="paper-state">正在加载演进专题 …</div></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+
+  <script>
+    // 策展:哪些论文组成一条版本链、按什么顺序、显示什么短名
+    const SERIES = [
+      { name: 'π · Physical Intelligence', icon: '🔵', desc: '从灵巧操作 → 开放世界家庭任务 → 部署后经验学习 → 可 steer 上下文',
+        steps: [
+          { id: '2410.24164', label: 'π0' },
+          { id: '2504.16054', label: 'π0.5' },
+          { id: '2511.14759', label: 'π*0.6' },
+          { id: '2604.15483', label: 'π0.7' }
+        ] },
+      { name: 'OpenVLA', icon: '🟢', desc: '开源 7B VLA 基座 → 实用化的连续动作 / 并行解码微调',
+        steps: [
+          { id: '2406.09246', label: 'OpenVLA' },
+          { id: '2502.19645', label: 'OpenVLA-OFT' }
+        ] },
+      { name: 'RT · Google DeepMind', icon: '🟡', desc: '机器人 Transformer → web-scale VLM 迁移 → 跨机构数据标准化',
+        steps: [
+          { id: '2212.06817', label: 'RT-1' },
+          { id: '2307.15818', label: 'RT-2' },
+          { id: '2310.08864', label: 'Open X-Embodiment' }
+        ] },
+      { name: 'MolmoAct', icon: '🟣', desc: 'Action Reasoning Models 的两代',
+        steps: [
+          { id: '2508.07917', label: 'MolmoAct' },
+          { id: '2605.02881', label: 'MolmoAct2' }
+        ] }
+    ];
+
+    const root = document.getElementById('root');
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const renderChange = c => {
+      const parts = String(c).split(/\s*(?:→|->|＞|>)\s*/);
+      if (parts.length === 2 && parts[0] && parts[1]) {
+        return `<li><span class="ch-before">${esc(parts[0])}</span><span class="ch-arrow">→</span><span class="ch-after">${esc(parts[1])}</span></li>`;
+      }
+      return `<li><span class="ch-after">${esc(c)}</span></li>`;
+    };
+
+    const benchLine = d => {
+      const bs = Array.isArray(d.benchmarks) ? d.benchmarks.filter(b => b && b.name && (b.before || b.after)) : [];
+      if (!bs.length) return '';
+      return `<div class="evo-bench">${bs.map(b => `<span class="evo-bench-pill">${esc(b.name)} <b>${esc(b.before || '?')}→${esc(b.after || '?')}</b></span>`).join('')}</div>`;
+    };
+
+    const stepHtml = (p, label, index, isFirst) => {
+      const d = (p.diff && typeof p.diff === 'object') ? p.diff : {};
+      const changes = Array.isArray(d.changes) ? d.changes.filter(Boolean) : [];
+      const date = (p.published || '').slice(0, 10);
+      const tags = (p.tags || []).slice(0, 3).map(t => `<span class="tag">${esc(t)}</span>`).join('');
+      const lead = isFirst
+        ? (d.base ? `<p class="evo-lead">起点 · 在 <b>${esc(d.base)}</b> 基础上</p>` : `<p class="evo-lead">起点</p>`)
+        : `<p class="evo-lead">↓ 从上一版改了什么</p>`;
+      return `
+        <div class="evo-step">
+          <div class="evo-num">${index + 1}</div>
+          <div class="evo-body">
+            <div class="evo-head">
+              <a class="evo-title" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}&from=series">${esc(label)}</a>
+              ${date ? `<span class="evo-date">${esc(date)}</span>` : ''}
+              <div class="tag-row">${tags}</div>
+            </div>
+            ${lead}
+            ${changes.length ? `<ul class="evo-changes">${changes.map(renderChange).join('')}</ul>` : `<p class="evo-fallback">${esc(p.delta || p.problem || '该版本暂无结构化 diff,点标题看详情。')}</p>`}
+            ${benchLine(d)}
+          </div>
+        </div>`;
+    };
+
+    const render = map => {
+      const out = SERIES.map(s => {
+        const steps = s.steps.map(st => ({ st, p: map[st.id] })).filter(x => x.p);
+        if (!steps.length) return '';
+        const rail = steps.map(({ st }) => `<span class="evo-railchip">${esc(st.label)}</span>`).join('<span class="evo-railarrow">→</span>');
+        const body = steps.map(({ st, p }, i) => stepHtml(p, st.label, i, i === 0)).join('<div class="evo-connector" aria-hidden="true">↓</div>');
+        return `
+          <section class="sticker-card card-pad series-card">
+            <div class="series-head">
+              <span class="series-icon">${s.icon}</span>
+              <div>
+                <h2 class="series-name">${esc(s.name)}</h2>
+                <p class="series-desc">${esc(s.desc)}</p>
+              </div>
+            </div>
+            <div class="series-rail">${rail}</div>
+            <div class="evo-list">${body}</div>
+          </section>`;
+      }).filter(Boolean).join('');
+      root.innerHTML = out || '<div class="paper-state">还没有可展示的演进链(等论文入库)。</div>';
+    };
+
+    async function load() {
+      try {
+        const res = await fetch('/api/vla-radar/list?limit=200', { cache: 'no-store' });
+        const j = await res.json();
+        if (j && j.configured === false) { root.innerHTML = '<div class="paper-state">论文库还没接好。</div>'; return; }
+        const map = {};
+        for (const p of (j.papers || [])) map[p.arxiv_id] = p;
+        render(map);
+      } catch (e) {
+        root.innerHTML = '<div class="paper-state">加载出错:' + esc(e && e.message ? e.message : e) + '</div>';
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
