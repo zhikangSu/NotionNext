@@ -50,7 +50,24 @@
     /* 首页英雄区的星辰场景 */
     #cosmos { position:absolute; inset:0; width:100%; height:100%; z-index:0; pointer-events:none; }
     .hero .container { position:relative; z-index:1; }
-    .hero-card { background:rgba(20,22,58,.55); backdrop-filter:blur(6px); }
+    /* 英雄区雷达卡 → 深空交互卡 */
+    .hero-card { background:linear-gradient(155deg, rgba(42,46,98,.72), rgba(15,17,44,.74)); backdrop-filter:blur(8px); border-color:rgba(255,255,255,.16); box-shadow:var(--shadow), 0 0 48px rgba(90,120,255,.22); }
+    .radar-sweep { position:absolute; inset:30px; border-radius:50%; z-index:0; pointer-events:none;
+      background:conic-gradient(from 0deg, rgba(127,180,255,0) 0deg, rgba(127,180,255,.30) 38deg, rgba(127,180,255,0) 72deg);
+      animation:radar-scan 4.5s linear infinite; }
+    @keyframes radar-scan { to { transform:rotate(360deg); } }
+    .radar-blip { position:absolute; z-index:0; width:9px; height:9px; border-radius:50%; background:var(--meow-yellow);
+      box-shadow:0 0 12px 3px rgba(255,212,59,.55); animation:blip 3s ease-in-out infinite; }
+    .radar-blip.b1 { top:30%; left:24%; } .radar-blip.b2 { top:62%; left:72%; animation-delay:1.5s; }
+    @keyframes blip { 0%,100%{ opacity:0; transform:scale(.3); } 28%{ opacity:1; transform:scale(1); } 70%{ opacity:.35; } }
+    .radar-logo { animation:floaty 5s ease-in-out infinite; }
+    @keyframes floaty { 0%,100%{ transform:rotate(-4deg) translateY(0); } 50%{ transform:rotate(-4deg) translateY(-9px); } }
+    .rc-title { margin:16px 0 6px; font-size:2rem; line-height:1.05; color:#eef1ff; }
+    .rc-sub { margin:0; color:#b9c2ea; }
+    .hero-card .mini-metric { display:block; text-decoration:none; color:#eef1ff; border:2px solid rgba(255,255,255,.14); background:rgba(255,255,255,.07); transition:transform .12s ease, box-shadow .12s ease, background .12s ease; }
+    .hero-card .mini-metric:hover { transform:translateY(-3px); background:rgba(255,255,255,.14); box-shadow:0 8px 22px rgba(80,110,255,.32); }
+    .hero-card .mini-metric b { display:block; font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.5rem; line-height:1.1; color:#ffd86b; }
+    .hero-card .mini-metric small { color:#aab4dd; }
   </style>
 </head>
 <body>
@@ -90,18 +107,20 @@
           <a class="stat-card" href="/vla-radar/views.html"><strong>6</strong><span>分析视角</span></a>
         </div>
       </div>
-      <aside class="hero-card" aria-label="VLA radar illustration">
+      <aside class="hero-card" aria-label="VLA radar">
         <div class="orbit"></div><div class="orbit"></div>
+        <div class="radar-sweep" aria-hidden="true"></div>
+        <span class="radar-blip b1" aria-hidden="true"></span><span class="radar-blip b2" aria-hidden="true"></span>
         <div class="radar-core">
           <div>
             <div class="radar-logo">🤖</div>
             <span class="badge">Robot Foundation Model Radar</span>
-            <h2 style="margin:16px 0 6px;font-size:2rem;line-height:1.05">Vision · Language · Action</h2>
-            <p style="margin:0;color:var(--meow-muted)">每篇论文回答：它在打哪个开放问题、改了哪一层、证据信不信、我能偷什么 idea。</p>
+            <h2 class="rc-title">Vision · Language · Action</h2>
+            <p class="rc-sub">每篇论文回答：它在打哪个开放问题、改了哪一层、证据信不信、对我有什么启发。</p>
             <div class="mini-metric-row">
-              <div class="mini-metric">地图<small>证明过的地标</small></div>
-              <div class="mini-metric">雷达<small>新论文·待沉淀</small></div>
-              <div class="mini-metric">档案<small>全量·可搜</small></div>
+              <a class="mini-metric" href="#map"><b id="hcMap">·</b>地图<small>证明过的地标</small></a>
+              <a class="mini-metric" href="/vla-radar/radar.html"><b id="hcRadar">·</b>雷达<small>新论文·待沉淀</small></a>
+              <a class="mini-metric" href="/vla-radar/papers.html"><b id="hcArch">·</b>档案<small>全量·可搜</small></a>
             </div>
           </div>
         </div>
@@ -242,9 +261,9 @@
     function renderMap(papers) {
       const byPain = {};
       for (const pp of PAIN) byPain[pp.key] = { map: [], radar: 0 };
-      let t2 = 0, t1 = 0;
+      let t2 = 0, t1 = 0, t0 = 0;
       for (const p of papers) {
-        if (p.tier === 2) t2++; else if (p.tier === 1) t1++;
+        if (p.tier === 2) t2++; else if (p.tier === 1) t1++; else t0++;
         const pts = Array.isArray(p.pain_points) ? p.pain_points : [];
         for (const k of pts) {
           if (!byPain[k]) continue;
@@ -252,9 +271,11 @@
           else if (p.tier === 1) byPain[k].radar++;
         }
       }
-      // 头部统计
+      // 头部统计 + 英雄区雷达卡的实时计数
       document.getElementById('statMap').textContent = t2;
       document.getElementById('statRadar').textContent = t1;
+      const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+      set('hcMap', t2); set('hcRadar', t1); set('hcArch', t0);
       radarStrip.innerHTML =
         `<span class="rs-dot"></span><span>已收录 <b>${papers.length}</b> 篇</span>` +
         `<span class="rs-sep">·</span><span>地图 <b>${t2}</b> 篇地标</span>` +
