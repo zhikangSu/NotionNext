@@ -9,6 +9,17 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+  <style>
+    .status-row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:14px 0 4px; }
+    .st-tier { font-weight:800; font-size:.84rem; padding:4px 12px; border-radius:999px; border:2px solid var(--meow-ink); }
+    .st-tier.st-map { background:var(--meow-blue); color:#fff; }
+    .st-tier.st-radar { background:var(--meow-yellow); color:var(--meow-ink); }
+    .st-tier.st-arch { background:#fff; color:var(--meow-muted); }
+    .st-q { font-weight:800; font-size:.82rem; color:var(--meow-blue); letter-spacing:1px; }
+    .st-pain { font-weight:700; font-size:.78rem; padding:3px 10px; border-radius:8px; background:var(--meow-sky); color:var(--meow-blue); }
+    .st-code { font-weight:700; font-size:.78rem; padding:3px 10px; border-radius:8px; background:var(--meow-cream); color:var(--meow-ink); }
+    .st-reason { margin:8px 0 0; color:var(--meow-muted); font-size:.86rem; font-weight:600; line-height:1.6; }
+  </style>
 </head>
 <body>
   <nav class="nav">
@@ -225,6 +236,21 @@
         </div>`;
     };
 
+    // 漏斗状态行：层级 / 质量 / 命中痛点 / 代码状态 / 一句话分诊理由
+    const PAIN_NAMES = { data:'数据瓶颈', generalization:'泛化', action:'动作表示', reasoning:'长程推理', posttrain:'部署后变强', efficiency:'效率/可复现', eval:'评测可信度', safety:'鲁棒/安全' };
+    const CODE_NAMES = { released:'已开源', promised:'已挂链接', none:'无代码迹象', 'closed-source':'闭源' };
+    const statusRow = p => {
+      const t = p.tier;
+      const label = t === 2 ? '🗺️ 地图地标' : t === 1 ? '📡 雷达' : '🗄️ 仅档案';
+      const cls = t === 2 ? 'st-map' : t === 1 ? 'st-radar' : 'st-arch';
+      const q = Math.max(0, Math.min(3, Number(p.quality || 0)));
+      const qStr = q ? '质量 ' + '●'.repeat(q) + '○'.repeat(3 - q) : '';
+      const pains = (Array.isArray(p.pain_points) ? p.pain_points : []).map(k => `<span class="st-pain">${esc(PAIN_NAMES[k] || k)}</span>`).join('');
+      const code = (p.code_status && p.code_status !== 'unknown') ? `<span class="st-code">代码:${esc(CODE_NAMES[p.code_status] || p.code_status)}</span>` : '';
+      const row = `<div class="status-row"><span class="st-tier ${cls}">${label}</span>${qStr ? `<span class="st-q">${qStr}</span>` : ''}${pains}${code}</div>`;
+      return row + (p.triage_reason ? `<p class="st-reason">📌 ${esc(p.triage_reason)}</p>` : '');
+    };
+
     const render = p => {
       document.title = `${p.title || '论文'} · VLA Radar`;
       const tags = (Array.isArray(p.tags) ? p.tags : []).map(t => `<span class="tag pink">${esc(t)}</span>`).join('');
@@ -248,6 +274,7 @@
         <h1 class="paper-title">${esc(p.title || p.arxiv_id || '未命名论文')}</h1>
         ${meta ? `<p class="paper-meta">${meta}</p>` : ''}
         ${p.arxiv_id ? `<p class="paper-meta">arXiv: ${esc(p.arxiv_id)}</p>` : ''}
+        ${statusRow(p)}
         ${tags ? `<div class="tag-row" style="margin-top:10px">${tags}</div>` : ''}
         ${linkButtons(p)}
         ${deepControl(p)}

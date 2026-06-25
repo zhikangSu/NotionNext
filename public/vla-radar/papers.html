@@ -9,6 +9,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+  <style>
+    .tier-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 4px; }
+    .tier-tab { padding:6px 14px; border:2px solid rgba(30,36,71,.16); border-radius:999px; background:#fff; color:var(--meow-ink); font-weight:700; font-size:.86rem; cursor:pointer; transition:.14s ease; }
+    .tier-tab:hover { transform:translate(-1px,-1px); }
+    .tier-tab.active { background:var(--meow-ink); color:#fff; border-color:var(--meow-ink); }
+    .paper-card .year .t-mark { margin-right:4px; }
+  </style>
 </head>
 <body>
   <nav class="nav">
@@ -35,6 +42,12 @@
         <span class="badge">论文库 · 按日期归档</span>
         <h1 class="paper-title">全部 VLA 论文</h1>
         <p class="paper-meta" id="count"></p>
+        <div class="tier-tabs" id="tierTabs">
+          <button class="tier-tab active" data-tier="all">全部</button>
+          <button class="tier-tab" data-tier="2">🗺️ 地图</button>
+          <button class="tier-tab" data-tier="1">📡 雷达</button>
+          <button class="tier-tab" data-tier="0">🗄️ 仅档案</button>
+        </div>
         <input class="searchbox" id="q" placeholder="搜索:flow / RL / OpenVLA / embodiment / efficient ..." style="margin:16px 0 6px" />
         <div class="archive-actions">
           <button class="archive-action" id="expandAll" type="button">展开全部</button>
@@ -61,6 +74,10 @@
     let visibleGroups = [];
     let openDates = new Set();
     let manualOpenState = false;
+    let tierFilter = 'all';
+    const tierTabs = document.getElementById('tierTabs');
+    const TIER_LABEL = { '2': '🗺️ 地图', '1': '📡 雷达', '0': '🗄️ 仅档案' };
+    const tierMark = t => t === 2 ? '🗺️' : t === 1 ? '📡' : t === 0 ? '🗄️' : '';
 
     const esc = s => String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -79,7 +96,7 @@
 
     const card = p => `
       <a class="sticker-card paper-card" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}&from=papers">
-        <span class="year">${esc((p.tags && p.tags[0]) || 'paper')}</span>
+        <span class="year"><span class="t-mark">${tierMark(p.tier)}</span>${esc((p.tags && p.tags[0]) || 'paper')}</span>
         <h3>${esc(p.title || p.arxiv_id)}</h3>
         <p>${esc(p.problem || p.abstract || '')}</p>
         <div class="tag-row">${(p.tags || []).slice(0, 4).map(t => `<span class="tag">${esc(t)}</span>`).join('')}</div>
@@ -109,8 +126,9 @@
 
     const applyFilter = () => {
       const query = q.value.trim().toLowerCase();
-      const f = query ? all.filter(p => JSON.stringify(p).toLowerCase().includes(query)) : all;
-      countEl.textContent = `共 ${all.length} 篇` + (query ? ` · 匹配 ${f.length} 篇` : '');
+      const byTier = tierFilter === 'all' ? all : all.filter(p => String(p.tier) === tierFilter);
+      const f = query ? byTier.filter(p => JSON.stringify(p).toLowerCase().includes(query)) : byTier;
+      countEl.textContent = `共 ${all.length} 篇` + (tierFilter !== 'all' ? ` · ${TIER_LABEL[tierFilter]} ${byTier.length} 篇` : '') + (query ? ` · 匹配 ${f.length} 篇` : '');
       const groups = groupByDate(f);
       if (query) {
         openDates = new Set(groups.map(([date]) => date));
@@ -141,6 +159,15 @@
       }
     }
     q.addEventListener('input', applyFilter);
+    tierTabs.addEventListener('click', e => {
+      const btn = e.target.closest('.tier-tab');
+      if (!btn) return;
+      tierFilter = btn.dataset.tier;
+      tierTabs.querySelectorAll('.tier-tab').forEach(x => x.classList.toggle('active', x === btn));
+      openDates = new Set();
+      manualOpenState = false;
+      applyFilter();
+    });
     root.addEventListener('click', e => {
       const btn = e.target.closest('.date-toggle');
       if (!btn) return;

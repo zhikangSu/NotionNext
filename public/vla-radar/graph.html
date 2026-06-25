@@ -4,24 +4,20 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>关系图谱 · VLA Radar</title>
-  <meta name="description" content="VLA 论文的关系图谱：节点是论文，连线是「在谁基础上改 / 跟谁比」。被指向越多越是地基。" />
+  <meta name="description" content="VLA 论文的 3D 关系图谱：节点是论文，连线是「在谁基础上改 / 跟谁比」。可旋转、缩放，枢纽自然浮现。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
   <style>
     .gr-wrap { position:relative; margin-top:18px; }
-    .gr-canvas-card { padding:0; overflow:hidden; border-radius:var(--radius-lg); }
-    #graph { display:block; width:100%; height:640px; cursor:grab; touch-action:none; }
-    #graph:active { cursor:grabbing; }
-    .gr-tooltip { position:absolute; pointer-events:none; z-index:5; max-width:280px; padding:10px 12px;
-      background:var(--meow-ink); color:#fff; border-radius:12px; box-shadow:var(--shadow); font-size:.82rem; line-height:1.5; opacity:0; transform:translateY(4px); transition:opacity .12s ease; }
-    .gr-tooltip.show { opacity:1; transform:translateY(0); }
-    .gr-tooltip b { font-size:.92rem; }
-    .gr-tooltip .tt-tier { display:inline-block; margin-top:4px; font-weight:800; font-size:.72rem; padding:1px 7px; border-radius:999px; }
-    .gr-ctrl { position:absolute; top:12px; right:12px; display:flex; gap:6px; }
-    .gr-ctrl button { width:34px; height:34px; border:2px solid var(--meow-ink); border-radius:10px; background:#fff; color:var(--meow-ink); font-weight:800; font-size:1.1rem; cursor:pointer; box-shadow:2px 2px 0 rgba(30,36,71,.5); }
-    .gr-ctrl button:hover { background:var(--meow-cream); }
+    .gr-canvas-card { padding:0; overflow:hidden; border-radius:var(--radius-lg); background:#141a38; border-color:var(--meow-ink); }
+    #graph { width:100%; height:640px; }
+    #graph canvas { display:block; border-radius:var(--radius-lg); }
+    .gr-ctrl { position:absolute; top:12px; right:12px; display:flex; gap:6px; z-index:4; }
+    .gr-ctrl button { height:34px; padding:0 12px; border:2px solid #fff; border-radius:10px; background:rgba(20,26,56,.7); color:#fff; font-weight:800; font-size:.82rem; cursor:pointer; }
+    .gr-ctrl button:hover { background:var(--meow-blue); }
+    .gr-loading { position:absolute; inset:0; display:grid; place-items:center; color:#cdd7f0; font-weight:700; z-index:3; }
     .gr-legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:16px; }
     .gr-leg-item { display:inline-flex; align-items:center; gap:7px; font-weight:700; font-size:.84rem; }
     .gr-leg-dot { width:13px; height:13px; border-radius:50%; border:2px solid var(--meow-ink); }
@@ -30,7 +26,8 @@
     .gr-eline { width:26px; height:0; border-top:3px solid var(--meow-ink); }
     .gr-eline.cmp { border-top:2px dashed rgba(30,36,71,.4); }
     .gr-hint { margin-top:8px; color:var(--meow-muted); font-size:.84rem; }
-    .gr-state { padding:60px 8px; text-align:center; color:var(--meow-muted); }
+    .gr-fallback { padding:50px 20px; text-align:center; color:#cdd7f0; }
+    .gr-fallback a { color:#fff; border-bottom:2px solid var(--meow-yellow); font-weight:800; }
     @media (max-width:760px){ #graph { height:520px; } }
   </style>
 </head>
@@ -53,20 +50,19 @@
     <section class="section paper-wrap">
       <div class="container">
         <a class="paper-back" href="/vla-radar/views.html">← 回到视角</a>
-        <span class="badge">关系图谱 · Knowledge Graph</span>
+        <span class="badge">关系图谱 · 3D Knowledge Graph</span>
         <h1 class="paper-title">谁站在谁的肩膀上</h1>
-        <p class="paper-meta">节点是论文，按 8 个开放问题上色；连线是它「<b>在谁基础上改</b>（实线箭头）/ <b>跟谁比</b>（虚线）」。<b>被指向越多 = 越是地基</b>（OpenVLA / π0 / RT-2 自然成为枢纽）。悬停看关系，点开看详情。</p>
+        <p class="paper-meta">节点是论文，按 8 个开放问题上色；连线是它「<b>在谁基础上改</b>（实线箭头）/ <b>跟谁比</b>（细线）」。<b>被指向越多 = 越是地基</b>（OpenVLA / π0 / RT-2 自然成为枢纽）。<b>拖动旋转</b>这个球、滚轮缩放，点节点看详情。</p>
 
         <div class="gr-wrap">
           <div class="sticker-card gr-canvas-card">
-            <canvas id="graph"></canvas>
+            <div id="graph"></div>
+            <div class="gr-loading" id="loading">正在构建 3D 图谱 …</div>
           </div>
           <div class="gr-ctrl">
-            <button id="zoomIn" title="放大">+</button>
-            <button id="zoomOut" title="缩小">−</button>
-            <button id="zoomReset" title="复位">⌂</button>
+            <button id="fit">复位视角</button>
+            <button id="spin">⏸ 自转</button>
           </div>
-          <div class="gr-tooltip" id="tip"></div>
         </div>
 
         <div class="gr-legend" id="legend"></div>
@@ -75,7 +71,7 @@
           <span><span class="gr-eline cmp"></span> 跟它对比（baseline）</span>
           <span>○ 越大 = 被指向越多（地基）</span>
         </div>
-        <p class="gr-hint" id="hint">拖动空白处平移 · 滚轮缩放 · 拖节点可摆位 · 点节点进详情</p>
+        <p class="gr-hint">拖动旋转 · 滚轮缩放 · 悬停看关系 · 点节点进详情 · 拖节点可摆位</p>
       </div>
     </section>
   </main>
@@ -86,9 +82,11 @@
     </div>
   </footer>
 
+  <script src="https://unpkg.com/three@0.160.1/build/three.min.js"></script>
+  <script src="https://unpkg.com/three-spritetext@1.8.2/dist/three-spritetext.min.js"></script>
+  <script src="https://unpkg.com/3d-force-graph@1.73.4/dist/3d-force-graph.min.js"></script>
   <script src="/vla-radar/data/curated.js"></script>
   <script>
-    // ---- 别名表：从 diff.base / diff.baselines 文本解析出指向的论文（最长匹配优先） ----
     const ALIAS = {
       '2212.06817': ['rt-1', 'rt1'], '2307.15818': ['rt-2', 'rt2', 'rt-2-x', 'rt-2-pali', 'rt-2-palm'],
       '2310.08864': ['open x-embodiment', 'open-x', 'rt-x', 'rt-1-x'], '2405.12213': ['octo'],
@@ -107,8 +105,7 @@
     for (const id in ALIAS) for (const a of ALIAS[id]) ALIAS_LIST.push([a.toLowerCase(), id]);
     ALIAS_LIST.sort((x, y) => y[0].length - x[0].length);
     function resolve(str, selfId, present) {
-      const s = String(str || '').toLowerCase();
-      if (!s) return null;
+      const s = String(str || '').toLowerCase(); if (!s) return null;
       for (const [a, id] of ALIAS_LIST) {
         if (id === selfId || !present.has(id)) continue;
         if (a.length < 4) {
@@ -119,210 +116,101 @@
       return null;
     }
 
-    // ---- 8 痛点配色 ----
     const PAIN = (window.VLA_CURATED && window.VLA_CURATED.painPoints) || [];
-    const PCOLOR = {
-      data: '#3563e9', generalization: '#27ae74', action: '#f2699c', reasoning: '#8a5cf0',
-      posttrain: '#f0883e', efficiency: '#e0a800', eval: '#1fa8b8', safety: '#ef5a5a'
-    };
+    const PCOLOR = { data:'#4d82ff', generalization:'#2ecc8f', action:'#ff7eb0', reasoning:'#a883ff',
+      posttrain:'#ffa05c', efficiency:'#ffd43b', eval:'#3ad0e0', safety:'#ff6b6b' };
     const painName = k => (PAIN.find(p => p.key === k) || {}).name || k;
     const cleanTitle = t => String(t || '').replace(/\$/g, '').replace(/\\[a-zA-Z]+/g, '').replace(/[{}^_]/g, '').replace(/:.*$/, '').trim();
+    const esc = s => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-    const canvas = document.getElementById('graph');
-    const ctx = canvas.getContext('2d');
-    const tip = document.getElementById('tip');
-    let nodes = [], edges = [], W = 0, H = 0, DPR = Math.min(window.devicePixelRatio || 1, 2);
-    let view = { x: 0, y: 0, k: 1 }, hover = null, dragNode = null, panning = false, last = null, moved = false;
+    document.getElementById('legend').innerHTML = PAIN.map(p =>
+      `<span class="gr-leg-item"><span class="gr-leg-dot" style="background:${PCOLOR[p.key]}"></span>${p.name}</span>`).join('');
 
-    function sizeCanvas() {
-      const r = canvas.getBoundingClientRect();
-      W = r.width; H = r.height;
-      canvas.width = W * DPR; canvas.height = H * DPR;
-      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-    }
-
-    function build(papers) {
+    function buildData(papers) {
       const present = new Set(papers.map(p => p.arxiv_id));
-      const byId = {}; papers.forEach(p => byId[p.arxiv_id] = p);
-      // edges
-      const seen = new Set(); edges = [];
+      const seen = new Set(), links = [];
       for (const p of papers) {
         const d = p.diff || {};
-        const add = (toId, type) => {
-          if (!toId) return; const key = p.arxiv_id + '>' + toId + ':' + type;
-          if (seen.has(key)) return; seen.add(key); edges.push({ from: p.arxiv_id, to: toId, type });
-        };
+        const add = (toId, type) => { if (!toId) return; const k = p.arxiv_id + '>' + toId + ':' + type; if (seen.has(k)) return; seen.add(k); links.push({ source: p.arxiv_id, target: toId, type }); };
         add(resolve(d.base, p.arxiv_id, present), 'base');
         for (const bl of (d.baselines || [])) add(resolve(bl, p.arxiv_id, present), 'cmp');
       }
-      const indeg = {}; edges.forEach(e => indeg[e.to] = (indeg[e.to] || 0) + 1);
-      // nodes
-      const ang = {}; PAIN.forEach((p, i) => ang[p.key] = (i / PAIN.length) * Math.PI * 2);
-      nodes = papers.map(p => {
+      const indeg = {}; links.forEach(l => indeg[l.target] = (indeg[l.target] || 0) + 1);
+      const nodes = papers.map(p => {
         const pri = (p.pain_points && p.pain_points[0]) || 'eval';
-        const a = ang[pri] != null ? ang[pri] : 0;
-        return {
-          id: p.arxiv_id, title: cleanTitle(p.title), full: p.title, tier: p.tier, pri,
-          color: PCOLOR[pri] || '#888', indeg: indeg[p.arxiv_id] || 0,
-          r: 5 + Math.min(indeg[p.arxiv_id] || 0, 19) * 1.15 + (p.tier === 2 ? 2 : 0),
-          ax: Math.cos(a), ay: Math.sin(a),
-          x: Math.cos(a) * 160 + (Math.random() - 0.5) * 80, y: Math.sin(a) * 160 + (Math.random() - 0.5) * 80,
-          vx: 0, vy: 0
-        };
+        return { id: p.arxiv_id, title: cleanTitle(p.title), tier: p.tier, pri, color: PCOLOR[pri] || '#9aa',
+          indeg: indeg[p.arxiv_id] || 0, val: 2 + Math.min(indeg[p.arxiv_id] || 0, 20) * 0.9 };
       });
-      const nmap = {}; nodes.forEach(n => nmap[n.id] = n);
-      edges.forEach(e => { e.a = nmap[e.from]; e.b = nmap[e.to]; });
-      edges = edges.filter(e => e.a && e.b);
-      buildLegend();
-      simulate();
+      return { nodes, links };
     }
 
-    function simulate() {
-      let alpha = 1;
-      const cx = 0, cy = 0;
-      for (let iter = 0; iter < 320; iter++) {
-        // repulsion
-        for (let i = 0; i < nodes.length; i++) {
-          for (let j = i + 1; j < nodes.length; j++) {
-            const a = nodes[i], b = nodes[j];
-            let dx = a.x - b.x, dy = a.y - b.y, d2 = dx * dx + dy * dy || 0.01;
-            const f = 900 / d2; const d = Math.sqrt(d2);
-            const fx = (dx / d) * f, fy = (dy / d) * f;
-            a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
-          }
+    function start(data) {
+      document.getElementById('loading').remove();
+      const el = document.getElementById('graph');
+      const tierName = t => t === 2 ? '地图' : t === 1 ? '雷达' : '档案';
+      const Graph = ForceGraph3D()(el)
+        .backgroundColor('#141a38')
+        .width(el.clientWidth).height(el.clientHeight)
+        .graphData(data)
+        .nodeColor(n => n.color)
+        .nodeVal(n => n.val)
+        .nodeOpacity(0.95)
+        .nodeLabel(n => `<div style="background:#1e2447;color:#fff;padding:8px 11px;border-radius:10px;max-width:260px;font:600 12px/1.5 'Noto Sans SC',sans-serif">
+            <b style="font-size:13px">${esc(n.title)}</b><br>
+            <span style="color:${n.color};font-weight:800">${esc(painName(n.pri))}</span> · ${tierName(n.tier)}${n.indeg ? ` · 被 ${n.indeg} 篇引用` : ''}</div>`)
+        .nodeThreeObjectExtend(true)
+        .nodeThreeObject(n => {
+          if (n.indeg < 4 || typeof SpriteText === 'undefined') return null;
+          const s = new SpriteText(n.title.slice(0, 18));
+          s.color = '#fff'; s.textHeight = 4.5; s.fontWeight = '700';
+          s.position.set(0, n.val + 6, 0);
+          return s;
+        })
+        .linkColor(l => l.type === 'base' ? 'rgba(180,196,235,0.7)' : 'rgba(150,166,206,0.28)')
+        .linkWidth(l => l.type === 'base' ? 0.8 : 0.4)
+        .linkOpacity(0.5)
+        .linkDirectionalArrowLength(l => l.type === 'base' ? 3.2 : 0)
+        .linkDirectionalArrowRelPos(1)
+        .linkDirectionalArrowColor(() => 'rgba(220,228,250,0.9)')
+        .onNodeClick(n => { window.location.href = `/vla-radar/paper.html?id=${encodeURIComponent(n.id)}&from=graph`; })
+        .onNodeHover(n => { el.style.cursor = n ? 'pointer' : 'grab'; });
+
+      // 让球更"鼓"一些：增大斥力 + 控制连线长度
+      Graph.d3Force('charge').strength(-110);
+      Graph.d3Force('link').distance(l => l.type === 'base' ? 36 : 28);
+
+      let spinning = true, t0 = Date.now();
+      const dist = 320;
+      (function rotate() {
+        if (spinning) {
+          const a = (Date.now() - t0) * 0.00018;
+          Graph.cameraPosition({ x: dist * Math.sin(a), z: dist * Math.cos(a) });
         }
-        // springs
-        for (const e of edges) {
-          let dx = e.b.x - e.a.x, dy = e.b.y - e.a.y, d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-          const f = (d - 70) * 0.04;
-          const fx = (dx / d) * f, fy = (dy / d) * f;
-          e.a.vx += fx; e.a.vy += fy; e.b.vx -= fx; e.b.vy -= fy;
-        }
-        // gravity to center + pain cluster anchor
-        for (const n of nodes) {
-          n.vx += (cx - n.x) * 0.012 + (n.ax * 230 - n.x) * 0.006;
-          n.vy += (cy - n.y) * 0.012 + (n.ay * 230 - n.y) * 0.006;
-          n.vx *= 0.85; n.vy *= 0.85;
-          n.x += n.vx * alpha; n.y += n.vy * alpha;
-        }
-        alpha *= 0.992;
-      }
-      fit();
-    }
+        requestAnimationFrame(rotate);
+      })();
+      setTimeout(() => Graph.zoomToFit(600, 40), 1200);
 
-    function fit() {
-      let minx = 1e9, miny = 1e9, maxx = -1e9, maxy = -1e9;
-      for (const n of nodes) { minx = Math.min(minx, n.x); miny = Math.min(miny, n.y); maxx = Math.max(maxx, n.x); maxy = Math.max(maxy, n.y); }
-      const gw = maxx - minx || 1, gh = maxy - miny || 1;
-      view.k = Math.min(W / (gw + 90), H / (gh + 90), 1.6);
-      view.x = W / 2 - ((minx + maxx) / 2) * view.k;
-      view.y = H / 2 - ((miny + maxy) / 2) * view.k;
+      document.getElementById('fit').onclick = () => Graph.zoomToFit(500, 40);
+      const spinBtn = document.getElementById('spin');
+      spinBtn.onclick = () => { spinning = !spinning; spinBtn.textContent = spinning ? '⏸ 自转' : '▶ 自转'; if (spinning) t0 = Date.now() - Math.acos(Graph.cameraPosition().z / dist) / 0.00018; };
+      window.addEventListener('resize', () => Graph.width(el.clientWidth).height(el.clientHeight));
+      // 用户开始操作就停自转
+      el.addEventListener('pointerdown', () => { if (spinning) { spinning = false; spinBtn.textContent = '▶ 自转'; } });
     }
-
-    function draw() {
-      ctx.clearRect(0, 0, W, H);
-      ctx.save(); ctx.translate(view.x, view.y); ctx.scale(view.k, view.k);
-      const hi = hover ? new Set([hover.id]) : null;
-      if (hover) edges.forEach(e => { if (e.a === hover || e.b === hover) { hi.add(e.from); hi.add(e.to); } });
-      // edges
-      for (const e of edges) {
-        const on = !hover || (e.a === hover || e.b === hover);
-        ctx.globalAlpha = on ? (e.type === 'base' ? 0.55 : 0.28) : 0.05;
-        ctx.strokeStyle = e.type === 'base' ? '#1e2447' : '#64708a';
-        ctx.lineWidth = (e.type === 'base' ? 1.6 : 1.1) / view.k;
-        if (e.type === 'cmp') ctx.setLineDash([4 / view.k, 4 / view.k]); else ctx.setLineDash([]);
-        ctx.beginPath(); ctx.moveTo(e.a.x, e.a.y); ctx.lineTo(e.b.x, e.b.y); ctx.stroke();
-        if (e.type === 'base' && on) { // arrowhead near target
-          const dx = e.b.x - e.a.x, dy = e.b.y - e.a.y, d = Math.hypot(dx, dy) || 1;
-          const ux = dx / d, uy = dy / d, tx = e.b.x - ux * (e.b.r + 3), ty = e.b.y - uy * (e.b.r + 3), s = 5 / view.k;
-          ctx.fillStyle = '#1e2447'; ctx.beginPath();
-          ctx.moveTo(tx, ty); ctx.lineTo(tx - ux * s - uy * s * 0.7, ty - uy * s + ux * s * 0.7);
-          ctx.lineTo(tx - ux * s + uy * s * 0.7, ty - uy * s - ux * s * 0.7); ctx.closePath(); ctx.fill();
-        }
-      }
-      ctx.setLineDash([]);
-      // nodes
-      for (const n of nodes) {
-        const on = !hover || hi.has(n.id);
-        ctx.globalAlpha = on ? 1 : 0.18;
-        ctx.beginPath(); ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-        ctx.fillStyle = n.color; ctx.fill();
-        ctx.lineWidth = (n === hover ? 3 : 1.6) / view.k; ctx.strokeStyle = '#1e2447'; ctx.stroke();
-      }
-      // labels: hubs (indeg>=3) or hovered/neighbors
-      ctx.globalAlpha = 1; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
-      for (const n of nodes) {
-        const show = (n === hover) || (hi && hi.has(n.id)) || (!hover && (n.indeg >= 3 || n.r > 11));
-        if (!show) continue;
-        ctx.font = `800 ${Math.max(11 / view.k, 8)}px 'Baloo 2','Noto Sans SC',sans-serif`;
-        ctx.fillStyle = '#1e2447';
-        ctx.fillText(n.title.slice(0, 16), n.x, n.y + n.r + 2 / view.k);
-      }
-      ctx.restore();
-    }
-
-    function loop() { draw(); requestAnimationFrame(loop); }
-
-    function buildLegend() {
-      const counts = {}; nodes.forEach(n => counts[n.pri] = (counts[n.pri] || 0) + 1);
-      document.getElementById('legend').innerHTML = PAIN.map(p =>
-        `<span class="gr-leg-item"><span class="gr-leg-dot" style="background:${PCOLOR[p.key]}"></span>${p.name}</span>`
-      ).join('');
-    }
-
-    // ---- interaction ----
-    function toWorld(mx, my) { return { x: (mx - view.x) / view.k, y: (my - view.y) / view.k }; }
-    function pick(mx, my) {
-      const w = toWorld(mx, my);
-      let best = null, bd = 1e9;
-      for (const n of nodes) { const d = Math.hypot(n.x - w.x, n.y - w.y); if (d < n.r + 6 && d < bd) { bd = d; best = n; } }
-      return best;
-    }
-    canvas.addEventListener('mousemove', e => {
-      const r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
-      if (dragNode) { const w = toWorld(mx, my); dragNode.x = w.x; dragNode.y = w.y; moved = true; return; }
-      if (panning) { view.x += mx - last.x; view.y += my - last.y; last = { x: mx, y: my }; moved = true; return; }
-      const n = pick(mx, my); hover = n; canvas.style.cursor = n ? 'pointer' : 'grab';
-      if (n) {
-        tip.innerHTML = `<b>${n.title}</b><br><span class="tt-tier" style="background:${n.color};color:#fff">${painName(n.pri)}</span> ` +
-          `<span class="tt-tier" style="background:#fff;color:#1e2447;border:1px solid #1e2447">${n.tier === 2 ? '地图' : n.tier === 1 ? '雷达' : '档案'}</span>` +
-          (n.indeg ? `<br>被 <b>${n.indeg}</b> 篇引用为基础/对比` : '');
-        tip.style.left = Math.min(mx + 14, W - 290) + 'px'; tip.style.top = (my + 14) + 'px'; tip.classList.add('show');
-      } else tip.classList.remove('show');
-    });
-    canvas.addEventListener('mousedown', e => {
-      const r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
-      moved = false; const n = pick(mx, my);
-      if (n) dragNode = n; else { panning = true; last = { x: mx, y: my }; }
-    });
-    window.addEventListener('mouseup', e => {
-      if (dragNode && !moved) location.href = `/vla-radar/paper.html?id=${encodeURIComponent(dragNode.id)}&from=graph`;
-      dragNode = null; panning = false;
-    });
-    canvas.addEventListener('wheel', e => {
-      e.preventDefault();
-      const r = canvas.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
-      const f = e.deltaY < 0 ? 1.12 : 1 / 1.12, w = toWorld(mx, my);
-      view.k = Math.max(0.3, Math.min(view.k * f, 4));
-      view.x = mx - w.x * view.k; view.y = my - w.y * view.k;
-    }, { passive: false });
-    document.getElementById('zoomIn').onclick = () => view.k = Math.min(view.k * 1.2, 4);
-    document.getElementById('zoomOut').onclick = () => view.k = Math.max(view.k / 1.2, 0.3);
-    document.getElementById('zoomReset').onclick = () => fit();
-    canvas.addEventListener('mouseleave', () => { tip.classList.remove('show'); if (!dragNode) hover = null; });
-    window.addEventListener('resize', () => { sizeCanvas(); fit(); });
 
     async function load() {
-      sizeCanvas();
+      if (typeof ForceGraph3D === 'undefined') {
+        document.querySelector('.gr-canvas-card').innerHTML = '<div class="gr-fallback">3D 图谱组件没加载出来（可能是网络拦了 CDN）。<br>可刷新重试，或去 <a href="/vla-radar/metro.html">研究拓扑</a> 看 2D 视图。</div>';
+        return;
+      }
       try {
         const res = await fetch('/api/vla-radar/list?limit=300', { cache: 'no-store' });
         const j = await res.json();
         const ps = (j && j.papers) || [];
-        if (!ps.length) { document.querySelector('.gr-canvas-card').innerHTML = '<div class="gr-state">还没有论文。</div>'; return; }
-        build(ps);
-        loop();
+        if (!ps.length) { document.querySelector('.gr-canvas-card').innerHTML = '<div class="gr-fallback">还没有论文。</div>'; return; }
+        start(buildData(ps));
       } catch (e) {
-        document.querySelector('.gr-canvas-card').innerHTML = `<div class="gr-state">加载出错：${e && e.message ? e.message : e}</div>`;
+        document.querySelector('.gr-canvas-card').innerHTML = `<div class="gr-fallback">加载出错：${esc(e && e.message ? e.message : e)}</div>`;
       }
     }
     load();
