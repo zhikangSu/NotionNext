@@ -117,6 +117,19 @@
     return hit;
   }
 
-  g.VLA_CURATED = { timeline, branches, works, benchmarks, components, classify };
+  // 8 条 VLA 开放痛点：判「一篇重不重要」的尺子，地图按这 8 条组织。
+  // key 与后端 store.js 的 PAIN_KEYS 一一对应。
+  const painPoints = [
+    {key:'data',           icon:'📦', name:'数据瓶颈',        short:'机器人数据稀缺；web/合成/人类/跨本体数据怎么真用起来'},
+    {key:'generalization', icon:'🌍', name:'泛化',            short:'换物体/场景/指令/本体还能不能用，benchmark 是否真在测泛化'},
+    {key:'action',         icon:'🦾', name:'动作表示与控制',  short:'flow/diffusion/token 取舍，高频灵巧控制，延迟 vs 质量'},
+    {key:'reasoning',      icon:'🧭', name:'长程 / 高层推理',  short:'子任务分解、规划、world model、记忆'},
+    {key:'posttrain',      icon:'🔁', name:'部署后变强',      short:'BC 的天花板；RL / 经验 / intervention / value'},
+    {key:'efficiency',     icon:'⚡', name:'效率 / 可复现 / 上车', short:'推理速度、小模型、冻结 VLM、异步 —— 你 SmolVLA 这条'},
+    {key:'eval',           icon:'🧪', name:'评测可信度',      short:'分数是真的吗：标准化、压力测试、饱和、刷榜'},
+    {key:'safety',         icon:'🛡️', name:'鲁棒 / 安全',      short:'恢复、失败检测、OOD、安全'}
+  ];
+
+  g.VLA_CURATED = { timeline, branches, works, benchmarks, components, classify, painPoints };
 })(window);
 
