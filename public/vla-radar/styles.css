@@ -779,3 +779,56 @@
 .evo-fallback { margin: 8px 0 0; color: var(--meow-ink); font-size: .92rem; line-height: 1.6; }
 .evo-bench { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .evo-bench-pill { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .78rem; color: #3b6d11; background: #eaf3de; border: 1.5px solid rgba(99,153,34,.4); border-radius: 8px; padding: 3px 9px; }
+
+    /* ====================================================================
+       ✦ 星之卡比 · 星辰底色 (cosmic theme · 2026-06-25)
+       背景换成深空星空；默认文字仍深色(保护所有白底卡片/胶囊/按钮)，
+       只把"浮在星空上的出卡文字"翻成浅色。
+       ==================================================================== */
+    body {
+      background: radial-gradient(ellipse 130% 95% at 50% -10%, #34357f 0%, #20214f 34%, #101030 70%, #0a0a22 100%) fixed;
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none; mask-image: none;
+      background-image:
+        radial-gradient(1.6px 1.6px at 40px 60px, #fff, transparent),
+        radial-gradient(1.3px 1.3px at 130px 200px, rgba(255,255,255,.85), transparent),
+        radial-gradient(1.6px 1.6px at 250px 120px, #d7deff, transparent),
+        radial-gradient(1px 1px at 305px 260px, rgba(255,255,255,.7), transparent),
+        radial-gradient(1.5px 1.5px at 85px 295px, #ffe9b0, transparent),
+        radial-gradient(1.2px 1.2px at 195px 45px, rgba(255,255,255,.8), transparent),
+        radial-gradient(1.5px 1.5px at 355px 185px, #ffd0e6, transparent);
+      background-repeat: repeat; background-size: 380px 320px;
+      animation: km-tw1 6.5s ease-in-out infinite alternate;
+    }
+    body::after {
+      content: ''; position: fixed; inset: 0; z-index: -2; pointer-events: none;
+      background-image:
+        radial-gradient(1px 1px at 60px 120px, rgba(255,255,255,.6), transparent),
+        radial-gradient(1.2px 1.2px at 230px 300px, #cdd6ff, transparent),
+        radial-gradient(1px 1px at 410px 80px, rgba(255,255,255,.55), transparent),
+        radial-gradient(1.3px 1.3px at 500px 270px, #ffe9b0, transparent),
+        radial-gradient(1px 1px at 150px 430px, rgba(255,255,255,.5), transparent);
+      background-repeat: repeat; background-size: 560px 480px;
+      animation: km-tw2 9s ease-in-out infinite alternate;
+    }
+    @keyframes km-tw1 { from { opacity: .5; } to { opacity: 1; } }
+    @keyframes km-tw2 { from { opacity: .9; } to { opacity: .4; } }
+
+    .nav { background: rgba(12,13,42,.74); border-bottom: 2px solid rgba(255,255,255,.08); }
+    .brand, .nav-links a { color: #eaeeff; }
+    .nav-links a:hover { background: rgba(255,255,255,.14); box-shadow: none; }
+
+    /* 出卡标题 → 浅色 */
+    .hero h1, .section-title h2, .paper-title, .ex-title, .fl-hero h1, .mt-head h1 { color: #f3f5ff; }
+    .hero h1 span, .mt-head h1 span { color: #8fb4ff; }
+    .paper-back { color: #aeb8e6; }
+    .paper-back:hover { color: #fff; }
+    /* 出卡正文/副标题 → 浅灰蓝 */
+    .hero p, .section-title p, .paper-meta, .footer,
+    .ex-sub, .fl-hero p, .mt-sub, .mt-foot, .rd-state { color: #b6c0e6; }
+    .ex-block-head, .bn-secthead { color: #e6eaff; }
+
+    /* 卡片浮在星空上：保留贴纸感 + 一层柔光让它更"亮" */
+    .sticker-card { box-shadow: var(--shadow), 0 10px 34px rgba(6,8,30,.55); }
+    .sticker-card:hover { box-shadow: var(--shadow-blue), 0 14px 40px rgba(70,100,255,.35); }
