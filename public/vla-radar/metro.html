@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>研究拓扑 · VLA Radar</title>
+  <meta name="description" content="把 VLA 的范式转移主线和它分出去的几条支线，画成一张人工策展的地铁图。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+  <style>
+    /* ===== 视角切换条 (ls- 前缀，五个视角共用风格) ===== */
+    .ls-switch { margin: 22px auto 4px; }
+    .ls-chips {
+      display: flex;
+      gap: 9px;
+      overflow-x: auto;
+      padding: 4px 2px 10px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .ls-chips::-webkit-scrollbar { display: none; }
+    .ls-chip {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 14px;
+      border: 2px solid rgba(30,36,71,.16);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--meow-ink);
+      font-weight: 800;
+      font-size: .9rem;
+      box-shadow: 2px 2px 0 rgba(30,36,71,.12);
+      transition: .16s ease;
+      white-space: nowrap;
+    }
+    .ls-chip:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(30,36,71,.2); }
+    .ls-chip.active {
+      background: var(--meow-ink);
+      color: #fff;
+      border-color: var(--meow-ink);
+      box-shadow: 3px 3px 0 rgba(30,36,71,.5);
+    }
+    .ls-chip .ls-ic { font-size: 1rem; line-height: 1; }
+
+    /* ===== 标题区 ===== */
+    .mt-head { padding: 18px 0 8px; }
+    .mt-head h1 { margin: 14px 0 12px; font-size: clamp(1.7rem, 4vw, 2.9rem); line-height: 1.08; max-width: 880px; }
+    .mt-head h1 span { color: var(--meow-blue); }
+    .mt-sub { margin: 0; color: var(--meow-muted); max-width: 760px; font-size: 1rem; line-height: 1.7; }
+    .mt-note-curated {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 14px;
+      padding: 7px 13px;
+      border: 2px dashed rgba(30,36,71,.22);
+      border-radius: 999px;
+      background: rgba(255,255,255,.7);
+      color: var(--meow-muted);
+      font-weight: 800;
+      font-size: .82rem;
+    }
+
+    /* ===== 地铁图卡片 ===== */
+    .mt-map-card { margin-top: 22px; padding: 10px; }
+    .mt-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .mt-svg { display: block; width: 100%; height: auto; }
+    /* 窄屏：横向滚动查看完整地铁图（给一个最小宽度保证标签可读） */
+    .mt-scrollhint { display: none; }
+
+    /* SVG 内站点交互 */
+    .mt-station { cursor: pointer; }
+    .mt-station .mt-dot { transition: transform .14s ease, fill .14s ease; transform-box: fill-box; transform-origin: center; }
+    .mt-station:hover .mt-dot { transform: scale(1.32); }
+    .mt-station:hover .mt-label-main { fill: var(--meow-blue); }
+    .mt-label-main { font-family: 'Baloo 2','Noto Sans SC',sans-serif; font-weight: 800; fill: var(--meow-ink); }
+    .mt-label-year { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-weight: 700; fill: var(--meow-muted); }
+    .mt-label-sub  { font-family: 'Noto Sans SC',sans-serif; font-weight: 700; }
+    .mt-trunk-title { font-family: 'Baloo 2','Noto Sans SC',sans-serif; font-weight: 800; fill: var(--meow-muted); letter-spacing:.04em; }
+
+    /* ===== 图例 ===== */
+    .mt-legend {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 10px 16px;
+      margin-top: 20px;
+    }
+    .mt-legend-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 2px solid rgba(30,36,71,.1);
+      border-radius: 16px;
+      background: rgba(255,255,255,.72);
+    }
+    .mt-legend-swatch {
+      flex: 0 0 auto;
+      width: 16px; height: 16px; margin-top: 4px;
+      border-radius: 5px;
+      border: 2px solid var(--meow-ink);
+    }
+    .mt-legend-tx b { display: block; font-family: 'Baloo 2','Noto Sans SC',sans-serif; font-size: .98rem; }
+    .mt-legend-tx small { color: var(--meow-muted); font-size: .82rem; line-height: 1.45; font-weight: 600; }
+
+    .mt-foot {
+      margin-top: 22px;
+      color: var(--meow-muted);
+      font-size: .86rem;
+      line-height: 1.7;
+      font-weight: 600;
+    }
+    .mt-foot b { color: var(--meow-ink); }
+
+    .mt-tip {
+      display: flex; flex-wrap: wrap; gap: 8px 16px;
+      margin-top: 6px;
+      color: var(--meow-muted); font-weight: 800; font-size: .82rem;
+    }
+    .mt-tip span { display: inline-flex; align-items: center; gap: 6px; }
+
+    @media (max-width: 760px) {
+      /* 窄屏不再缩成一团：按高度定尺寸 + 横向滚动看完整图，标签保持可读大小 */
+      .mt-svg { width: auto; height: 560px; }
+      .mt-scrollhint { display: flex; align-items: center; gap: 6px; margin: 2px 4px 8px; color: var(--meow-muted); font-weight: 800; font-size: .8rem; }
+      .mt-map-card { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/">
+        <span class="brand-badge">🐾</span>
+        <span>Meowsu · VLA Radar</span>
+      </a>
+            <div class="nav-links">
+        <a href="/vla-radar/#benchmarks">Benchmark</a>
+        <a href="/vla-radar/#timeline">主线</a>
+        <a href="/vla-radar/#branches">分化</a>
+        <a href="/vla-radar/#finetune">微调</a>
+        <a href="/vla-radar/#daily">论文雷达</a>
+        <a href="/vla-radar/views.html">视角</a>
+        <a href="/vla-radar/papers.html">论文库</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 视角切换条 -->
+  <div class="ls-switch">
+    <div class="container">
+      <div class="ls-chips" id="lsChips">
+        <a class="ls-chip" href="/vla-radar/series.html"><span class="ls-ic">🧬</span>版本演进</a>
+        <a class="ls-chip" href="/vla-radar/explorer.html"><span class="ls-ic">🔬</span>组件透视</a>
+        <a class="ls-chip" href="/vla-radar/flow.html"><span class="ls-ic">🔀</span>推理流程</a>
+        <a class="ls-chip" href="/vla-radar/bench.html"><span class="ls-ic">🎯</span>Benchmark</a>
+        <a class="ls-chip active" href="/vla-radar/metro.html"><span class="ls-ic">🗺️</span>研究拓扑</a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="section mt-head" style="padding-top:6px;">
+      <div class="container">
+        <span class="badge">研究拓扑 · Metro Map</span>
+        <h1>VLA 的<span>主线</span>和它的<span>分叉</span>，画成一张地铁图</h1>
+        <p class="mt-sub">主干是范式转移主线，从 RT-1 一路走到 π0.7；几条支线在相关年代从主干分出去。站点是模型，点开看相关论文。这是一张人工策展的拓扑图，求清晰、不求全。</p>
+        <div class="mt-note-curated">✎ 人工策展视图，非自动生成 · 数据同首页 timeline / branches</div>
+        <div class="mt-tip" id="mtTip"></div>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top:0;">
+      <div class="container">
+        <div class="sticker-card mt-map-card" id="mapCard">
+          <div class="paper-state" id="mapState">正在绘制地铁图 …</div>
+        </div>
+
+        <div class="mt-legend" id="legend"></div>
+
+        <p class="mt-foot" id="foot"></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+
+  <script src="/vla-radar/data/curated.js"></script>
+  <script>
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const C = (window.VLA_CURATED || {});
+    const TIMELINE = Array.isArray(C.timeline) ? C.timeline : [];
+    const BRANCHES = Array.isArray(C.branches) ? C.branches : [];
+    const WORKS = Array.isArray(C.works) ? C.works : [];
+
+    // ---- 调色板：6 条支线，彼此可区分（全部取自设计系统变量值）----
+    const PALETTE = {
+      blue:     '#3563e9',
+      pink:     '#f2699c',
+      yellow:   '#ffd43b',
+      red:      '#ef5a5a',
+      skyDeep:  '#c9deff',
+      pinkSoft: '#ffd8e6'
+    };
+    // 给每条 branch 指定一个可区分的描边色 + 是否深色文字
+    const BRANCH_STYLE = [
+      { stroke: PALETTE.blue,    text: '#fff' },
+      { stroke: PALETTE.pink,    text: '#fff' },
+      { stroke: '#caa400',       text: '#1e2447' }, // 黄色加深以保证对比
+      { stroke: PALETTE.red,     text: '#fff' },
+      { stroke: '#5f86c8',       text: '#fff' },     // sky-deep 加深
+      { stroke: '#cf6f95',       text: '#fff' }      // pink-soft 加深
+    ];
+    const INK = '#1e2447';
+    const TRUNK = '#1e2447';
+
+    // ---- 短名查表：arxiv_id -> 简短标签 ----
+    // 优先 works.title，其次 timeline.title，再次 API title，最后 arxiv_id
+    const worksTitle = {};
+    for (const w of WORKS) if (w && w.arxiv_id) worksTitle[w.arxiv_id] = w.title;
+
+    // works 标题里常有 " / " 复合，挑一个短的代表
+    function shorten(t) {
+      if (!t) return '';
+      let s = String(t).split(/\s*\/\s*/)[0].trim();      // 取斜杠前
+      s = s.replace(/\s*[:：].*$/, '').trim();              // 去掉冒号副标题
+      if (s.length > 22) s = s.slice(0, 21) + '…';
+      return s;
+    }
+
+    function labelFor(id, apiMap) {
+      if (worksTitle[id]) return shorten(worksTitle[id]);
+      const tn = TIMELINE.find(t => (t.paperIds || []).includes(id));
+      if (tn && tn.title) return shorten(tn.title);
+      const p = apiMap[id];
+      if (p && p.title) return shorten(p.title);
+      return id;
+    }
+
+    // ---- 策展：每条支线从哪个 trunk 节点（按 id）分出去、朝上还是朝下、挑哪几个代表站 ----
+    // 用具体节点 id 锚定（而非年份），让多条 2025 支线沿主干横向错开，不挤在一个点。
+    // 重清晰不求全：每支 2~3 个代表，paperId 取自 branch.paperIds 里的代表子集。
+    // 锚点都选在主干靠左/中段，给支线往右铺站点留出水平空间；
+    // 上方 3 支、下方 3 支，各自独占一行。
+    const BRANCH_PLAN = {
+      'action-representation':       { fromId: 'octo-openvla', dir: -1, picks: ['2303.04137', '2410.24164', '2502.19645'] },
+      'reasoning-planning':          { fromId: 'pi0-rdt',      dir: -1, picks: ['2504.16054', '2508.07917', '2604.15483'] },
+      'experience-rl':               { fromId: 'fast',         dir: -1, picks: ['2511.14759'] },
+      'benchmark-generalization':    { fromId: 'octo-openvla', dir:  1, picks: ['2306.03310', '2510.03827', '2510.13626'] },
+      'simple-baselines':            { fromId: 'pi0-rdt',      dir:  1, picks: ['2502.19645', '2506.01844', '2604.11757'] },
+      'spatial-grounding':           { fromId: 'fast',         dir:  1, picks: ['2501.15830', '2508.09071', '2510.13375'] }
+    };
+
+    // 找到某 trunk 节点 id 的 index
+    function trunkIndexForId(id) {
+      const i = TIMELINE.findIndex(t => t.id === id);
+      return i < 0 ? 0 : i;
+    }
+
+    function buildState(apiMap) {
+      // 计算每条支线挂在哪个 trunk index；同一锚点多支按 dir+顺序错开避免重叠
+      const styled = BRANCHES.map((b, i) => {
+        const plan = BRANCH_PLAN[b.id] || { fromId: TIMELINE[Math.floor(TIMELINE.length/2)]?.id, dir: (i % 2 ? 1 : -1), picks: (b.paperIds || []).slice(0, 3) };
+        return {
+          ...b,
+          style: BRANCH_STYLE[i % BRANCH_STYLE.length],
+          dir: plan.dir,
+          anchor: trunkIndexForId(plan.fromId),
+          picks: (plan.picks || []).filter(Boolean)
+        };
+      });
+      return styled;
+    }
+
+    /* ===================== 桌面横向 SVG ===================== */
+    function renderDesktop(branches, apiMap) {
+      const n = TIMELINE.length;
+      const padL = 80, padR = 80;
+      const colW = 158;                       // 每个 trunk 站间距
+      const W = padL + padR + colW * (n - 1);
+      const trunkY = 430;                     // 主干 y（居中偏下，给上方支线留空间）
+      const upBase = trunkY - 150;            // 向上支线第一行（拉开，避免压住主干标题）
+      const downBase = trunkY + 132;          // 向下支线第一行（避开主干年份/标题）
+      const rowGap = 92;                       // 相邻支线行垂直间距
+      const H = 820;
+
+      const tx = i => padL + colW * i;
+
+      // 每条支线独占一条水平 lane（按方向分别从内到外堆叠），彻底避免横向重叠。
+      let upLane = 0, downLane = 0;
+      function takeLane(dir) {
+        return dir < 0 ? upLane++ : downLane++;
+      }
+
+      let svg = `<svg class="mt-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMinYMid meet" role="img" aria-label="VLA 研究拓扑地铁图（横向）">`;
+
+      // ---- 支线（先画线，后画主干，主干在最上层）----
+      const stationsHtml = [];
+      branches.forEach(b => {
+        const ax = tx(b.anchor);
+        const lane = takeLane(b.dir);
+        const col = b.style.stroke;
+        const picks = b.picks.filter(Boolean);
+        if (!picks.length) return;
+
+        // 每条支线一条专属水平行；行内站点从锚点右侧水平排开。
+        const startX = ax + 26;
+        const firstY = b.dir < 0
+          ? upBase - lane * rowGap
+          : downBase + lane * rowGap;
+        const stepX = 150;
+
+        const pts = picks.map((id, k) => ({
+          id,
+          x: startX + (k + 1) * stepX,
+          y: firstY
+        }));
+
+        // 路径：trunk 锚点 -> 斜线到第一站 -> 水平连各站
+        const first = pts[0];
+        let d = `M ${ax} ${trunkY} C ${ax + 30} ${trunkY}, ${first.x - 46} ${first.y}, ${first.x} ${first.y}`;
+        for (let k = 1; k < pts.length; k++) d += ` L ${pts[k].x} ${pts[k].y}`;
+        svg += `<path d="${d}" fill="none" stroke="${col}" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity="0.92"/>`;
+
+        // 支线站点
+        pts.forEach(pt => {
+          const label = labelFor(pt.id, apiMap);
+          const href = `/vla-radar/paper.html?id=${encodeURIComponent(pt.id)}&from=metro`;
+          const labelY = b.dir < 0 ? pt.y - 18 : pt.y + 28;
+          stationsHtml.push(`
+            <a class="mt-station" href="${href}">
+              <circle class="mt-dot" cx="${pt.x}" cy="${pt.y}" r="8.5" fill="#fff" stroke="${col}" stroke-width="4"/>
+              <text class="mt-label-main" x="${pt.x}" y="${labelY}" text-anchor="middle" font-size="13.5">${esc(label)}</text>
+            </a>`);
+        });
+      });
+
+      // ---- 主干线 ----
+      svg += `<line x1="${tx(0)}" y1="${trunkY}" x2="${tx(n-1)}" y2="${trunkY}" stroke="${TRUNK}" stroke-width="11" stroke-linecap="round"/>`;
+      // 主干标识（放到画布左上角，不压站点）
+      svg += `<text class="mt-trunk-title" x="${padL - 4}" y="36" text-anchor="start" font-size="13">范式转移主线 · TRUNK</text>`;
+
+      // 主干站点 + 标签：标题在线上方两行内，年份在线下方一行
+      const trunkStations = [];
+      TIMELINE.forEach((t, i) => {
+        const x = tx(i);
+        const href = `/vla-radar/group.html?id=${encodeURIComponent(t.id)}`;
+        const title = shorten(t.title);
+        trunkStations.push(`
+          <a class="mt-station" href="${href}">
+            <circle class="mt-dot" cx="${x}" cy="${trunkY}" r="10.5" fill="${TRUNK}" stroke="#fff" stroke-width="4"/>
+            <text class="mt-label-year" x="${x}" y="${trunkY + 34}" text-anchor="middle" font-size="11.5">${esc(t.year)}</text>
+            ${trunkTitleTspan(x, trunkY, title)}
+          </a>`);
+      });
+
+      svg += stationsHtml.join('');
+      svg += trunkStations.join('');
+      svg += `</svg>`;
+      return svg;
+    }
+
+    // 主干标题：放在站点正上方，两行换行避免拥挤
+    function trunkTitleTspan(x, trunkY, title) {
+      // 只在自然分隔符(空格 / 斜杠 / 连字符)处折行，绝不在词中间硬切
+      let l1 = title, l2 = '';
+      if (title.length > 9) {
+        const mid = title.length / 2;
+        let best = -1, bestDist = 1e9;
+        for (let i = 1; i < title.length - 1; i++) {
+          const ch = title[i];
+          if (ch === ' ' || ch === '/' || ch === '-') {
+            const d = Math.abs(i - mid);
+            if (d < bestDist) { bestDist = d; best = i; }
+          }
+        }
+        if (best > 0) {
+          if (title[best] === ' ') { l1 = title.slice(0, best).trim(); l2 = title.slice(best + 1).trim(); }
+          else { l1 = title.slice(0, best + 1).trim(); l2 = title.slice(best + 1).trim(); } // 连字符/斜杠留在上一行末
+          if (!l1 || !l2) { l1 = title; l2 = ''; }
+        }
+        // 没有任何可折断点 → 保持单行
+      }
+      const baseY = trunkY - 22;
+      if (!l2) {
+        return `<text class="mt-label-main" x="${x}" y="${baseY}" text-anchor="middle" font-size="13.5">${esc(l1)}</text>`;
+      }
+      return `<text class="mt-label-main" x="${x}" y="${baseY - 14}" text-anchor="middle" font-size="13"><tspan x="${x}" dy="0">${esc(l1)}</tspan><tspan x="${x}" dy="15">${esc(l2)}</tspan></text>`;
+    }
+
+    function renderLegend(branches) {
+      const html = branches.map(b => `
+        <div class="mt-legend-item">
+          <span class="mt-legend-swatch" style="background:${b.style.stroke}"></span>
+          <span class="mt-legend-tx">
+            <b>${esc(b.icon ? b.icon + ' ' : '')}${esc(b.title)}</b>
+            <small>${esc(b.text || '')}</small>
+          </span>
+        </div>`).join('');
+      document.getElementById('legend').innerHTML = html;
+    }
+
+    function renderTip() {
+      document.getElementById('mtTip').innerHTML =
+        `<span>● 主干站点 = 主线模型，点开看该节点专题</span>` +
+        `<span>○ 支线站点 = 该方向代表论文，点开看详情</span>`;
+    }
+
+    function renderFoot() {
+      document.getElementById('foot').innerHTML =
+        `这是一张<b>人工策展</b>的拓扑视图：主干取自首页 timeline 的 ${TIMELINE.length} 个范式转移节点，支线取自 branches 的 ${BRANCHES.length} 条分化方向，每支只画 2–3 个代表站点，重清晰不求全。颜色与分组是编辑判断（主观），不代表自动聚类。`;
+    }
+
+    function paint(apiMap) {
+      const branches = buildState(apiMap);
+      const card = document.getElementById('mapCard');
+      try {
+        card.innerHTML =
+          `<div class="mt-scrollhint">↔ 窄屏可左右滑动查看完整地铁图</div>` +
+          `<div class="mt-scroll">${renderDesktop(branches, apiMap)}</div>`;
+      } catch (e) {
+        card.innerHTML = `<div class="paper-state">地铁图绘制出错：${esc(e && e.message ? e.message : e)}</div>`;
+        return;
+      }
+      renderLegend(branches);
+      renderTip();
+      renderFoot();
+    }
+
+    async function load() {
+      if (!TIMELINE.length || !BRANCHES.length) {
+        document.getElementById('mapState').textContent = '策展拓扑数据没加载到，地铁图无法绘制。';
+        return;
+      }
+      let apiMap = {};
+      try {
+        const res = await fetch('/api/vla-radar/list?limit=200', { cache: 'no-store' });
+        const j = await res.json();
+        if (j && j.configured !== false) {
+          for (const p of (j.papers || [])) if (p && p.arxiv_id) apiMap[p.arxiv_id] = p;
+        }
+      } catch (e) {
+        // 论文库挂了也没关系：站点标签优先来自 curated，仍可渲染
+        apiMap = {};
+      }
+      paint(apiMap);
+    }
+    load();
+  </script>
+</body>
+</html>

@@ -9,7 +9,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
-
+  <style>
+    .lens-row { display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:14px; margin-top:8px; }
+    .lens-pill { display:flex; flex-direction:column; gap:3px; padding:16px 18px; background:var(--meow-card); border:2px solid var(--meow-ink); border-radius:var(--radius-lg); box-shadow:var(--shadow); text-decoration:none; color:inherit; transition:transform .12s ease, box-shadow .12s ease; }
+    .lens-pill:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-blue); }
+    .lens-pill .lens-ico { font-size:1.5rem; }
+    .lens-pill b { font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.05rem; }
+    .lens-pill small { color:var(--meow-muted); }
+  </style>
 </head>
 <body>
   <nav class="nav">
@@ -24,7 +31,7 @@
         <a href="#branches">分化</a>
         <a href="#finetune">微调</a>
         <a href="#daily">论文雷达</a>
-        <a href="/vla-radar/series.html">演进</a>
+        <a href="/vla-radar/views.html">视角</a>
         <a href="/vla-radar/papers.html">论文库</a>
         <a href="/">返回博客</a>
       </div>
@@ -69,6 +76,26 @@
   </header>
 
   <main>
+    <section class="section lens-entry">
+      <div class="container">
+        <div class="section-head">
+          <div class="section-title">
+            <span class="badge">同一批论文，多个角度</span>
+            <h2>多视角 · Lenses</h2>
+            <p>除了往下滚这张发展地图，你还可以换一个角度切进同一批每日论文。以后还会有更多视角加进来。</p>
+          </div>
+          <a class="btn-ghost" href="/vla-radar/views.html">看全部视角 →</a>
+        </div>
+        <div class="lens-row">
+          <a class="lens-pill" href="/vla-radar/series.html"><span class="lens-ico">🧬</span><b>版本演进</b><small>π / OpenVLA 版本链</small></a>
+          <a class="lens-pill" href="/vla-radar/explorer.html"><span class="lens-ico">🔬</span><b>组件透视</b><small>这篇动了哪一层</small></a>
+          <a class="lens-pill" href="/vla-radar/flow.html"><span class="lens-ico">🔀</span><b>推理流程</b><small>画面到动作的链路</small></a>
+          <a class="lens-pill" href="/vla-radar/bench.html"><span class="lens-ico">🎯</span><b>Benchmark 可信度</b><small>分数能不能信</small></a>
+          <a class="lens-pill" href="/vla-radar/metro.html"><span class="lens-ico">🗺️</span><b>研究拓扑</b><small>主线与分叉地铁图</small></a>
+        </div>
+      </div>
+    </section>
+
     <section id="benchmarks" class="section">
       <div class="container">
         <div class="section-head">

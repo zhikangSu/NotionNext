@@ -9,6 +9,16 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+  <style>
+    /* ===== 视角切换条（与其它视角页一致） ===== */
+    .ls-switch-wrap { padding: 22px 0 4px; }
+    .ls-switch { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .ls-switch::-webkit-scrollbar { display: none; }
+    .ls-chip { flex: 0 0 auto; display: inline-flex; align-items: center; gap: 7px; padding: 8px 14px; border: 2px solid rgba(30,36,71,.16); border-radius: 999px; background: #fff; color: var(--meow-ink); font-weight: 800; font-size: .9rem; box-shadow: 2px 2px 0 rgba(30,36,71,.12); transition: .16s ease; }
+    .ls-chip:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(30,36,71,.85); }
+    .ls-chip.active { background: var(--meow-ink); color: #fff; border-color: var(--meow-ink); box-shadow: 3px 3px 0 rgba(30,36,71,.5); }
+    .ls-chip .ls-ic { font-size: 1rem; }
+  </style>
 </head>
 <body>
   <nav class="nav">
@@ -17,17 +27,30 @@
         <span class="brand-badge">🐾</span>
         <span>Meowsu · VLA Radar</span>
       </a>
-      <div class="nav-links">
+            <div class="nav-links">
         <a href="/vla-radar/#benchmarks">Benchmark</a>
         <a href="/vla-radar/#timeline">主线</a>
         <a href="/vla-radar/#branches">分化</a>
+        <a href="/vla-radar/#finetune">微调</a>
         <a href="/vla-radar/#daily">论文雷达</a>
-        <a href="/vla-radar/series.html">演进</a>
+        <a href="/vla-radar/views.html">视角</a>
         <a href="/vla-radar/papers.html">论文库</a>
         <a href="/">返回博客</a>
       </div>
     </div>
   </nav>
+
+  <div class="ls-switch-wrap">
+    <div class="container">
+      <div class="ls-switch">
+        <a class="ls-chip active" href="/vla-radar/series.html"><span class="ls-ic">🧬</span>版本演进</a>
+        <a class="ls-chip" href="/vla-radar/explorer.html"><span class="ls-ic">🔬</span>组件透视</a>
+        <a class="ls-chip" href="/vla-radar/flow.html"><span class="ls-ic">🔀</span>推理流程</a>
+        <a class="ls-chip" href="/vla-radar/bench.html"><span class="ls-ic">🎯</span>Benchmark</a>
+        <a class="ls-chip" href="/vla-radar/metro.html"><span class="ls-ic">🗺️</span>研究拓扑</a>
+      </div>
+    </div>
+  </div>
 
   <main>
     <section class="section paper-wrap">

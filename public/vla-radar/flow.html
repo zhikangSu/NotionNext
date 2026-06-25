@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>推理流程 · VLA Radar</title>
+  <meta name="description" content="把一条 VLA 的运行链路摊平:从观测到动作再到经验回流,标出每一步最近论文在改什么。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+  <style>
+    /* ===== 视角切换条 ===== */
+    .ls-switch-wrap { padding: 22px 0 4px; }
+    .ls-switch {
+      display: flex; gap: 8px; overflow-x: auto;
+      padding: 4px 2px 10px;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .ls-switch::-webkit-scrollbar { display: none; }
+    .ls-chip {
+      flex: 0 0 auto;
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 8px 14px;
+      border: 2px solid rgba(30,36,71,.16);
+      border-radius: 999px;
+      background: #fff;
+      color: var(--meow-ink);
+      font-weight: 800; font-size: .9rem;
+      box-shadow: 2px 2px 0 rgba(30,36,71,.12);
+      transition: .16s ease;
+    }
+    .ls-chip:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(30,36,71,.85); }
+    .ls-chip.active {
+      background: var(--meow-ink); color: #fff;
+      border-color: var(--meow-ink);
+      box-shadow: 3px 3px 0 rgba(30,36,71,.5);
+    }
+    .ls-chip .ls-ic { font-size: 1rem; }
+
+    /* ===== 标题区 ===== */
+    .fl-hero { padding: 14px 0 10px; }
+    .fl-hero h1 { margin: 14px 0 12px; font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.06; max-width: 760px; }
+    .fl-hero p { margin: 0; color: var(--meow-muted); max-width: 760px; font-size: 1.02rem; }
+    .fl-hero p b { color: var(--meow-ink); }
+
+    /* ===== 主体布局:流程 + 侧栏 ===== */
+    .fl-layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 20px; align-items: start; margin-top: 26px; }
+
+    /* ===== 流程图 ===== */
+    .fl-flow { display: grid; gap: 0; }
+    .fl-node {
+      position: relative;
+      border: 2px solid var(--meow-ink);
+      border-radius: var(--radius-lg);
+      background: var(--meow-card);
+      box-shadow: 4px 4px 0 rgba(30,36,71,.85);
+      padding: 16px 18px;
+    }
+    .fl-node.plain {
+      background: rgba(255,255,255,.7);
+      border-style: dashed;
+      border-color: rgba(30,36,71,.4);
+      box-shadow: none;
+    }
+    .fl-node-head { display: flex; align-items: center; gap: 11px; }
+    .fl-ic {
+      flex: 0 0 auto;
+      width: 42px; height: 42px;
+      display: grid; place-items: center;
+      border: 2px solid var(--meow-ink);
+      border-radius: 13px;
+      background: var(--meow-sky);
+      box-shadow: 3px 3px 0 rgba(30,36,71,.82);
+      font-size: 1.3rem;
+    }
+    .fl-node.stage .fl-ic { background: var(--meow-cream); }
+    .fl-titles { min-width: 0; }
+    .fl-stage-kicker {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .68rem; font-weight: 700; letter-spacing: .04em;
+      color: #3153ae; text-transform: uppercase;
+    }
+    .fl-name { margin: 1px 0 0; font-family: 'Baloo 2','Noto Sans SC',sans-serif; font-weight: 800; font-size: 1.18rem; line-height: 1.12; }
+    .fl-sub { margin: 9px 0 0; color: var(--meow-muted); font-size: .9rem; line-height: 1.55; }
+
+    /* 连接箭头 */
+    .fl-arrow {
+      position: relative;
+      height: 30px;
+      margin: 0 auto;
+      width: 2px;
+      background: var(--meow-ink);
+    }
+    .fl-arrow::after {
+      content: '';
+      position: absolute; left: 50%; bottom: -2px;
+      width: 9px; height: 9px;
+      border-right: 2px solid var(--meow-blue);
+      border-bottom: 2px solid var(--meow-blue);
+      transform: translateX(-50%) rotate(45deg);
+    }
+
+    /* 论文 chip */
+    .fl-papers { margin: 12px 0 0; display: flex; flex-wrap: wrap; gap: 7px; }
+    .fl-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      max-width: 100%;
+      border: 1.5px solid rgba(30,36,71,.16);
+      border-radius: 999px;
+      background: rgba(247,250,255,.85);
+      padding: 5px 11px;
+      font-weight: 700; font-size: .82rem;
+      color: var(--meow-ink);
+      transition: .14s ease;
+    }
+    .fl-chip:hover { border-color: var(--meow-ink); background: #fff; box-shadow: 2px 2px 0 rgba(30,36,71,.2); transform: translate(-1px,-1px); }
+    .fl-chip .fl-chip-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 230px; }
+    .fl-chip .fl-chip-meta { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: .68rem; color: var(--meow-muted); }
+    .fl-papers-empty { margin: 11px 0 0; color: var(--meow-muted); font-size: .82rem; font-weight: 700; }
+    .fl-papers-label { margin: 12px 0 0; font-weight: 800; font-size: .76rem; color: var(--meow-muted); }
+
+    /* 经验回流闭环标注 */
+    .fl-loop {
+      position: relative;
+      margin: 30px 0 0;
+      border: 2px solid var(--meow-blue);
+      border-radius: var(--radius-lg);
+      background: rgba(53,99,233,.06);
+      padding: 16px 18px;
+    }
+    .fl-loop-tag {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-weight: 900; font-size: .82rem;
+      color: var(--meow-blue-deep);
+      background: #fff;
+      border: 2px solid var(--meow-blue);
+      border-radius: 999px;
+      padding: 4px 12px;
+      margin-bottom: 10px;
+    }
+    .fl-loop-back {
+      margin: 10px 0 0;
+      display: inline-flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: .82rem; color: var(--meow-blue);
+    }
+
+    /* ===== 侧栏:其实没怎么变 ===== */
+    .fl-side { position: sticky; top: 90px; }
+    .fl-side .fl-side-card { padding: 20px; }
+    .fl-side h3 { margin: 0 0 4px; font-size: 1.2rem; }
+    .fl-side .fl-side-note { margin: 0 0 14px; color: var(--meow-muted); font-size: .86rem; }
+    .fl-stable { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+    .fl-stable li {
+      display: flex; gap: 9px; align-items: start;
+      padding: 11px 13px;
+      border: 2px solid rgba(30,36,71,.1);
+      border-radius: 15px;
+      background: rgba(247,250,255,.72);
+      font-size: .9rem; line-height: 1.5;
+    }
+    .fl-stable li::before { content: '='; color: var(--meow-muted); font-weight: 900; font-family: 'Baloo 2'; }
+    .fl-stable li b { color: var(--meow-ink); }
+    .fl-subjective { margin: 14px 0 0; font-size: .76rem; color: var(--meow-muted); font-weight: 700; line-height: 1.5; }
+
+    .fl-state { text-align: center; color: var(--meow-muted); font-weight: 800; padding: 30px 0; }
+
+    @media (max-width: 980px) {
+      .fl-layout { grid-template-columns: 1fr; }
+      .fl-side { position: static; }
+    }
+    @media (max-width: 640px) {
+      .fl-chip .fl-chip-name { max-width: 180px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/">
+        <span class="brand-badge">🐾</span>
+        <span>Meowsu · VLA Radar</span>
+      </a>
+            <div class="nav-links">
+        <a href="/vla-radar/#benchmarks">Benchmark</a>
+        <a href="/vla-radar/#timeline">主线</a>
+        <a href="/vla-radar/#branches">分化</a>
+        <a href="/vla-radar/#finetune">微调</a>
+        <a href="/vla-radar/#daily">论文雷达</a>
+        <a href="/vla-radar/views.html">视角</a>
+        <a href="/vla-radar/papers.html">论文库</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="ls-switch-wrap">
+    <div class="container">
+      <div class="ls-switch">
+        <a class="ls-chip" href="/vla-radar/series.html"><span class="ls-ic">🧬</span>版本演进</a>
+        <a class="ls-chip" href="/vla-radar/explorer.html"><span class="ls-ic">🔬</span>组件透视</a>
+        <a class="ls-chip active" href="/vla-radar/flow.html"><span class="ls-ic">🔀</span>推理流程</a>
+        <a class="ls-chip" href="/vla-radar/bench.html"><span class="ls-ic">🎯</span>Benchmark</a>
+        <a class="ls-chip" href="/vla-radar/metro.html"><span class="ls-ic">🗺️</span>研究拓扑</a>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section class="section fl-hero">
+      <div class="container">
+        <span class="badge">推理流程 · VLA Pipeline</span>
+        <h1>一条 VLA,是怎么从画面走到动作的</h1>
+        <p>把运行链路摊平——<b>观测 → 语义编码 → 高层推理 → 动作生成 → 机器人执行 → 经验回流重新训练</b>,并标出每一步最近论文在改什么。</p>
+      </div>
+    </section>
+
+    <section class="section" style="padding-top: 0;">
+      <div class="container">
+        <div class="fl-layout">
+          <div class="fl-flow" id="flow">
+            <div class="fl-state">正在加载流程与代表论文 …</div>
+          </div>
+
+          <aside class="fl-side">
+            <div class="sticker-card fl-side-card">
+              <h3>其实没怎么变的东西</h3>
+              <p class="fl-side-note">链路一直在改,但有些地基这几年基本没动。</p>
+              <ul class="fl-stable">
+                <li><span><b>Transformer</b> 仍是主干,从 RT-1 到今天都没换骨架。</span></li>
+                <li><span><b>RGB + 本体感觉 + 语言</b> 仍是标准输入三件套。</span></li>
+                <li><span>输出仍是<b>控制命令</b>(末端/关节动作),只是表示在变。</span></li>
+                <li><span><b>机器人真实数据</b>仍是瓶颈,合成与社区数据都在绕它。</span></li>
+              </ul>
+              <p class="fl-subjective">以上为编辑性归纳(主观),用于给流程图做背景对照,不来自单篇分数。</p>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+
+  <script src="/vla-radar/data/curated.js"></script>
+  <script>
+    const flowEl = document.getElementById('flow');
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    const C = (window.VLA_CURATED || {});
+    const classify = typeof C.classify === 'function' ? C.classify : () => [];
+
+    // 流程节点顺序;有 component key 的节点会挂代表论文 chip。
+    const STAGES = [
+      { icon: '👁️', kicker: '输入 · Observation', name: '观测', sub: 'RGB 相机 + 本体感觉(关节/夹爪) + 语言指令,一起进入模型。', comp: null },
+      { icon: '🧠', kicker: '编码 · Encoding', name: '语义编码 / VLM·LLM 骨干', sub: '用预训练视觉语言模型当感知主干,把画面和指令变成语义表示。', comp: 'backbone' },
+      { icon: '🧭', kicker: '决策 · Reasoning', name: '高层推理 / 子目标', sub: '动作之前先想:阶段、子目标、计划、世界模型、记忆,把长程任务拆开。', comp: 'reasoning' },
+      { icon: '🦾', kicker: '生成 · Action', name: '动作生成', sub: '动作头解码意图:flow / diffusion / 离散 token / 连续动作块。', comp: 'action' },
+      { icon: '🧩', kicker: '组块 · Chunk', name: '动作块 chunk', sub: '一次输出一段动作块而非单步,降低高频决策的累积误差。', comp: null },
+      { icon: '🤖', kicker: '执行 · Deploy', name: '机器人执行', sub: 'PD / IK / chunk 控制器把动作下发给真实机器人,要够快够稳才能上车。', comp: 'efficiency' }
+    ];
+
+    // 闭环节点单列(回流到训练)
+    const LOOP = { icon: '🔁', name: '经验回流 → 重新训练', sub: 'rollout / reward / 人类 intervention 收集成新数据,回灌训练——VLA 近年最大的结构变化之一:从"只学演示"走向"部署后继续变强"。', comp: 'training' };
+
+    const chipHtml = p => {
+      const id = p.arxiv_id;
+      const title = p.title || id;
+      const date = (p.published || '').slice(0, 10);
+      return `<a class="fl-chip" href="/vla-radar/paper.html?id=${encodeURIComponent(id)}&from=flow" title="${esc(title)}">`
+        + `<span class="fl-chip-name">${esc(title)}</span>`
+        + (date ? `<span class="fl-chip-meta">${esc(date)}</span>` : '')
+        + `</a>`;
+    };
+
+    // 取该 component 命中的代表论文:先按 figures 数,再按日期,取前 3。
+    const pickPapers = (papers, compKey, n) => {
+      return papers
+        .filter(p => classify(p.tags || []).includes(compKey))
+        .slice()
+        .sort((a, b) => {
+          const fa = Array.isArray(a.figures) ? a.figures.length : 0;
+          const fb = Array.isArray(b.figures) ? b.figures.length : 0;
+          if (fb !== fa) return fb - fa;
+          return String(b.published || '').localeCompare(String(a.published || ''));
+        })
+        .slice(0, n);
+    };
+
+    const papersBlock = (papers, compKey) => {
+      if (!compKey) return '';
+      const picks = pickPapers(papers, compKey, 3);
+      if (!picks.length) return `<p class="fl-papers-empty">这一步暂无入库论文。</p>`;
+      const comp = (C.components || []).find(c => c.key === compKey);
+      const label = comp ? `最近在改这一步 · ${esc(comp.name)}` : '最近在改这一步';
+      return `<p class="fl-papers-label">${label}</p><div class="fl-papers">${picks.map(chipHtml).join('')}</div>`;
+    };
+
+    const stageHtml = (s, papers, isStage) => {
+      return `
+        <div class="fl-node ${isStage ? 'stage' : 'plain'}">
+          <div class="fl-node-head">
+            <span class="fl-ic">${s.icon}</span>
+            <div class="fl-titles">
+              <div class="fl-stage-kicker">${esc(s.kicker || '')}</div>
+              <h3 class="fl-name">${esc(s.name)}</h3>
+            </div>
+          </div>
+          <p class="fl-sub">${esc(s.sub)}</p>
+          ${papersBlock(papers, s.comp)}
+        </div>`;
+    };
+
+    const arrow = '<div class="fl-arrow" aria-hidden="true"></div>';
+
+    const render = papers => {
+      const parts = [];
+      STAGES.forEach((s, i) => {
+        parts.push(stageHtml(s, papers, !!s.comp));
+        if (i < STAGES.length - 1) parts.push(arrow);
+      });
+
+      // 闭环段
+      parts.push(arrow);
+      const loopPapers = papersBlock(papers, LOOP.comp);
+      parts.push(`
+        <div class="fl-loop">
+          <span class="fl-loop-tag">↺ 闭环 · Experience Loop</span>
+          <div class="fl-node-head">
+            <span class="fl-ic" style="background: rgba(53,99,233,.12);">${LOOP.icon}</span>
+            <div class="fl-titles">
+              <div class="fl-stage-kicker">回流 · Training</div>
+              <h3 class="fl-name">${esc(LOOP.name)}</h3>
+            </div>
+          </div>
+          <p class="fl-sub">${esc(LOOP.sub)}</p>
+          ${loopPapers}
+          <p class="fl-loop-back">↑ 回到「语义编码 / 骨干」,用新经验把整条链重新训一遍。</p>
+        </div>`);
+
+      flowEl.innerHTML = parts.join('');
+    };
+
+    async function load() {
+      let papers = [];
+      try {
+        const res = await fetch('/api/vla-radar/list?limit=200', { cache: 'no-store' });
+        const j = await res.json();
+        if (j && j.configured === false) {
+          flowEl.innerHTML = '<div class="fl-state">论文库还没接好——流程结构如下,代表论文待入库后自动补齐。</div>';
+          render([]);
+          return;
+        }
+        papers = Array.isArray(j && j.papers) ? j.papers : [];
+      } catch (e) {
+        flowEl.innerHTML = '';
+        render([]);
+        const note = document.createElement('div');
+        note.className = 'fl-state';
+        note.textContent = '论文数据加载失败,先显示流程骨架:' + (e && e.message ? e.message : e);
+        flowEl.prepend(note);
+        return;
+      }
+      render(papers);
+    }
+    load();
+  </script>
+</body>
+</html>

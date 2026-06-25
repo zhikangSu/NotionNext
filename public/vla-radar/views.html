@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>视角 · VLA Radar</title>
+  <meta name="description" content="同一批 VLA 论文的多种看法:版本演进 / 组件透视 / 推理流程 / Benchmark 可信度 / 研究拓扑。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+  <style>
+    .hub-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; margin-top:26px; }
+    .hub-card { display:flex; flex-direction:column; gap:10px; padding:24px; text-decoration:none; color:inherit; transition:transform .12s ease, box-shadow .12s ease; }
+    .hub-card:hover { transform:translate(-2px,-2px); box-shadow:var(--shadow-blue); }
+    .hub-icon { width:52px; height:52px; display:grid; place-items:center; font-size:1.7rem; border:2px solid var(--meow-ink); border-radius:16px; background:var(--meow-cream); }
+    .hub-name { font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.4rem; font-weight:800; margin:6px 0 0; }
+    .hub-tag { font-size:.78rem; color:var(--meow-muted); font-weight:700; letter-spacing:.04em; }
+    .hub-desc { color:var(--meow-muted); margin:0; line-height:1.66; }
+    .hub-go { margin-top:auto; font-weight:800; color:var(--meow-blue); }
+    .hub-note { margin-top:30px; display:flex; flex-wrap:wrap; gap:10px; align-items:center; color:var(--meow-muted); }
+    .hub-note a { font-weight:800; color:var(--meow-ink); border-bottom:2px solid var(--meow-yellow); }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/"><span class="brand-badge">🐾</span><span>Meowsu · VLA Radar</span></a>
+            <div class="nav-links">
+        <a href="/vla-radar/#benchmarks">Benchmark</a>
+        <a href="/vla-radar/#timeline">主线</a>
+        <a href="/vla-radar/#branches">分化</a>
+        <a href="/vla-radar/#finetune">微调</a>
+        <a href="/vla-radar/#daily">论文雷达</a>
+        <a href="/vla-radar/views.html">视角</a>
+        <a href="/vla-radar/papers.html">论文库</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="section paper-wrap">
+      <div class="container">
+        <a class="paper-back" href="/vla-radar/">← 回到 VLA Radar 首页</a>
+        <span class="badge">视角 · Lenses</span>
+        <h1 class="paper-title">换个角度看同一批 VLA 论文</h1>
+        <p class="paper-meta">每天抓取、解析的同一批论文,被组织成不同的「看法」。挑一个角度进去 —— 以后还会有更多视角加进来。</p>
+
+        <div class="hub-grid">
+          <a class="sticker-card hub-card" href="/vla-radar/series.html">
+            <span class="hub-icon">🧬</span>
+            <span class="hub-tag">SERIES · 版本链</span>
+            <h2 class="hub-name">版本演进</h2>
+            <p class="hub-desc">把模型家族(π0→π0.5→π*0.6→π0.7、OpenVLA→OFT)做成版本链,每一跳显示相对上一版改了什么。</p>
+            <span class="hub-go">进入 →</span>
+          </a>
+          <a class="sticker-card hub-card" href="/vla-radar/explorer.html">
+            <span class="hub-icon">🔬</span>
+            <span class="hub-tag">EXPLORER · 解剖</span>
+            <h2 class="hub-name">组件透视</h2>
+            <p class="hub-desc">每篇论文到底动了 VLA 的哪一层:骨干 / 动作头 / 数据 / 训练 / 推理 / 空间……按组件归位,可筛选。</p>
+            <span class="hub-go">进入 →</span>
+          </a>
+          <a class="sticker-card hub-card" href="/vla-radar/flow.html">
+            <span class="hub-icon">🔀</span>
+            <span class="hub-tag">PIPELINE · 链路</span>
+            <h2 class="hub-name">推理流程</h2>
+            <p class="hub-desc">一条 VLA 从画面到动作的完整链路,每一步标出最近论文在这一步改什么,以及经验如何回流。</p>
+            <span class="hub-go">进入 →</span>
+          </a>
+          <a class="sticker-card hub-card" href="/vla-radar/bench.html">
+            <span class="hub-icon">🎯</span>
+            <span class="hub-tag">BENCHMARK · 可信度</span>
+            <h2 class="hub-name">Benchmark 可信度</h2>
+            <p class="hub-desc">刷出来的分到底测到了什么:尺子的标准化、饱和、刷榜风险,以及谁在专门审计 LIBERO。</p>
+            <span class="hub-go">进入 →</span>
+          </a>
+          <a class="sticker-card hub-card" href="/vla-radar/metro.html">
+            <span class="hub-icon">🗺️</span>
+            <span class="hub-tag">TOPOLOGY · 地铁图</span>
+            <h2 class="hub-name">研究拓扑</h2>
+            <p class="hub-desc">VLA 的主线和它的分叉,画成一张地铁图。站点是模型,点开看相关论文。</p>
+            <span class="hub-go">进入 →</span>
+          </a>
+        </div>
+
+        <div class="hub-note">
+          <span>想看原始的论文流?</span>
+          <a href="/vla-radar/#daily">每日论文雷达</a>
+          <span>·</span>
+          <a href="/vla-radar/papers.html">全部论文库</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+</body>
+</html>

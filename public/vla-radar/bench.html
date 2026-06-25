@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Benchmark 可信度 · VLA Radar</title>
+  <meta name="description" content="VLA benchmark 的尺子本身:标准化程度、是否饱和刷榜、有没有人专门审计它。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260624-series" />
+  <style>
+    /* ===== bench 视角页:页内样式,bn- 前缀 ===== */
+
+    /* 视角切换条 */
+    .bn-views { margin: 18px 0 4px; }
+    .bn-views-inner {
+      display: flex; gap: 8px; overflow-x: auto;
+      padding: 4px 2px 8px; scroll-snap-type: x proximity;
+      -webkit-overflow-scrolling: touch;
+    }
+    .bn-views-inner::-webkit-scrollbar { height: 0; }
+    .bn-chip {
+      flex: 0 0 auto; scroll-snap-align: start;
+      display: inline-flex; align-items: center; gap: 7px;
+      border: 2px solid rgba(30,36,71,.16); border-radius: 999px;
+      background: #fff; color: var(--meow-ink);
+      padding: 8px 14px; font-weight: 800; font-size: .9rem;
+      box-shadow: 2px 2px 0 rgba(30,36,71,.12);
+      white-space: nowrap; transition: .14s ease;
+    }
+    .bn-chip:hover { transform: translate(-1px,-1px); box-shadow: 3px 3px 0 rgba(30,36,71,.2); }
+    .bn-chip.active {
+      background: var(--meow-ink); color: #fff;
+      border-color: var(--meow-ink); box-shadow: 3px 3px 0 rgba(30,36,71,.85);
+    }
+    .bn-chip .bn-chip-ico { font-size: 1rem; line-height: 1; }
+
+    /* 段落标题 */
+    .bn-secthead { margin: 40px 0 6px; }
+    .bn-secthead.first { margin-top: 26px; }
+    .bn-secthead h2 { margin: 0; font-size: clamp(1.4rem, 3vw, 2rem); line-height: 1.1; }
+    .bn-secthead p { margin: 8px 0 0; color: var(--meow-muted); font-size: .95rem; max-width: 760px; }
+    .bn-subj-note {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 10px; padding: 4px 11px;
+      border: 1.5px dashed rgba(242,105,156,.5); border-radius: 999px;
+      background: var(--meow-pink-soft); color: #b43c6b;
+      font-weight: 800; font-size: .76rem;
+    }
+
+    /* benchmark 卡网格 */
+    .bn-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 18px; }
+    .bn-card { padding: 20px 22px; display: flex; flex-direction: column; }
+    .bn-card-head { display: flex; align-items: flex-start; gap: 12px; }
+    .bn-ico {
+      flex: 0 0 auto; width: 46px; height: 46px; display: grid; place-items: center;
+      border-radius: 14px; border: 2px solid var(--meow-ink); background: var(--meow-cream);
+      box-shadow: 3px 3px 0 rgba(30,36,71,.82); font-size: 1.4rem;
+    }
+    .bn-card-titles { min-width: 0; flex: 1 1 auto; }
+    .bn-badge {
+      display: inline-block; width: max-content; max-width: 100%;
+      border-radius: 999px; padding: 3px 10px;
+      background: var(--meow-sky); color: #3153ae;
+      font-size: .72rem; font-weight: 900; margin-bottom: 6px;
+    }
+    .bn-badge.audit { background: var(--meow-pink-soft); color: #b43c6b; }
+    .bn-card h3 { margin: 0; font-size: 1.28rem; line-height: 1.12; }
+    .bn-card-text { margin: 12px 0 0; color: var(--meow-muted); font-size: .92rem; line-height: 1.62; }
+
+    /* 判断条:0-3 实心点 + 标签 */
+    .bn-rubric { margin: 16px 0 0; display: grid; gap: 9px; }
+    .bn-rubric-row { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; }
+    .bn-rubric-label { font-size: .82rem; font-weight: 800; color: var(--meow-ink); }
+    .bn-dots { display: inline-flex; gap: 5px; }
+    .bn-dot {
+      width: 11px; height: 11px; border-radius: 50%;
+      border: 2px solid var(--meow-ink); background: #fff;
+    }
+    .bn-dot.on { background: var(--meow-blue); }
+    .bn-rubric-row.risk .bn-dot.on { background: var(--meow-red); }
+    .bn-rubric-row.audit .bn-dot.on { background: var(--meow-pink); }
+
+    /* 真实数据锚点 */
+    .bn-anchor {
+      margin: 16px 0 0; padding: 11px 13px;
+      border: 2px solid rgba(30,36,71,.1); border-radius: 14px;
+      background: rgba(247,250,255,.72);
+      font-size: .85rem; line-height: 1.55;
+    }
+    .bn-anchor .bn-anchor-k {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .68rem; font-weight: 700; letter-spacing: .02em;
+      color: #3b6d11; background: #eaf3de;
+      border: 1.5px solid rgba(99,153,34,.4); border-radius: 6px;
+      padding: 2px 7px; margin-right: 8px;
+    }
+    .bn-anchor.empty .bn-anchor-k { color: var(--meow-muted); background: rgba(100,112,138,.1); border-color: rgba(100,112,138,.25); }
+    .bn-anchor b { color: var(--meow-ink); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+
+    /* 审计层卡(LIBERO stress) 特殊样式 */
+    .bn-card.is-audit { border-color: var(--meow-pink); box-shadow: 6px 6px 0 rgba(242,105,156,.55); }
+    .bn-audit-tag {
+      margin: 16px 0 0; display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 13px; border: 2px solid var(--meow-ink); border-radius: 999px;
+      background: var(--meow-pink-soft); color: #b43c6b;
+      font-weight: 900; font-size: .82rem;
+    }
+
+    /* 审计聚焦区 */
+    .bn-audit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 18px; }
+    .bn-audit-card { padding: 18px 20px; display: flex; flex-direction: column; }
+    .bn-audit-card .bn-id {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .76rem; font-weight: 700; color: var(--meow-blue);
+    }
+    .bn-audit-card h4 {
+      margin: 8px 0 0; font-size: 1.15rem; line-height: 1.16;
+      font-family: 'Baloo 2','Noto Sans SC',sans-serif; font-weight: 800;
+    }
+    .bn-audit-card .bn-field { margin: 12px 0 0; }
+    .bn-audit-card .bn-field .fk {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: .68rem; font-weight: 700; letter-spacing: .02em;
+      color: #3153ae; background: var(--meow-sky);
+      border: 1.5px solid rgba(53,99,233,.18); border-radius: 6px;
+      padding: 2px 7px;
+    }
+    .bn-audit-card .bn-field.warn .fk { color: #b43c6b; background: var(--meow-pink-soft); border-color: rgba(242,105,156,.4); }
+    .bn-audit-card .bn-field p { margin: 7px 0 0; color: var(--meow-ink); font-size: .9rem; line-height: 1.58; }
+    .bn-audit-card .bn-field.warn p { color: var(--meow-muted); }
+    .bn-audit-link {
+      margin-top: auto; padding-top: 14px;
+      display: inline-flex; width: max-content; align-items: center; gap: 6px;
+      color: var(--meow-blue); font-weight: 900; font-size: .85rem;
+    }
+    .bn-audit-link:hover { color: var(--meow-blue-deep); }
+
+    /* 阅读清单 */
+    .bn-checklist { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 11px; }
+    .bn-checklist li {
+      display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start;
+      padding: 14px 16px; border: 2px solid rgba(30,36,71,.1); border-radius: 18px;
+      background: rgba(247,250,255,.72);
+    }
+    .bn-check-n {
+      width: 30px; height: 30px; display: grid; place-items: center;
+      border: 2px solid var(--meow-ink); border-radius: 9px; background: var(--meow-yellow);
+      font-family: 'Baloo 2'; font-weight: 800; font-size: .9rem;
+      box-shadow: 2px 2px 0 rgba(30,36,71,.82);
+    }
+    .bn-checklist li b { color: var(--meow-blue); }
+    .bn-checklist li p { margin: 4px 0 0; color: var(--meow-muted); font-size: .9rem; line-height: 1.55; }
+    .bn-checklist li h4 { margin: 0; font-size: 1rem; line-height: 1.3; }
+
+    .bn-state { text-align: center; color: var(--meow-muted); font-weight: 800; padding: 30px 0; }
+
+    @media (max-width: 900px) {
+      .bn-grid { grid-template-columns: 1fr; }
+      .bn-audit-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .bn-card, .bn-audit-card { padding: 18px; }
+      .bn-card h3 { font-size: 1.18rem; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/"><span class="brand-badge">🐾</span><span>Meowsu · VLA Radar</span></a>
+            <div class="nav-links">
+        <a href="/vla-radar/#benchmarks">Benchmark</a>
+        <a href="/vla-radar/#timeline">主线</a>
+        <a href="/vla-radar/#branches">分化</a>
+        <a href="/vla-radar/#finetune">微调</a>
+        <a href="/vla-radar/#daily">论文雷达</a>
+        <a href="/vla-radar/views.html">视角</a>
+        <a href="/vla-radar/papers.html">论文库</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 视角切换条 -->
+  <div class="bn-views">
+    <div class="container bn-views-inner">
+      <a class="bn-chip" href="/vla-radar/series.html"><span class="bn-chip-ico">🧬</span>版本演进</a>
+      <a class="bn-chip" href="/vla-radar/explorer.html"><span class="bn-chip-ico">🔬</span>组件透视</a>
+      <a class="bn-chip" href="/vla-radar/flow.html"><span class="bn-chip-ico">🔀</span>推理流程</a>
+      <a class="bn-chip active" href="/vla-radar/bench.html"><span class="bn-chip-ico">🎯</span>Benchmark</a>
+      <a class="bn-chip" href="/vla-radar/metro.html"><span class="bn-chip-ico">🗺️</span>研究拓扑</a>
+    </div>
+  </div>
+
+  <main>
+    <section class="section paper-wrap" style="padding-top: 18px;">
+      <div class="container">
+        <a class="paper-back" href="/vla-radar/#benchmarks">← 回到论文雷达</a>
+        <span class="badge">Benchmark 可信度 · 分数能信吗</span>
+        <h1 class="paper-title">刷出来的分,到底测到了什么?</h1>
+        <p class="paper-meta" style="font-size: 1rem; line-height: 1.6;">
+          VLA 的「提升」常是在同一批尺子上重定义条件。这页把尺子本身摊开:它标准化吗、是否已经饱和、有没有人专门审计它。
+        </p>
+
+        <!-- A) 家族卡 -->
+        <div class="bn-secthead first">
+          <h2>尺子盘点 · 每个 benchmark 家族能信几分</h2>
+          <p>对常见 benchmark 家族给出三条判断条:<b>标准化程度</b>(协议是否统一) / <b>饱和·刷榜风险</b>(分数是否逼近天花板) / <b>审计覆盖</b>(有没有人专门拆它)。每条 0–3 颗实心点,点越多越好(刷榜风险一栏点越多代表风险越高)。再附「真实数据锚点」:扫本库论文的结构化分数,统计有多少篇报告了它。</p>
+          <span class="bn-subj-note">⚠ 三条判断条为主观评估,仅作阅读参考</span>
+        </div>
+        <div class="bn-grid" id="bnGrid"></div>
+
+        <!-- B) 审计聚焦 -->
+        <div class="bn-secthead">
+          <h2>审计聚焦 · 有人专门拆 LIBERO</h2>
+          <p>LIBERO 是 VLA 论文最常见的尺子,也最先被质疑「高分=背题」。下面三篇压力测试直接从本库取出它们的 <b>问题陈述</b> 与 <b>风险提示</b>,是「这把尺子能不能信」的核心证据。</p>
+        </div>
+        <div class="bn-audit-grid" id="bnAudit"></div>
+
+        <!-- C) 阅读清单 -->
+        <div class="bn-secthead">
+          <h2>怎么读一张 benchmark 表</h2>
+          <p>看到一张漂亮的成功率表,先别急着信。把下面几条逐项问一遍。</p>
+        </div>
+        <ol class="bn-checklist">
+          <li>
+            <span class="bn-check-n">1</span>
+            <div>
+              <h4>换了初始状态 / 语言指令吗?</h4>
+              <p>同一套件,换初始位姿、物体摆放或 paraphrase 指令后还稳吗?只在固定布置上刷分,泛化无从谈起。</p>
+            </div>
+          </li>
+          <li>
+            <span class="bn-check-n">2</span>
+            <div>
+              <h4>报真实机器人了吗?</h4>
+              <p>纯仿真高分和真实机器人成功率常有落差。有没有真机结果、还是只有 sim 数字。</p>
+            </div>
+          </li>
+          <li>
+            <span class="bn-check-n">3</span>
+            <div>
+              <h4>跑过压力测试吗?</h4>
+              <p>有没有在 LIBERO-PRO / Para / Plus 这类扰动审计上验证,还是只报标准套件的最优数。</p>
+            </div>
+          </li>
+          <li>
+            <span class="bn-check-n">4</span>
+            <div>
+              <h4>分数是否逼近饱和?</h4>
+              <p>当成功率已经 95%+,再涨一两个点的意义有限,差异可能落在噪声里。看天花板,别看小数点。</p>
+            </div>
+          </li>
+          <li>
+            <span class="bn-check-n">5</span>
+            <div>
+              <h4>baseline 是同协议吗?</h4>
+              <p>对比对象是否用相同套件、相同 episode 数、相同评测脚本。换了协议的对比,数字不可比。</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+
+  <script src="/vla-radar/data/curated.js"></script>
+  <script>
+    const esc = s => String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
+    // ===== 主观判断条取值(策展,标注为主观) =====
+    // key 用于子串匹配 curated.benchmarks 标题;sub[] 为匹配真实分数用的家族名子串
+    const RUBRIC = [
+      { match: 'LIBERO', exclude: 'PRO',
+        sub: ['LIBERO'], std: 3, risk: 3, audit: 3 },
+      { match: 'SimplerEnv',
+        sub: ['Simpler'], std: 2, risk: 2, audit: 1 },
+      { match: 'RoboCasa',
+        sub: ['RoboCasa'], std: 2, risk: 1, audit: 1 },
+      { match: 'RoboTwin',
+        sub: ['RoboTwin'], std: 2, risk: 1, audit: 1 },
+      { match: 'CALVIN',
+        sub: ['CALVIN', 'Meta-World', 'ManiSkill'], std: 3, risk: 3, audit: 2 }
+    ];
+
+    const dots = (n, cls) => {
+      let h = '<span class="bn-dots">';
+      for (let i = 0; i < 3; i++) h += `<span class="bn-dot${i < n ? ' on' : ''}"></span>`;
+      return h + '</span>';
+    };
+
+    // 从 before/after 字符串里抽「像成功率的百分数」:优先带 % 的,其次 0-100 的整数/小数
+    const pctNums = s => {
+      if (s == null) return [];
+      const str = String(s);
+      const out = [];
+      // 1) 带 % 的数(如 97.1% / 高 2.5 个点 的 98.3%)
+      let m, re = /(-?\d+\.?\d*)\s*%/g;
+      while ((m = re.exec(str))) { const v = parseFloat(m[1]); if (v >= 0 && v <= 100) out.push(v); }
+      if (out.length) return out;
+      // 2) 没有 %:取 0-100 的裸数,但排除明显是模型规模(后跟 B/b)的
+      re = /(-?\d+\.?\d*)\s*(?![%\d.])(?!\s*[Bb])/g;
+      const cleaned = str.replace(/\d+\.?\d*\s*[Bb]\b/g, ''); // 去掉 0.45B / 7B 这类规模
+      re = /-?\d+\.?\d*/g;
+      while ((m = re.exec(cleaned))) { const v = parseFloat(m[0]); if (v >= 1 && v <= 100) out.push(v); }
+      return out;
+    };
+
+    // 统计某家族:多少篇报告、观测区间
+    const anchorFor = (subs, papers) => {
+      const ids = new Set();
+      const vals = [];
+      for (const p of papers) {
+        const diff = (p.diff && typeof p.diff === 'object') ? p.diff : {};
+        const bms = Array.isArray(diff.benchmarks) ? diff.benchmarks : [];
+        let hit = false;
+        for (const b of bms) {
+          if (!b || !b.name) continue;
+          const n = String(b.name).toLowerCase();
+          if (!subs.some(s => n.includes(s.toLowerCase()))) continue;
+          hit = true;
+          pctNums(b.before).forEach(v => vals.push(v));
+          pctNums(b.after).forEach(v => vals.push(v));
+        }
+        if (hit) ids.add(p.arxiv_id);
+      }
+      return { count: ids.size, vals };
+    };
+
+    const anchorHtml = (subs, papers) => {
+      const { count, vals } = anchorFor(subs, papers);
+      if (!count) {
+        return `<div class="bn-anchor empty"><span class="bn-anchor-k">真实数据锚点</span>本库暂无结构化分数</div>`;
+      }
+      if (!vals.length) {
+        return `<div class="bn-anchor"><span class="bn-anchor-k">真实数据锚点</span>本库 <b>${count}</b> 篇报告,但未抽到可比百分数</div>`;
+      }
+      const lo = Math.min(...vals), hi = Math.max(...vals);
+      const fmt = x => (Number.isInteger(x) ? x : x.toFixed(1));
+      const range = lo === hi ? `${fmt(lo)}` : `${fmt(lo)}–${fmt(hi)}`;
+      return `<div class="bn-anchor"><span class="bn-anchor-k">真实数据锚点</span>本库 <b>${count}</b> 篇报告,成功率区间 <b>${range}%</b><span style="color:var(--meow-muted)">(按结构化 diff 抽取的可比百分数)</span></div>`;
+    };
+
+    function renderFamilies(papers) {
+      const grid = document.getElementById('bnGrid');
+      const C = window.VLA_CURATED;
+      if (!C || !Array.isArray(C.benchmarks)) {
+        grid.innerHTML = '<div class="bn-state">策展数据未加载。</div>';
+        return;
+      }
+      const cards = C.benchmarks.map(fam => {
+        const isStress = /stress/i.test(fam.badge || '') || /PRO/i.test(fam.title || '');
+        const head = `
+          <div class="bn-card-head">
+            <div class="bn-ico">${fam.icon || '🧪'}</div>
+            <div class="bn-card-titles">
+              <span class="bn-badge${isStress ? ' audit' : ''}">${esc(fam.badge || 'Benchmark')}</span>
+              <h3>${esc(fam.title)}</h3>
+            </div>
+          </div>
+          <p class="bn-card-text">${esc(fam.text || '')}</p>`;
+
+        // 审计层卡:LIBERO 压力测试家族,不套三条
+        if (isStress) {
+          return `<article class="sticker-card bn-card is-audit">
+            ${head}
+            <div class="bn-audit-tag">🧨 它本身就是审计层 · 在质疑 LIBERO 是否被背题</div>
+            ${anchorHtml(['LIBERO-PRO', 'LIBERO-Para', 'LIBERO-Plus'], papers)}
+          </article>`;
+        }
+
+        // 普通家族:匹配 RUBRIC
+        const r = RUBRIC.find(x => (fam.title || '').includes(x.match) &&
+          (!x.exclude || !(fam.title || '').includes(x.exclude)));
+        let rubricHtml = '';
+        let anchor = '';
+        if (r) {
+          rubricHtml = `
+            <div class="bn-rubric">
+              <div class="bn-rubric-row"><span class="bn-rubric-label">标准化程度</span>${dots(r.std)}</div>
+              <div class="bn-rubric-row risk"><span class="bn-rubric-label">饱和 · 刷榜风险</span>${dots(r.risk)}</div>
+              <div class="bn-rubric-row audit"><span class="bn-rubric-label">审计覆盖</span>${dots(r.audit)}</div>
+            </div>`;
+          anchor = anchorHtml(r.sub, papers);
+        } else {
+          anchor = anchorHtml([fam.title], papers);
+        }
+        return `<article class="sticker-card bn-card">
+          ${head}
+          ${rubricHtml}
+          ${anchor}
+        </article>`;
+      });
+      grid.innerHTML = cards.join('');
+    }
+
+    // ===== B) 审计聚焦:三篇压力测试 =====
+    const AUDIT_PAPERS = [
+      { id: '2510.03827', name: 'LIBERO-PRO' },
+      { id: '2603.28301', name: 'LIBERO-Para' },
+      { id: '2510.13626', name: 'LIBERO-Plus' }
+    ];
+
+    function renderAudit(map) {
+      const wrap = document.getElementById('bnAudit');
+      const cards = AUDIT_PAPERS.map(a => {
+        const p = map[a.id];
+        if (!p) {
+          return `<article class="sticker-card bn-audit-card">
+            <span class="bn-id">arXiv:${esc(a.id)}</span>
+            <h4>${esc(a.name)}</h4>
+            <p class="bn-card-text" style="margin-top:12px;">本库暂未收录该篇的结构化拆解。</p>
+            <a class="bn-audit-link" href="/vla-radar/paper.html?id=${encodeURIComponent(a.id)}&from=bench">看详情 →</a>
+          </article>`;
+        }
+        const diff = (p.diff && typeof p.diff === 'object') ? p.diff : {};
+        const problem = p.problem || p.delta || '';
+        const risk = diff.risk || '';
+        const title = a.name + (p.title ? ' · ' + p.title : '');
+        const probHtml = problem
+          ? `<div class="bn-field"><span class="fk">problem</span><p>${esc(problem)}</p></div>`
+          : `<div class="bn-field"><span class="fk">problem</span><p style="color:var(--meow-muted)">本库暂无 problem 字段。</p></div>`;
+        const riskHtml = risk
+          ? `<div class="bn-field warn"><span class="fk">diff.risk</span><p>${esc(risk)}</p></div>`
+          : '';
+        return `<article class="sticker-card bn-audit-card">
+          <span class="bn-id">arXiv:${esc(a.id)}</span>
+          <h4>${esc(title)}</h4>
+          ${probHtml}
+          ${riskHtml}
+          <a class="bn-audit-link" href="/vla-radar/paper.html?id=${encodeURIComponent(a.id)}&from=bench">看完整拆解 →</a>
+        </article>`;
+      });
+      wrap.innerHTML = cards.join('');
+    }
+
+    async function load() {
+      let papers = [];
+      let configured = true;
+      try {
+        const res = await fetch('/api/vla-radar/list?limit=200', { cache: 'no-store' });
+        const j = await res.json();
+        configured = j && j.configured !== false;
+        papers = Array.isArray(j && j.papers) ? j.papers : [];
+      } catch (e) {
+        papers = [];
+        configured = false;
+      }
+      const map = {};
+      for (const p of papers) map[p.arxiv_id] = p;
+
+      // 家族卡:即使论文没加载也能渲染(锚点会回退到「暂无结构化分数」)
+      renderFamilies(papers);
+      renderAudit(map);
+
+      if (!configured) {
+        const grid = document.getElementById('bnGrid');
+        const note = document.createElement('div');
+        note.className = 'bn-anchor empty';
+        note.style.gridColumn = '1 / -1';
+        note.innerHTML = '<span class="bn-anchor-k">提示</span>论文库暂未接好,以下尺子盘点与判断条仍可参考,真实数据锚点将在数据可用后自动填充。';
+        grid.prepend(note);
+      }
+    }
+    load();
+  </script>
+</body>
+</html>
