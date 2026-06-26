@@ -83,6 +83,7 @@
       })
 
       var current = null, isLeopard = false, everUnlocked = false, faceIdx = 0, aspect = 0.78, natH = 2400
+      var cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2, trackNx = 0, trackNy = 0
 
       function applySize() {
         var dispH = BASE_H * state.scale
@@ -102,22 +103,42 @@
         try { localStorage.setItem(LS, JSON.stringify({ x: state.x, y: state.y, scale: state.scale, outfitB: state.outfitB, prefModel: state.prefModel })) } catch (e) {}
       }
 
-      // 换装：在「动作算完、定稿渲染前」(afterMotionUpdate) 强制写入服饰参数。
-      // Idle 待机动作每帧也在动这 10 个参数，必须在这个时机盖过它，否则会和动作来回打架（抽搐）。
-      function applyOutfit(im) {
-        if (!state.outfitB) return
-        var cm = im && im.coreModel
-        if (!cm || !cm.setParameterValueById) return
+      // 看向鼠标：以「脸」为原点算方向，覆写头/眼参数（盖过 Idle 对这些参数的晃动），
+      // 比内置 focus() 更灵敏、方向更准。轻微平滑避免抖动。
+      function applyTracking(cm) {
+        var r = wrap.getBoundingClientRect()
+        var hx = r.left + r.width / 2          // 脸的水平中心
+        var hy = r.top + r.height * 0.22       // 脸大概在框的上部
+        var nx = clamp((cursorX - hx) / (window.innerWidth * 0.4), -1, 1)
+        var ny = clamp((cursorY - hy) / (window.innerHeight * 0.4), -1, 1)
+        trackNx += (nx - trackNx) * 0.35
+        trackNy += (ny - trackNy) * 0.35
+        try {
+          cm.setParameterValueById('ParamAngleX', trackNx * 30)
+          cm.setParameterValueById('ParamAngleY', -trackNy * 30)
+          cm.setParameterValueById('ParamEyeBallX', trackNx)
+          cm.setParameterValueById('ParamEyeBallY', -trackNy)
+          cm.setParameterValueById('ParamBodyAngleX', trackNx * 10)
+        } catch (e) {}
+      }
+      // 换装：同样在 afterMotionUpdate 强制写入服饰参数，盖过 Idle 对这 10 个参数的动画（否则抽搐）。
+      function applyOutfit(cm) {
+        if (!state.outfitB || !cm) return
         for (var i = 0; i < OUTFIT_PARAMS.length; i++) {
           try { cm.setParameterValueById(OUTFIT_PARAMS[i][0], OUTFIT_PARAMS[i][1]) } catch (e) {}
         }
       }
-      function hookOutfit(model) {
+      function hookModel(model) {
         try {
           var im = model.internalModel
-          if (!im || im.__outfitHook) return
-          im.on('afterMotionUpdate', function () { applyOutfit(im) })
-          im.__outfitHook = true
+          if (!im || im.__petHook) return
+          im.on('afterMotionUpdate', function () {
+            var cm = im.coreModel
+            if (!cm || !cm.setParameterValueById) return
+            applyTracking(cm)
+            applyOutfit(cm)
+          })
+          im.__petHook = true
         } catch (e) {}
       }
 
@@ -130,7 +151,7 @@
           aspect = (model.width || 1) / (model.height || 1) || 0.78
           model.anchor.set(0.5, 1)
           app.stage.addChild(model)
-          hookOutfit(model)
+          hookModel(model)
           applySize(); applyPos()
         }).catch(function () {})
       }
@@ -168,10 +189,8 @@
       menuBtn.addEventListener('click', function (ev) { ev.stopPropagation(); menu.style.display = (menu.style.display === 'none' ? 'flex' : 'none') })
       document.addEventListener('click', function (ev) { if (menu.style.display !== 'none' && !menu.contains(ev.target) && ev.target !== menuBtn) menu.style.display = 'none' })
 
-      // 跟随鼠标转头（全局）
-      window.addEventListener('pointermove', function (e) {
-        try { if (current) { var r = wrap.getBoundingClientRect(); current.focus(e.clientX - r.left, e.clientY - r.top) } } catch (_) {}
-      })
+      // 只记录鼠标位置；实际转头在 afterMotionUpdate 里直接驱动头/眼参数（见 hookModel）
+      window.addEventListener('pointermove', function (e) { cursorX = e.clientX; cursorY = e.clientY })
 
       // ===== 拖动 / 缩放 / 点击 =====
       var dragging = false, resizing = false, sx = 0, sy = 0, ox = 0, oy = 0, startH = 0, moved = false

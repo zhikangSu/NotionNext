@@ -11,7 +11,7 @@ export default function Live2DPet() {
     window.__live2dPetInjected = true
     try {
       const s = document.createElement('script')
-      s.src = '/vla-radar/live2d/pet.js?v=20260626d'
+      s.src = '/vla-radar/live2d/pet.js?v=20260626e'
       s.async = true
       document.body.appendChild(s)
     } catch (e) {}
