@@ -77,6 +77,8 @@
     .hero-card .mini-metric:hover { transform:translateY(-3px); background:rgba(255,255,255,.14); box-shadow:0 8px 22px rgba(80,110,255,.32); }
     .hero-card .mini-metric b { display:block; font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.5rem; line-height:1.1; color:#ffd86b; }
     .hero-card .mini-metric small { color:#aab4dd; }
+    /* Live2D 桌宠画布：全窗透明、点击穿透 */
+    #live2d-pet { position:fixed; left:0; bottom:0; width:100vw; height:100vh; z-index:30; pointer-events:none; }
   </style>
 </head>
 <body>
@@ -366,5 +368,8 @@
       requestAnimationFrame(draw);
     })();
   </script>
+  <canvas id="live2d-pet" aria-hidden="true"></canvas>
+  <!-- Live2D mascot: Mao (Live2D Cubism sample, © Live2D Inc., Free Material License, non-commercial) -->
+  <script src="/vla-radar/live2d/pet.js"></script>
 </body>
 </html>
