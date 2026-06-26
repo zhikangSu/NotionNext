@@ -31,6 +31,10 @@
   ]
   var LS = 'live2dPetState'
   var BASE_H = 330
+  // 角标图标：缩放=引力透镜（宇宙放大镜），菜单=三颗星
+  var ICON_LENS = '<svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#ffd84d" stroke-width="1" opacity=".4"/><circle cx="12" cy="12" r="6.2" fill="none" stroke="#fff6e3" stroke-width="1.7"/><circle cx="12" cy="12" r="1.7" fill="#ffd43b"/><circle cx="9.3" cy="9.3" r="1" fill="#fff"/></svg>'
+  var _SP = 'M0 -2.6 Q.6 -.6 2.6 0 Q.6 .6 0 2.6 Q-.6 .6 -2.6 0 Q-.6 -.6 0 -2.6Z'
+  var ICON_STARS = '<svg width="14" height="14" viewBox="0 0 24 24"><g fill="#ffe9b0"><path transform="translate(12 5)" d="' + _SP + '"/><path transform="translate(12 12)" d="' + _SP + '"/><path transform="translate(12 19)" d="' + _SP + '"/></g></svg>'
 
   function loadSeq(urls, i, done) {
     if (i >= urls.length) return done()
@@ -61,13 +65,18 @@
       var grip = document.createElement('div')
       grip.title = '拖我缩放'
       grip.style.cssText = 'position:absolute;right:-2px;top:-2px;width:22px;height:22px;display:grid;place-items:center;cursor:nwse-resize;opacity:0;transition:opacity .15s;font-size:13px;color:#fff;background:rgba(30,36,71,.8);border-radius:50%'
-      grip.textContent = '⤢'
+      grip.innerHTML = ICON_LENS
       wrap.appendChild(grip)
+      var gripPulse = null
+      grip.addEventListener('mouseenter', function () {
+        try { gripPulse = grip.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 1100, iterations: Infinity, easing: 'ease-in-out' }) } catch (e) {}
+      })
+      grip.addEventListener('mouseleave', function () { try { if (gripPulse) { gripPulse.cancel(); gripPulse = null } } catch (e) {} })
 
       var menuBtn = document.createElement('div')
       menuBtn.title = '菜单'
       menuBtn.style.cssText = 'position:absolute;left:-2px;top:-2px;width:22px;height:22px;display:grid;place-items:center;cursor:url(/vla-radar/cursor/star-pointer.svg) 17 17,url(/vla-radar/cursor/star-pointer.png) 17 17,pointer;opacity:0;transition:opacity .15s;font-size:14px;color:#fff;background:rgba(30,36,71,.8);border-radius:50%'
-      menuBtn.textContent = '≡'
+      menuBtn.innerHTML = ICON_STARS
       wrap.appendChild(menuBtn)
       var menu = document.createElement('div')
       menu.style.cssText = 'position:absolute;left:-2px;top:25px;display:none;flex-direction:column;gap:2px;background:rgba(20,24,48,.96);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:6px;min-width:148px;z-index:5;box-shadow:0 8px 22px rgba(0,0,0,.4)'
