@@ -10,10 +10,12 @@ export default function Live2DPet() {
     if (typeof window === 'undefined' || window.__live2dPetInjected) return
     window.__live2dPetInjected = true
     try {
-      const s = document.createElement('script')
-      s.src = '/vla-radar/live2d/pet.js?v=20260626e'
-      s.async = true
-      document.body.appendChild(s)
+      ;['/vla-radar/cursor.js?v=20260627a', '/vla-radar/live2d/pet.js?v=20260626e'].forEach(src => {
+        const s = document.createElement('script')
+        s.src = src
+        s.async = true
+        document.body.appendChild(s)
+      })
     } catch (e) {}
   }, [])
   return null
