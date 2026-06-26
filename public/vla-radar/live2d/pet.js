@@ -102,24 +102,21 @@
         try { localStorage.setItem(LS, JSON.stringify({ x: state.x, y: state.y, scale: state.scale, outfitB: state.outfitB, prefModel: state.prefModel })) } catch (e) {}
       }
 
-      // 换装：每帧（在模型自身 update 之后）强制写入服饰参数，独立于表情
+      // 换装：在「动作算完、定稿渲染前」(afterMotionUpdate) 强制写入服饰参数。
+      // Idle 待机动作每帧也在动这 10 个参数，必须在这个时机盖过它，否则会和动作来回打架（抽搐）。
+      function applyOutfit(im) {
+        if (!state.outfitB) return
+        var cm = im && im.coreModel
+        if (!cm || !cm.setParameterValueById) return
+        for (var i = 0; i < OUTFIT_PARAMS.length; i++) {
+          try { cm.setParameterValueById(OUTFIT_PARAMS[i][0], OUTFIT_PARAMS[i][1]) } catch (e) {}
+        }
+      }
       function hookOutfit(model) {
         try {
           var im = model.internalModel
           if (!im || im.__outfitHook) return
-          var orig = im.update
-          if (typeof orig !== 'function') return
-          im.update = function () {
-            orig.apply(im, arguments)
-            if (state.outfitB) {
-              var cm = im.coreModel
-              if (cm && cm.setParameterValueById) {
-                for (var i = 0; i < OUTFIT_PARAMS.length; i++) {
-                  try { cm.setParameterValueById(OUTFIT_PARAMS[i][0], OUTFIT_PARAMS[i][1]) } catch (e) {}
-                }
-              }
-            }
-          }
+          im.on('afterMotionUpdate', function () { applyOutfit(im) })
           im.__outfitHook = true
         } catch (e) {}
       }
