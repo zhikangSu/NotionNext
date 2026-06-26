@@ -58,6 +58,7 @@
         linear-gradient(to bottom, transparent 0, #000 64px, #000 calc(100% - 64px), transparent 100%);
       mask-composite: intersect; }
     .hero .container { position:relative; z-index:1; }
+    .hero h1 { font-size:clamp(2.1rem, 5.6vw, 4.3rem); line-height:1.02; }
     /* 英雄区雷达卡 → 深空交互卡 */
     .hero-card { background:linear-gradient(155deg, rgba(42,46,98,.72), rgba(15,17,44,.74)); backdrop-filter:blur(8px); border-color:rgba(255,255,255,.16); box-shadow:var(--shadow), 0 0 48px rgba(90,120,255,.22); }
     .radar-sweep { position:absolute; inset:30px; border-radius:50%; z-index:0; pointer-events:none;
@@ -100,9 +101,9 @@
     <canvas id="cosmos" aria-hidden="true"></canvas>
     <div class="container hero-grid">
       <div>
-        <span class="badge">VLA 研究地图 · 按开放问题组织</span>
-        <h1>VLA 现在卡在哪，<br /><span>哪条线在动</span></h1>
-        <p>这不是论文列表，是一张按 <b>8 个开放问题</b>组织的地图：每条问题挂着最有料的代表作，空着的地方就是研究机会。每天的新论文先进<b>雷达</b>，证明过自己才升级进<b>地图</b>。</p>
+        <span class="badge">VLA 研究星图 · 8 个开放问题</span>
+        <h1>在 VLA 的星海里，<br /><span>盯住发光的那几颗</span></h1>
+        <p>这不是论文列表，是把 VLA 的 <b>8 个开放问题</b>摊成一片星海：每个问题里发光的几颗，是已经证明过自己的代表作；<b>还黑着的地方，就是没人点亮的机会</b>。新论文先进<b>雷达</b>，亮够了才升进<b>地图</b>。</p>
         <div class="hero-actions">
           <a class="btn" href="#map">看 8 条开放问题 →</a>
           <a class="btn-ghost" href="/vla-radar/radar.html">看每日雷达</a>
