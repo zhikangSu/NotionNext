@@ -53,7 +53,7 @@
 
       var wrap = document.createElement('div')
       wrap.id = 'live2d-pet-wrap'
-      wrap.style.cssText = 'position:fixed;z-index:40;cursor:grab;touch-action:none;user-select:none'
+      wrap.style.cssText = 'position:fixed;z-index:40;touch-action:none;user-select:none'
       var canvas = document.createElement('canvas')
       canvas.style.cssText = 'display:block;width:100%;height:100%'
       wrap.appendChild(canvas)
@@ -66,7 +66,7 @@
 
       var menuBtn = document.createElement('div')
       menuBtn.title = '菜单'
-      menuBtn.style.cssText = 'position:absolute;left:-2px;top:-2px;width:22px;height:22px;display:grid;place-items:center;cursor:pointer;opacity:0;transition:opacity .15s;font-size:14px;color:#fff;background:rgba(30,36,71,.8);border-radius:50%'
+      menuBtn.style.cssText = 'position:absolute;left:-2px;top:-2px;width:22px;height:22px;display:grid;place-items:center;cursor:url(/vla-radar/cursor/star-pointer.svg) 17 17,url(/vla-radar/cursor/star-pointer.png) 17 17,pointer;opacity:0;transition:opacity .15s;font-size:14px;color:#fff;background:rgba(30,36,71,.8);border-radius:50%'
       menuBtn.textContent = '≡'
       wrap.appendChild(menuBtn)
       var menu = document.createElement('div')
@@ -211,7 +211,7 @@
         if (e.target === menuBtn || menu.contains(e.target)) return // 菜单自己处理，不拖动
         moved = false
         if (e.target === grip) { resizing = true; startH = BASE_H * state.scale; sy = e.clientY }
-        else { dragging = true; ox = state.x; oy = state.y; sx = e.clientX; sy = e.clientY; wrap.style.cursor = 'grabbing' }
+        else { dragging = true; ox = state.x; oy = state.y; sx = e.clientX; sy = e.clientY }
         try { wrap.setPointerCapture(e.pointerId) } catch (_) {}
         e.preventDefault()
       })
@@ -232,7 +232,7 @@
       function endDrag(e) {
         if (moved) save()
         else if (dragging) onTap()
-        dragging = false; resizing = false; wrap.style.cursor = 'grab'
+        dragging = false; resizing = false
         try { wrap.releasePointerCapture(e.pointerId) } catch (_) {}
       }
       wrap.addEventListener('pointerup', endDrag)
