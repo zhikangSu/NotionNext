@@ -12,6 +12,7 @@ import ExternalScript from './ExternalScript'
 import WebWhiz from './Webwhiz'
 import { useGlobal } from '@/lib/global'
 import IconFont from './IconFont'
+import Live2DPet from './Live2DPet'
 
 /**
  * 各种插件脚本
@@ -195,6 +196,8 @@ const ExternalPlugin = props => {
     <>
       {/* 全局样式嵌入 */}
       <GlobalStyle />
+      {/* 全站 Live2D 桌宠（Mao；密码解锁 snow_leopard） */}
+      <Live2DPet />
       {ENABLE_ICON_FONT && <IconFont />}
       {MOUSE_FOLLOW && <MouseFollow />}
       {THEME_SWITCH && <ThemeSwitch />}

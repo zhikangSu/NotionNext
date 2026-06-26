@@ -1,66 +1,114 @@
 /*
- * VLA Radar 首页桌宠：Live2D「Mao」浮在星海角落，会呼吸/眨眼/跟随鼠标，点一下换表情。
- * 模型：Live2D Cubism 官方示例 Mao（© Live2D Inc.，Free Material License，非商用）。见 ./LICENSE-Live2D.md
- * 懒加载：window load 之后再拉 CDN 运行时，不挡首屏；手机端 / prefers-reduced-motion 不加载。
+ * 全站 Live2D 桌宠（Cubism 4 / pixi-live2d-display）。单一实现，博客页和 vla-radar 静态页共用。
+ * - 默认所有人看免费的 Mao（/vla-radar/live2d/mao_pro）。
+ * - 在桌宠身上「快速连点 5 下」→ 输密码 → 服务端校验(/api/pet/unlock) → 种长效 cookie(记住本设备)
+ *   → 加载付费 snow_leopard（/api/pet/model 返回 Supabase 私有桶的签名链接）。点雪豹切「change」双形态。
+ * - 懒加载、单例、手机/reduce-motion 跳过、全程 try/catch：绝不影响页面。
  */
 (function () {
-  if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  if (window.innerWidth < 760) return;
+  if (window.__live2dPetStarted) return
+  try {
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (window.innerWidth < 760) return
+  } catch (e) { return }
+  window.__live2dPetStarted = true
 
-  const MODEL = '/vla-radar/live2d/mao_pro/mao_pro.model3.json';
-  const DEPS = [
+  var CDN = [
     'https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js',
     'https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js',
     'https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js'
-  ];
+  ]
+  var MAO = '/vla-radar/live2d/mao_pro/mao_pro.model3.json'
+  var LEOPARD_EXPR = ['change', '0', '1', 'a', 'e']
 
   function loadSeq(urls, i, done) {
-    if (i >= urls.length) return done();
-    const s = document.createElement('script');
-    s.src = urls[i]; s.async = false; // 保持顺序
-    s.onload = () => loadSeq(urls, i + 1, done);
-    s.onerror = () => { /* CDN 挂了就静默放弃，不影响页面 */ };
-    document.head.appendChild(s);
+    if (i >= urls.length) return done()
+    var s = document.createElement('script')
+    s.src = urls[i]; s.async = false
+    s.onload = function () { loadSeq(urls, i + 1, done) }
+    s.onerror = function () {}
+    document.head.appendChild(s)
   }
 
-  function init() {
-    if (!window.PIXI || !window.PIXI.live2d) return;
-    const canvas = document.getElementById('live2d-pet');
-    if (!canvas) return;
-    const app = new PIXI.Application({
-      view: canvas, resizeTo: window, backgroundAlpha: 0, antialias: true, autoStart: true,
-      resolution: Math.min(window.devicePixelRatio || 1, 2), autoDensity: true // 按屏幕像素比渲染 → 视网膜屏不糊
-    });
-    PIXI.live2d.Live2DModel.from(MODEL, { autoInteract: false }).then(model => {
-      app.stage.addChild(model);
-      model.anchor.set(0.5, 1);
-      let exp = 0;
+  function boot() {
+    try {
+      var PIXI = window.PIXI
+      if (!PIXI || !PIXI.live2d || document.getElementById('live2d-pet')) return
+      var canvas = document.createElement('canvas')
+      canvas.id = 'live2d-pet'
+      canvas.setAttribute('aria-hidden', 'true')
+      canvas.style.cssText = 'position:fixed;left:0;bottom:0;width:100vw;height:100vh;z-index:40;pointer-events:none'
+      document.body.appendChild(canvas)
+      var app = new PIXI.Application({
+        view: canvas, resizeTo: window, backgroundAlpha: 0, antialias: true, autoStart: true,
+        resolution: Math.min(window.devicePixelRatio || 1, 2), autoDensity: true
+      })
 
-      function place() {
-        model.scale.set(1);
-        const natH = model.height || 2400;
-        const target = Math.min(window.innerHeight * 0.36, 300);
-        model.scale.set(target / natH);
-        model.x = model.width * 0.34;             // 从左下角探出小半身
-        model.y = window.innerHeight + 18;
+      var current = null, isLeopard = false, expIdx = 0
+
+      function place(m) {
+        try {
+          m.scale.set(1)
+          var natH = m.height || 2400
+          m.scale.set(Math.min(window.innerHeight * 0.42, 340) / natH)
+          m.x = m.width * 0.36
+          m.y = window.innerHeight + 14
+        } catch (e) {}
       }
-      place();
-      window.addEventListener('resize', place);
+      function show(source) {
+        return PIXI.live2d.Live2DModel.from(source, { autoInteract: false }).then(function (model) {
+          if (current) { try { app.stage.removeChild(current); current.destroy() } catch (e) {} }
+          current = model
+          model.anchor.set(0.5, 1)
+          app.stage.addChild(model)
+          place(model)
+        }).catch(function () {})
+      }
+      function loadLeopard() {
+        return fetch('/api/pet/model', { credentials: 'same-origin' }).then(function (r) {
+          if (!r.ok) return false
+          return r.json().then(function (settings) { return show(settings).then(function () { isLeopard = true; return true }) })
+        }).catch(function () { return false })
+      }
 
-      // 跟随鼠标
-      window.addEventListener('pointermove', e => { try { model.focus(e.clientX, e.clientY); } catch (_) {} });
+      window.addEventListener('resize', function () { if (current) place(current) })
+      window.addEventListener('pointermove', function (e) { try { if (current) current.focus(e.clientX, e.clientY) } catch (_) {} })
 
-      // 点到她身上 → 换个表情（canvas 是 pointer-events:none，所以这里自己判断命中范围）
-      window.addEventListener('click', e => {
-        const hw = model.width / 2;
-        if (e.clientX >= model.x - hw && e.clientX <= model.x + hw && e.clientY >= model.y - model.height) {
-          try { model.expression('exp_0' + ((exp++ % 8) + 1)); } catch (_) {}
+      var clicks = 0, timer = null
+      window.addEventListener('click', function (e) {
+        if (!current) return
+        var hit = false
+        try {
+          var hw = current.width / 2
+          hit = e.clientX >= current.x - hw && e.clientX <= current.x + hw && e.clientY >= current.y - current.height
+        } catch (_) {}
+        if (!hit) return
+        if (isLeopard) {
+          try { current.expression(LEOPARD_EXPR[expIdx++ % LEOPARD_EXPR.length]) } catch (_) {}
+          return
         }
-      });
-    }).catch(() => {});
+        clicks++
+        clearTimeout(timer)
+        timer = setTimeout(function () { clicks = 0 }, 2000)
+        if (clicks >= 5) {
+          clicks = 0
+          var pw = window.prompt('桌宠密码（解锁隐藏形态）')
+          if (!pw) return
+          fetch('/api/pet/unlock', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin', body: JSON.stringify({ password: pw })
+          }).then(function (r) {
+            if (r.ok) loadLeopard(); else window.alert('密码不对')
+          }).catch(function () {})
+        }
+      })
+
+      show(MAO)      // 默认 Mao
+      loadLeopard()  // 本设备已记住(cookie)就直接换雪豹；403 静默留 Mao
+    } catch (e) {}
   }
 
-  const go = () => loadSeq(DEPS, 0, init);
-  if (document.readyState === 'complete') setTimeout(go, 900);
-  else window.addEventListener('load', () => setTimeout(go, 900));
-})();
+  var go = function () { loadSeq(CDN, 0, boot) }
+  if (document.readyState === 'complete') setTimeout(go, 1200)
+  else window.addEventListener('load', function () { setTimeout(go, 1200) })
+})()
