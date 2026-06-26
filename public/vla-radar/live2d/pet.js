@@ -196,7 +196,7 @@
         menu.appendChild(mkItem('↺ 复位位置/大小', function () { state.x = 10; state.y = null; state.scale = 1; applySize(); applyPos(); save() }))
       }
       menuBtn.addEventListener('click', function (ev) { ev.stopPropagation(); menu.style.display = (menu.style.display === 'none' ? 'flex' : 'none') })
-      document.addEventListener('click', function (ev) { if (menu.style.display !== 'none' && !menu.contains(ev.target) && ev.target !== menuBtn) menu.style.display = 'none' })
+      document.addEventListener('click', function (ev) { if (menu.style.display !== 'none' && !menu.contains(ev.target) && !menuBtn.contains(ev.target)) menu.style.display = 'none' })
 
       // 只记录鼠标位置；实际转头在 afterMotionUpdate 里直接驱动头/眼参数（见 hookModel）
       window.addEventListener('pointermove', function (e) { cursorX = e.clientX; cursorY = e.clientY })
@@ -217,9 +217,9 @@
         }
       }
       wrap.addEventListener('pointerdown', function (e) {
-        if (e.target === menuBtn || menu.contains(e.target)) return // 菜单自己处理，不拖动
+        if (menuBtn.contains(e.target) || menu.contains(e.target)) return // 菜单自己处理，不拖动
         moved = false
-        if (e.target === grip) { resizing = true; startH = BASE_H * state.scale; sy = e.clientY }
+        if (grip.contains(e.target)) { resizing = true; startH = BASE_H * state.scale; sy = e.clientY }
         else { dragging = true; ox = state.x; oy = state.y; sx = e.clientX; sy = e.clientY }
         try { wrap.setPointerCapture(e.pointerId) } catch (_) {}
         e.preventDefault()
