@@ -14,9 +14,9 @@
   window.__live2dPetStarted = true
 
   var CDN = [
-    'https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js',
-    'https://cdn.jsdelivr.net/npm/pixi.js@6.5.10/dist/browser/pixi.min.js',
-    'https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js'
+    '/vla-radar/live2d/lib/live2dcubismcore.min.js',
+    '/vla-radar/live2d/lib/pixi.min.js',
+    '/vla-radar/live2d/lib/pixi-live2d-cubism4.min.js'
   ]
   var MAO = '/vla-radar/live2d/mao_pro/mao_pro.model3.json'
   var LEOPARD_EXPR = ['change', '0', '1', 'a', 'e']
