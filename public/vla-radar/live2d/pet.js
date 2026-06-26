@@ -1,15 +1,17 @@
 /*
  * 全站 Live2D 桌宠（Cubism 4 / pixi-live2d-display）。单一实现，博客页和 vla-radar 静态页共用。
  * - 默认所有人看免费的 Mao；连点 5 下输密码 → /api/pet/unlock → cookie → /api/pet/model 解锁 snow_leopard。
- * - 可拖动（按住身体拖）、可缩放（拖右上角 ⤢ 或滚轮），位置/大小/换装/选哪只 都记进 localStorage。
- * - 雪豹：单击循环 35 个表情；左上角「≡」菜单 = 换装(独立常驻层) / 临时切回 Mao⇄雪豹 / 复位。
- * - 运行时自托管(/vla-radar/live2d/lib)，避免被墙。懒加载、单例、手机/reduce-motion 跳过、全程 try/catch。
+ * - 桌面端：可拖动、可缩放（拖右上角透镜/滚轮），看向鼠标，位置/大小/换装/选哪只 记进 localStorage。
+ * - 手机端（精简档 MOBILE）：固定右下角、小尺寸(150px)、滚动穿透、只点按（点身体换表情/连点解锁、菜单常驻），
+ *   关闭跟踪/拖动/缩放，性能封顶（分辨率1、关抗锯齿、30fps、切后台暂停）。
+ * - 运行时自托管(/vla-radar/live2d/lib)，避免被墙。懒加载、单例、reduce-motion 跳过、全程 try/catch。
  */
 (function () {
   if (window.__live2dPetStarted) return
+  var MOBILE = false
   try {
     if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    if (window.innerWidth < 760) return
+    MOBILE = (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) || window.innerWidth < 760
   } catch (e) { return }
   window.__live2dPetStarted = true
 
@@ -30,7 +32,7 @@
     ['Param107', 1], ['Param108', 1], ['Param106', 1], ['Param112', 1], ['Param116', 9], ['Param118', 9]
   ]
   var LS = 'live2dPetState'
-  var BASE_H = 330
+  var BASE_H = MOBILE ? 150 : 330
   // 角标图标：缩放=引力透镜（宇宙放大镜），菜单=三颗星
   var ICON_LENS = '<svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="#ffd84d" stroke-width="1" opacity=".4"/><circle cx="12" cy="12" r="6.2" fill="none" stroke="#fff6e3" stroke-width="1.7"/><circle cx="12" cy="12" r="1.7" fill="#ffd43b"/><circle cx="9.3" cy="9.3" r="1" fill="#fff"/></svg>'
   var _SP = 'M0 -2.6 Q.6 -.6 2.6 0 Q.6 .6 0 2.6 Q-.6 .6 -2.6 0 Q-.6 -.6 0 -2.6Z'
@@ -51,13 +53,15 @@
       var PIXI = window.PIXI
       if (!PIXI || !PIXI.live2d || document.getElementById('live2d-pet-wrap')) return
 
-      var state = { x: 10, y: null, scale: 1, outfitB: false, prefModel: 'leopard' }
+      var state = { x: MOBILE ? null : 10, y: null, scale: 1, outfitB: false, prefModel: 'leopard' }
       try { var saved = JSON.parse(localStorage.getItem(LS) || 'null'); if (saved && typeof saved.scale === 'number') state = Object.assign(state, saved) } catch (e) {}
+      if (MOBILE) { state.x = null; state.y = null; state.scale = 1 } // 手机忽略保存的位置/大小，固定右下角小尺寸
       state.scale = clamp(state.scale || 1, 0.4, 2.2)
 
       var wrap = document.createElement('div')
       wrap.id = 'live2d-pet-wrap'
-      wrap.style.cssText = 'position:fixed;z-index:40;touch-action:none;user-select:none'
+      // 手机用 touch-action:pan-y —— 竖向滑动照常滚页面，只有"点按"才算交互
+      wrap.style.cssText = 'position:fixed;z-index:40;user-select:none;-webkit-touch-callout:none;touch-action:' + (MOBILE ? 'pan-y' : 'none')
       var canvas = document.createElement('canvas')
       canvas.style.cssText = 'display:block;width:100%;height:100%'
       wrap.appendChild(canvas)
@@ -66,6 +70,7 @@
       grip.title = '拖我缩放'
       grip.style.cssText = 'position:absolute;right:-2px;top:-2px;width:22px;height:22px;display:grid;place-items:center;cursor:nwse-resize;opacity:0;transition:opacity .15s;font-size:13px;color:#fff;background:rgba(30,36,71,.8);border-radius:50%'
       grip.innerHTML = ICON_LENS
+      if (MOBILE) grip.style.display = 'none' // 手机不缩放，藏起手柄
       wrap.appendChild(grip)
       var gripPulse = null
       grip.addEventListener('mouseenter', function () {
@@ -82,14 +87,25 @@
       menu.style.cssText = 'position:absolute;left:-2px;top:25px;display:none;flex-direction:column;gap:2px;background:rgba(20,24,48,.96);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:6px;min-width:148px;z-index:5;box-shadow:0 8px 22px rgba(0,0,0,.4)'
       wrap.appendChild(menu)
 
-      wrap.addEventListener('mouseenter', function () { grip.style.opacity = '.85'; menuBtn.style.opacity = '.85' })
-      wrap.addEventListener('mouseleave', function () { grip.style.opacity = '0'; menuBtn.style.opacity = '0' })
+      if (MOBILE) {
+        menuBtn.style.opacity = '.9'                          // 手机无 hover，菜单按钮常驻可见
+        menuBtn.style.width = menuBtn.style.height = '30px'   // 更大的点按区
+        menuBtn.style.left = 'auto'; menuBtn.style.right = '-2px' // 移到右上角（贴着屏幕右侧的桌宠）
+        menu.style.left = 'auto'; menu.style.right = '-2px'; menu.style.top = '34px' // 向左下展开，留在屏内
+      } else {
+        wrap.addEventListener('mouseenter', function () { grip.style.opacity = '.85'; menuBtn.style.opacity = '.85' })
+        wrap.addEventListener('mouseleave', function () { grip.style.opacity = '0'; menuBtn.style.opacity = '0' })
+      }
       document.body.appendChild(wrap)
 
       var app = new PIXI.Application({
-        view: canvas, backgroundAlpha: 0, antialias: true, autoStart: true,
-        resolution: Math.min(window.devicePixelRatio || 1, 2), autoDensity: true, width: 10, height: 10
+        view: canvas, backgroundAlpha: 0, antialias: !MOBILE, autoStart: true,
+        resolution: MOBILE ? 1 : Math.min(window.devicePixelRatio || 1, 2), autoDensity: true, width: 10, height: 10
       })
+      if (MOBILE) {
+        try { app.ticker.maxFPS = 30 } catch (e) {}
+        document.addEventListener('visibilitychange', function () { try { if (document.hidden) app.ticker.stop(); else app.ticker.start() } catch (e) {} })
+      }
 
       var current = null, isLeopard = false, everUnlocked = false, faceIdx = 0, aspect = 0.78, natH = 2400
       var cursorX = window.innerWidth / 2, cursorY = window.innerHeight / 2, trackNx = 0, trackNy = 0
@@ -103,17 +119,30 @@
       }
       function applyPos() {
         var w = wrap.offsetWidth, h = wrap.offsetHeight
-        if (state.y == null) state.y = window.innerHeight - h - 10
-        state.x = clamp(state.x, -w * 0.35, window.innerWidth - w * 0.65)
-        state.y = clamp(state.y, 0, window.innerHeight - h * 0.45)
+        if (MOBILE) {
+          if (state.x == null) state.x = window.innerWidth - w - 10   // 右下角
+          if (state.y == null) state.y = window.innerHeight - h - 18  // 留点安全区
+          state.x = clamp(state.x, 0, window.innerWidth - w)          // 整只都在屏内
+          state.y = clamp(state.y, 0, window.innerHeight - h)
+        } else {
+          if (state.y == null) state.y = window.innerHeight - h - 10
+          state.x = clamp(state.x, -w * 0.35, window.innerWidth - w * 0.65)
+          state.y = clamp(state.y, 0, window.innerHeight - h * 0.45)
+        }
         wrap.style.left = state.x + 'px'; wrap.style.top = state.y + 'px'
       }
       function save() {
-        try { localStorage.setItem(LS, JSON.stringify({ x: state.x, y: state.y, scale: state.scale, outfitB: state.outfitB, prefModel: state.prefModel })) } catch (e) {}
+        try {
+          var prev = {}
+          try { prev = JSON.parse(localStorage.getItem(LS) || '{}') || {} } catch (e) {}
+          prev.outfitB = state.outfitB; prev.prefModel = state.prefModel
+          if (!MOBILE) { prev.x = state.x; prev.y = state.y; prev.scale = state.scale } // 手机不写位置/大小，免得污染桌面那份
+          localStorage.setItem(LS, JSON.stringify(prev))
+        } catch (e) {}
       }
 
       // 看向鼠标：以「脸」为原点算方向，覆写头/眼参数（盖过 Idle 对这些参数的晃动），
-      // 比内置 focus() 更灵敏、方向更准。轻微平滑避免抖动。
+      // 比内置 focus() 更灵敏、方向更准。轻微平滑避免抖动。手机端不启用（触屏没有常驻光标）。
       function applyTracking(cm) {
         var r = wrap.getBoundingClientRect()
         var hx = r.left + r.width / 2          // 脸的水平中心
@@ -144,7 +173,7 @@
           im.on('afterMotionUpdate', function () {
             var cm = im.coreModel
             if (!cm || !cm.setParameterValueById) return
-            applyTracking(cm)
+            if (!MOBILE) applyTracking(cm)
             applyOutfit(cm)
           })
           im.__petHook = true
@@ -179,7 +208,7 @@
       function mkItem(label, fn) {
         var b = document.createElement('button')
         b.textContent = label
-        b.style.cssText = 'all:unset;box-sizing:border-box;width:100%;cursor:pointer;color:#fff;font:600 13px/1.4 system-ui,-apple-system,sans-serif;padding:7px 10px;border-radius:7px;white-space:nowrap'
+        b.style.cssText = 'all:unset;box-sizing:border-box;width:100%;cursor:pointer;color:#fff;font:600 ' + (MOBILE ? '14px' : '13px') + '/1.4 system-ui,-apple-system,sans-serif;padding:' + (MOBILE ? '10px 12px' : '7px 10px') + ';border-radius:7px;white-space:nowrap'
         b.addEventListener('mouseenter', function () { b.style.background = 'rgba(255,255,255,.13)' })
         b.addEventListener('mouseleave', function () { b.style.background = 'transparent' })
         b.addEventListener('click', function (ev) { ev.stopPropagation(); menu.style.display = 'none'; try { fn() } catch (e) {} })
@@ -193,16 +222,18 @@
         } else if (everUnlocked) {
           menu.appendChild(mkItem('🐆 切回雪豹', function () { state.prefModel = 'leopard'; save(); loadLeopard(true) }))
         }
-        menu.appendChild(mkItem('↺ 复位位置/大小', function () { state.x = 10; state.y = null; state.scale = 1; applySize(); applyPos(); save() }))
+        if (!MOBILE) menu.appendChild(mkItem('↺ 复位位置/大小', function () { state.x = 10; state.y = null; state.scale = 1; applySize(); applyPos(); save() }))
+        if (MOBILE) menuBtn.style.display = menu.children.length ? 'grid' : 'none' // 手机：没条目就别显示空菜单按钮
       }
       menuBtn.addEventListener('click', function (ev) { ev.stopPropagation(); menu.style.display = (menu.style.display === 'none' ? 'flex' : 'none') })
       document.addEventListener('click', function (ev) { if (menu.style.display !== 'none' && !menu.contains(ev.target) && !menuBtn.contains(ev.target)) menu.style.display = 'none' })
 
-      // 只记录鼠标位置；实际转头在 afterMotionUpdate 里直接驱动头/眼参数（见 hookModel）
-      window.addEventListener('pointermove', function (e) { cursorX = e.clientX; cursorY = e.clientY })
+      // 只记录鼠标位置；实际转头在 afterMotionUpdate 里直接驱动头/眼参数（见 hookModel）。手机端不需要。
+      if (!MOBILE) window.addEventListener('pointermove', function (e) { cursorX = e.clientX; cursorY = e.clientY })
 
       // ===== 拖动 / 缩放 / 点击 =====
       var dragging = false, resizing = false, sx = 0, sy = 0, ox = 0, oy = 0, startH = 0, moved = false
+      var tapX = 0, tapY = 0, tapOk = false // 手机：判定一次"点按"
       var clicks = 0, ctimer = null
       function onTap() {
         if (isLeopard) { try { current.expression(FACE_EXPR[faceIdx++ % FACE_EXPR.length]) } catch (_) {} ; return }
@@ -217,7 +248,8 @@
         }
       }
       wrap.addEventListener('pointerdown', function (e) {
-        if (menuBtn.contains(e.target) || menu.contains(e.target)) return // 菜单自己处理，不拖动
+        if (menuBtn.contains(e.target) || menu.contains(e.target)) { tapOk = false; return } // 菜单自己处理
+        if (MOBILE) { tapX = e.clientX; tapY = e.clientY; tapOk = true; return } // 不拖、不阻止滚动
         moved = false
         if (grip.contains(e.target)) { resizing = true; startH = BASE_H * state.scale; sy = e.clientY }
         else { dragging = true; ox = state.x; oy = state.y; sx = e.clientX; sy = e.clientY }
@@ -225,6 +257,7 @@
         e.preventDefault()
       })
       wrap.addEventListener('pointermove', function (e) {
+        if (MOBILE) { if (tapOk && Math.abs(e.clientX - tapX) + Math.abs(e.clientY - tapY) > 12) tapOk = false; return }
         if (resizing) {
           var bottom = state.y + wrap.offsetHeight
           var nd = clamp(startH + (sy - e.clientY), 130, 720)
@@ -239,21 +272,25 @@
         }
       })
       function endDrag(e) {
+        if (MOBILE) {
+          if (tapOk && Math.abs(e.clientX - tapX) + Math.abs(e.clientY - tapY) <= 12) onTap() // 只用位移判定"点按 vs 滑动"
+          tapOk = false; return
+        }
         if (moved) save()
         else if (dragging) onTap()
         dragging = false; resizing = false
         try { wrap.releasePointerCapture(e.pointerId) } catch (_) {}
       }
       wrap.addEventListener('pointerup', endDrag)
-      wrap.addEventListener('pointercancel', endDrag)
-      wrap.addEventListener('wheel', function (e) {
+      wrap.addEventListener('pointercancel', function (e) { if (MOBILE) { tapOk = false; return } endDrag(e) })
+      if (!MOBILE) wrap.addEventListener('wheel', function (e) {
         e.preventDefault()
         var bottom = state.y + wrap.offsetHeight
         state.scale = clamp(state.scale * (e.deltaY < 0 ? 1.08 : 1 / 1.08), 0.4, 2.2)
         applySize(); state.y = bottom - wrap.offsetHeight; applyPos(); save()
       }, { passive: false })
 
-      window.addEventListener('resize', function () { applyPos() })
+      window.addEventListener('resize', function () { if (MOBILE) { state.x = null; state.y = null } applyPos() })
 
       renderMenu()
       show(MAO)
