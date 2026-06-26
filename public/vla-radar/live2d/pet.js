@@ -28,7 +28,8 @@
     const canvas = document.getElementById('live2d-pet');
     if (!canvas) return;
     const app = new PIXI.Application({
-      view: canvas, resizeTo: window, backgroundAlpha: 0, antialias: true, autoStart: true
+      view: canvas, resizeTo: window, backgroundAlpha: 0, antialias: true, autoStart: true,
+      resolution: Math.min(window.devicePixelRatio || 1, 2), autoDensity: true // 按屏幕像素比渲染 → 视网膜屏不糊
     });
     PIXI.live2d.Live2DModel.from(MODEL, { autoInteract: false }).then(model => {
       app.stage.addChild(model);
