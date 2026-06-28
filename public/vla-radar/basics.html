@@ -30,10 +30,6 @@
     .cmp-card .flow { display:flex; align-items:center; gap:9px; margin:0 0 16px; color:var(--meow-ink); min-height:26px; }
     .cmp-card .flow .ar { color:var(--meow-muted); font-weight:900; }
     .cmp-card .fml { align-self:flex-start; }
-    .cmp-card.acc { border-color:var(--meow-pink); }
-    .cmp-card.acc h3 { color:var(--meow-pink); }
-    .cmp-card.acc .flow { color:var(--meow-pink); }
-    .cmp-card.acc .fml { color:var(--meow-pink); background:var(--meow-pink-soft); border-color:var(--meow-pink); }
 
     .stack { display:flex; flex-wrap:wrap; align-items:center; gap:9px; }
     .stk { font-weight:800; color:var(--meow-ink); background:var(--meow-cream); border:2px solid var(--meow-ink); border-radius:12px; padding:9px 13px; font-size:.92rem; box-shadow:3px 3px 0 rgba(30,36,71,.85); }
@@ -50,9 +46,6 @@
 
     .bridge { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:26px; padding:20px; text-decoration:none; font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.15rem; font-weight:800; color:var(--meow-ink); text-align:center; }
     .bridge:hover { color:var(--meow-blue); }
-
-    .credit { color:#8b95c8; font-size:.8rem; line-height:1.6; margin:32px 0 0; }
-    .credit a { color:#b6c0e6; border-bottom:1px solid #6b76ad; }
   </style>
 </head>
 <body>
@@ -106,7 +99,7 @@
             <div class="flow"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="2.6"/></svg><span class="ar">→</span><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="11" rx="5" stroke-dasharray="2.5 2.5"/><circle cx="7" cy="18.5" r="1.1"/><circle cx="4" cy="21.5" r=".7"/></svg></div>
             <span class="fml">p(o' | o, a, l)</span>
           </div>
-          <div class="sticker-card cmp-card acc">
+          <div class="sticker-card cmp-card">
             <h3>世界-动作模型</h3>
             <p class="sub">先想象未来，再用它帮忙决定动作。</p>
             <div class="flow"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="2.6"/></svg><span class="ar">→</span><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="11" rx="5" stroke-dasharray="2.5 2.5"/><circle cx="7" cy="18.5" r="1.1"/></svg><span class="ar">→</span><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="6.5" r="2.4"/><path d="M12 9v6"/><path d="M6 18.5c0-1.4 2.7-2.5 6-2.5s6 1.1 6 2.5-2.7 2.5-6 2.5-6-1.1-6-2.5z"/></svg></div>
@@ -125,38 +118,41 @@
         </div>
         <p class="bx-note">每一个可点的方块都跳到「<b>组件透视</b>」，看最近哪些论文在改这一层（主干 / 推理 / 动作头……）。</p>
 
-        <h2 class="bx-h">先读这 5 篇打底</h2>
+        <h2 class="bx-h">先读这几篇打底（关系图谱里的大节点）</h2>
         <div class="read-grid">
           <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2212.06817&from=basics">
             <span class="rt">RT-1</span><span class="rid">arXiv:2212.06817</span>
-            <p class="rw">起点：真实机器人多任务数据 + Transformer 能扩展；动作以离散 token 输出。</p>
+            <p class="rw">真实机器人 Transformer 的起点，几乎所有后续工作的源头。</p>
             <span class="rgo">读 →</span>
           </a>
           <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2307.15818&from=basics">
             <span class="rt">RT-2</span><span class="rid">arXiv:2307.15818</span>
-            <p class="rw">把 VLM 的网络知识接进控制，动作被映射进语言 token 空间。</p>
+            <p class="rw">把 VLM 的网络知识接进控制；图谱里的枢纽之一。</p>
+            <span class="rgo">读 →</span>
+          </a>
+          <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2310.08864&from=basics">
+            <span class="rt">Open X-Embodiment / RT-X</span><span class="rid">arXiv:2310.08864</span>
+            <p class="rw">跨机构、跨机器人的大一统数据集，后续 generalist 的共同基座。</p>
             <span class="rgo">读 →</span>
           </a>
           <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2406.09246&from=basics">
             <span class="rt">OpenVLA</span><span class="rid">arXiv:2406.09246</span>
-            <p class="rw">开源 7B generalist policy，社区复现与改造的基线。</p>
+            <p class="rw">开源 7B generalist，被最多后续工作拿来改 / 比的枢纽。</p>
             <span class="rgo">读 →</span>
           </a>
           <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2410.24164&from=basics">
             <span class="rt">π0</span><span class="rid">arXiv:2410.24164</span>
-            <p class="rw">连续动作块 + 独立 action expert，当前的主流解法。</p>
+            <p class="rw">连续动作块 + 独立 action expert，当前主流解法的枢纽。</p>
             <span class="rgo">读 →</span>
           </a>
           <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2303.04137&from=basics">
             <span class="rt">Diffusion Policy</span><span class="rid">arXiv:2303.04137</span>
-            <p class="rw">用扩散建模动作分布，"动作怎么表示"这条线的关键一招。</p>
+            <p class="rw">用扩散建模动作分布，"动作怎么表示"这条线的奠基。</p>
             <span class="rgo">读 →</span>
           </a>
         </div>
 
         <a class="sticker-card bridge" href="/vla-radar/#map">有地图了 → 去看 8 个开放问题的星海 →</a>
-
-        <p class="credit">VLA / 世界模型 / 世界-动作模型 的三件套分类框架，参考自 <a href="https://world-action-models.github.io/" target="_blank" rel="noopener noreferrer">world-action-models.github.io</a>。</p>
       </div>
     </section>
   </main>
