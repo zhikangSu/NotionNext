@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>架构拆解（预览）· VLA Radar</title>
-  <meta name="description" content="OpenVLA 与 π0 的经典 VLA 架构，拆到零件级：前向推理架构 / 训练数据飞轮两种视图。" />
+  <meta name="description" content="OpenVLA 与 π0 的经典 VLA 架构交互流程图：前向推理架构 / 训练数据飞轮，点节点看零件。" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
@@ -14,29 +14,35 @@
     .arch-tg { display:flex; gap:4px; background:rgba(255,255,255,.06); border:1.5px solid rgba(255,255,255,.15); border-radius:999px; padding:4px; }
     .arch-tg button { border:0; background:transparent; color:#cdd7f5; font-family:'Baloo 2','Noto Sans SC',sans-serif; font-weight:800; font-size:.92rem; padding:7px 16px; border-radius:999px; cursor:pointer; transition:.14s; }
     .arch-tg button.on { background:#fff; color:var(--meow-ink); }
-    .arch-meta { color:#aeb8e6; font-size:.84rem; font-weight:700; margin:14px 0 0; font-family:ui-monospace,Menlo,Consolas,monospace; }
-    .arch-flow { margin-top:18px; }
-    .arch-node { border:2px solid var(--meow-ink); border-radius:var(--radius-lg); background:var(--meow-card); box-shadow:4px 4px 0 rgba(30,36,71,.85); padding:16px 18px; }
-    .arch-khead { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
-    .arch-kicker { font-family:ui-monospace,Menlo,Consolas,monospace; font-size:.68rem; font-weight:800; letter-spacing:.05em; color:#3153ae; text-transform:uppercase; }
-    .arch-tag { font-size:.7rem; font-weight:900; color:var(--meow-blue-deep); background:var(--meow-sky); border:1.5px solid var(--meow-sky-deep); border-radius:999px; padding:2px 9px; }
-    .arch-name { margin:4px 0 0; font-family:'Baloo 2','Noto Sans SC',sans-serif; font-weight:800; font-size:1.18rem; color:var(--meow-ink); line-height:1.14; }
-    .arch-role { margin:7px 0 0; color:var(--meow-muted); font-size:.9rem; line-height:1.55; font-weight:600; }
-    .arch-comps { margin:13px 0 0; display:grid; grid-template-columns:repeat(auto-fit,minmax(218px,1fr)); gap:9px; }
-    .arch-comp { border:1.5px solid rgba(30,36,71,.14); border-radius:12px; background:rgba(247,250,255,.82); padding:10px 12px; }
-    .arch-comp .cn { font-weight:800; color:var(--meow-ink); font-size:.89rem; line-height:1.35; }
-    .arch-comp .cd { margin-top:3px; color:var(--meow-muted); font-size:.81rem; line-height:1.5; font-weight:600; }
-    .arch-node.acc { border-color:var(--meow-blue); box-shadow:5px 5px 0 var(--meow-blue); }
-    .arch-arrow { height:26px; width:2px; margin:0 auto; background:var(--meow-ink); position:relative; }
-    .arch-arrow::after { content:''; position:absolute; left:50%; bottom:-2px; width:9px; height:9px; border-right:2px solid var(--meow-blue); border-bottom:2px solid var(--meow-blue); transform:translateX(-50%) rotate(45deg); }
-    .arch-node.tnode .tn { font-family:'Baloo 2','Noto Sans SC',sans-serif; font-weight:800; font-size:1.06rem; color:var(--meow-ink); }
-    .arch-node.tnode .td { margin-top:6px; color:var(--meow-muted); font-size:.88rem; line-height:1.6; font-weight:600; }
-    .arch-data { border:2px dashed rgba(255,255,255,.22); border-radius:var(--radius-lg); padding:14px 18px; margin-top:24px; background:rgba(255,255,255,.03); }
-    .arch-data .adh { color:#eaf0ff; font-weight:800; font-family:'Baloo 2','Noto Sans SC',sans-serif; margin-bottom:8px; }
-    .arch-data ul { margin:0; padding-left:18px; color:#c2cbed; font-size:.88rem; line-height:1.7; font-weight:600; }
-    .arch-loop { border:2px solid var(--meow-blue); border-radius:var(--radius-lg); background:rgba(53,99,233,.1); padding:14px 18px; margin-top:18px; }
-    .arch-loop .alt { display:inline-block; font-weight:900; color:#fff; background:var(--meow-blue); border-radius:999px; padding:3px 12px; font-size:.8rem; margin-bottom:9px; }
-    .arch-loop p { margin:0; color:#dfe6ff; font-size:.9rem; line-height:1.62; font-weight:600; }
+    .arch-meta { color:#aeb8e6; font-size:.84rem; font-weight:700; margin:14px 0 2px; font-family:ui-monospace,Menlo,Consolas,monospace; }
+    .arch-hint { color:#8b95c8; font-size:.82rem; font-weight:700; margin:0 0 8px; }
+
+    .fc-scroll { overflow-x:auto; margin-top:14px; padding:6px 2px 4px; }
+    .fc { position:relative; min-width:680px; margin:0 auto; }
+    .fc-grid { position:relative; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; justify-items:center; row-gap:46px; column-gap:14px; z-index:2; }
+    .fc-svg { position:absolute; left:0; top:0; pointer-events:none; z-index:1; overflow:visible; }
+    .fc-node { position:relative; cursor:pointer; border:2px solid var(--meow-ink); border-radius:16px; background:var(--meow-card); box-shadow:4px 4px 0 rgba(30,36,71,.85); padding:11px 15px; text-align:center; color:var(--meow-ink); line-height:1.25; transition:transform .12s, box-shadow .12s; max-width:330px; }
+    .fc-node:hover { transform:translate(-2px,-2px); box-shadow:6px 6px 0 var(--meow-blue); }
+    .fc-node .nm { font-family:'Baloo 2','Noto Sans SC',sans-serif; font-weight:800; font-size:1rem; }
+    .fc-node .nt { display:block; margin-top:2px; font-size:.74rem; color:var(--meow-muted); font-weight:700; }
+    .fc-node .star { color:var(--meow-blue); }
+    .fc-node.side { background:var(--meow-cream); padding:9px 13px; max-width:180px; box-shadow:3px 3px 0 rgba(30,36,71,.7); }
+    .fc-node.side .nm { font-size:.88rem; }
+    .fc-node.store { background:var(--meow-sky); border-radius:40px; }
+    .fc-node.core { border-color:var(--meow-blue); box-shadow:5px 5px 0 var(--meow-blue); }
+    .fc-node.on { outline:3px solid var(--meow-yellow); outline-offset:2px; }
+
+    .fc-detail { margin-top:20px; border:2px solid var(--meow-ink); border-radius:var(--radius-lg); background:var(--meow-card); box-shadow:4px 4px 0 rgba(30,36,71,.85); padding:16px 18px; }
+    .fc-detail .dh { display:flex; align-items:center; gap:9px; flex-wrap:wrap; }
+    .fc-detail .dh h3 { margin:0; font-family:'Baloo 2','Noto Sans SC',sans-serif; font-weight:800; font-size:1.12rem; color:var(--meow-ink); }
+    .fc-detail .dk { font-family:ui-monospace,Menlo,monospace; font-size:.66rem; font-weight:800; letter-spacing:.05em; color:#3153ae; text-transform:uppercase; }
+    .fc-detail .comps { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:9px; margin-top:12px; }
+    .fc-detail .comp { border:1.5px solid rgba(30,36,71,.14); border-radius:11px; background:rgba(247,250,255,.85); padding:10px 12px; }
+    .fc-detail .comp .cn { font-weight:800; font-size:.88rem; color:var(--meow-ink); line-height:1.35; }
+    .fc-detail .comp .cd { margin-top:3px; color:var(--meow-muted); font-size:.81rem; line-height:1.5; font-weight:600; }
+    .fc-detail p { margin:10px 0 0; color:var(--meow-muted); font-weight:600; line-height:1.62; font-size:.92rem; }
+    .fc-loopnote { margin-top:16px; border:2px solid var(--meow-blue); background:rgba(53,99,233,.1); border-radius:16px; padding:13px 17px; color:#dfe6ff; font-weight:600; font-size:.88rem; line-height:1.62; }
+    .fc-loopnote b { color:#fff; }
     .arch-foot { color:#8b95c8; font-size:.78rem; margin:30px 0 0; line-height:1.6; }
   </style>
 </head>
@@ -61,8 +67,8 @@
       <div class="container">
         <a class="paper-back" href="/vla-radar/basics.html">← 回到 VLA 101</a>
         <span class="badge">架构拆解 · 预览</span>
-        <h1 class="paper-title">VLA 经典架构，拆到零件级</h1>
-        <p class="paper-meta">OpenVLA 与 π0 两条经典路线 × <b>前向推理架构</b> / <b>训练数据飞轮</b> 两种视图。这是预览页（先不挂进导航），选定方案后再并进 basics。</p>
+        <h1 class="paper-title">VLA 经典架构，交互流程图</h1>
+        <p class="paper-meta">OpenVLA 与 π0 两条经典路线 × <b>前向推理架构</b> / <b>训练数据飞轮</b>。流程图看流向与分支，<b>点任意节点 → 下面展开它的内部零件</b>。预览页，选定后再并进 basics。</p>
 
         <div class="arch-tabs">
           <div class="arch-tg" id="mtg">
@@ -75,7 +81,11 @@
           </div>
         </div>
         <p class="arch-meta" id="ameta"></p>
-        <div class="arch-flow" id="arch"></div>
+        <p class="arch-hint">★ = 核心分叉（动作头）· 点节点看零件 · 实线=数据流，虚线=回环</p>
+
+        <div class="fc-scroll"><div class="fc" id="fc"><svg class="fc-svg" id="fcsvg"></svg><div class="fc-grid" id="fcgrid"></div></div></div>
+        <div class="fc-detail" id="fcdetail"></div>
+        <div id="fcloop"></div>
 
         <p class="arch-foot">细节经两轮（研究 → 对抗校验）核对；部分与版本相关。OpenVLA = arXiv 2406.09246（Prismatic-7B）；π0 = arXiv 2410.24164（A VLA Flow Model）。后续变体（OpenVLA-OFT / π0-FAST / π0.5 / π0.6·RECAP）已标注，不混进基础版。</p>
       </div>
@@ -89,141 +99,219 @@
   </footer>
 
   <script>
-    const DATA = {
+    const C = (n, d) => ({ n, d });
+    const D = {
       openvla: {
-        meta: 'OpenVLA · 7B · 融合双编码器(SigLIP+DINOv2) + Llama-2 7B · 离散动作 token · 单图无本体感知',
-        inference: { stages: [
-          { k:'输入 · Observation', name:'观测 + 指令', role:'每个控制步抓一帧图 + 一句话指令。', comps:[
-            { n:'单张第三人称 RGB', d:'无腕部相机 / 无深度 / 无本体感知，只有一张工作区图。' },
-            { n:'缩放到 224×224', d:'匹配 SigLIP/DINOv2 输入；论文实测 384px 无收益且慢约 3 倍。' },
-            { n:'语言指令', d:'套固定提示模板包住自由指令（如：把茄子放进碗里）。' } ] },
-          { k:'视觉编码 · Encode', name:'融合双视觉编码器（~600M）', role:'一帧图 → 既有语义又有空间几何的 patch 特征。', comps:[
-            { n:'SigLIP（ViT）', d:'图文预训练，出语义 / 语言对齐特征。' },
-            { n:'DINOv2（ViT）', d:'自监督，出细粒度空间 / 几何特征，利于精确操作。' },
-            { n:'通道维拼接', d:'两个 backbone 的 patch 特征沿通道拼成一串 token（Prismatic 式融合）。' } ] },
-          { k:'对齐投影 · Project', name:'视觉 → 语言投影', role:'把视觉特征映进 LLM 的 token 空间，当“软提示”。', comps:[
-            { n:'2 层 MLP projector', d:'把每个融合 patch 投到 Llama-2 隐藏维。' },
-            { n:'视觉 token 序列', d:'拼在文本 token 前；靠序列拼接融合，不是 cross-attention。' } ] },
-          { k:'主干 · Backbone', name:'Llama-2 7B 主干（Prismatic VLM）', role:'对 [视觉‖文本] token 联合自注意，自回归预测动作。', comps:[
-            { n:'Llama-2 7B decoder', d:'整模型约 7B；[视觉 token ‖ 指令 token] 当一段上下文。' },
-            { n:'早融合单流注意', d:'视觉与文本拼成一条自注意流，无独立融合模块。' },
-            { n:'词表改写', d:'Llama 词表里 256 个最少用 token 被改写成动作分箱。' } ] },
-          { k:'动作头 · Decode', name:'离散动作头（token 解码）', role:'把动作当成几个离散 token，从 LM 头解出来。', accent:true, comps:[
-            { n:'自回归出 7 个动作 token', d:'每维一个 token，左到右 next-token，跟生成文字同一套头。' },
-            { n:'每维 256 分箱', d:'按训练数据 1–99 百分位均匀分 256 箱（裁掉离群值）。' },
-            { n:'映到 256 个冷门 token', d:'分箱占用 Llama 最少用的 256 个词表槽 → 复用 LM 头，无专用动作头。' } ] },
-          { k:'动作表示 · Action', name:'动作表示 + 反量化', role:'7 个 token → 一个 7-DoF 末端命令。', comps:[
-            { n:'7-DoF 末端增量', d:'Δx Δy Δz Δroll Δpitch Δyaw + 夹爪开合。' },
-            { n:'反量化', d:'箱号按各数据集统计映回连续值（分箱的逆操作）。' },
-            { n:'单步（不分块）', d:'一次前向只出 1 步（chunk=1）；分块是后续 OpenVLA-OFT 才加。' } ] },
-          { k:'执行 · Deploy', name:'低层控制 / 执行', role:'把增量下发给机器人，闭环看下一帧。', comps:[
-            { n:'机器人控制器', d:'IK / 低层控制把末端增量变关节命令 + 控夹爪。' },
-            { n:'单步闭环', d:'执行 → 重新拍图 → 再跑一次；反应式单步控制。' },
-            { n:'吞吐 ~6 Hz（RTX 4090）', d:'7B 自回归解 7 个 token 是瓶颈；4-bit 约 3 Hz。OFT 并行解码可上 100+ Hz。' } ] }
-        ] },
+        inference: {
+          meta: 'OpenVLA · 7B · 融合双编码器(SigLIP+DINOv2) + Llama-2 7B · 离散动作 token · 单图无本体感知',
+          nodes: [
+            { id:'cam', r:1, c:'C', label:'观测 · 单图 RGB', nt:'224×224 · 第三人称', k:'输入', comps:[
+              C('单张第三人称 RGB','无腕部相机 / 无深度 / 无本体感知，只有一张工作区图。'),
+              C('缩放到 224×224','匹配 SigLIP/DINOv2；论文实测 384px 无收益且慢约 3 倍。') ] },
+            { id:'txt', r:4, c:'L', label:'语言指令', k:'输入', comps:[
+              C('自由指令','套固定提示模板包住任务指令（如：把茄子放进碗里）。') ] },
+            { id:'enc', r:2, c:'C', label:'融合双视觉编码器', nt:'SigLIP + DINOv2 · ~600M', k:'视觉编码', comps:[
+              C('SigLIP（ViT）','图文预训练，出语义 / 语言对齐特征。'),
+              C('DINOv2（ViT）','自监督，出细粒度空间 / 几何特征，利于精确操作。'),
+              C('通道维拼接','两个 backbone 的 patch 沿通道拼成一串 token（Prismatic 式融合）。') ] },
+            { id:'proj', r:3, c:'C', label:'视觉 → 语言投影', nt:'2 层 MLP', k:'对齐投影', comps:[
+              C('2 层 MLP projector','把每个融合 patch 投到 Llama-2 隐藏维。'),
+              C('视觉 token 序列','拼在文本 token 前；靠序列拼接融合，不是 cross-attention。') ] },
+            { id:'bb', r:4, c:'C', label:'Llama-2 7B 主干', nt:'Prismatic · 单流自注意', k:'主干', comps:[
+              C('Llama-2 7B decoder','整模型约 7B；[视觉 token ‖ 指令 token] 当一段上下文。'),
+              C('早融合单流注意','视觉与文本拼成一条自注意流，无独立融合模块。'),
+              C('词表改写','Llama 词表里 256 个最少用 token 被改写成动作分箱。') ] },
+            { id:'ah', r:5, c:'C', core:true, label:'离散动作头', nt:'7×256 分箱 · 自回归', k:'动作头', comps:[
+              C('自回归出 7 个动作 token','每维一个 token，左到右 next-token，跟生成文字同一套头。'),
+              C('每维 256 分箱','按训练数据 1–99 百分位均匀分 256 箱（裁掉离群值）。'),
+              C('映到 256 个冷门 token','分箱占用 Llama 最少用的 256 个词表槽 → 复用 LM 头，无专用动作头。') ] },
+            { id:'act', r:6, c:'C', label:'动作表示 + 反量化', nt:'7-DoF 末端增量', k:'动作表示', comps:[
+              C('7-DoF 末端增量','Δx Δy Δz Δroll Δpitch Δyaw + 夹爪开合。'),
+              C('反量化','箱号按各数据集统计映回连续值。'),
+              C('单步（不分块）','一次前向只出 1 步（chunk=1）；分块是后续 OpenVLA-OFT 才加。') ] },
+            { id:'exe', r:7, c:'C', label:'低层控制 / 执行', nt:'~6 Hz · 单步闭环', k:'执行', comps:[
+              C('机器人控制器','IK / 低层控制把末端增量变关节命令 + 控夹爪。'),
+              C('单步闭环','执行 → 重新拍图 → 再跑一次；反应式单步控制。'),
+              C('吞吐 ~6 Hz（RTX 4090）','7B 自回归解 7 个 token 是瓶颈；4-bit 约 3 Hz。OFT 并行解码可上 100+ Hz。') ] }
+          ],
+          edges: [ {f:'cam',t:'enc'}, {f:'enc',t:'proj'}, {f:'proj',t:'bb'}, {f:'txt',t:'bb'},
+            {f:'bb',t:'ah'}, {f:'ah',t:'act'}, {f:'act',t:'exe'}, {f:'exe',t:'cam',kind:'loop',label:'闭环'} ]
+        },
         training: {
-          stages: [
-            { n:'① VLM 主干预训练（继承）', d:'起点是预训练好的 Prismatic-7B（SigLIP+DINOv2 + 2 层 MLP + Llama-2 7B），已在网络图文上对齐。这步是继承的，OpenVLA 不重做。' },
-            { n:'② Open X-Embodiment 上行为克隆', d:'全模型（含视觉编码器，论文发现微调编码器更好）BC 微调，next-token 交叉熵预测离散动作 token。64×A100 训 14 天（约 2.15 万 A100·时，batch 2048）。' },
-            { n:'③ 动作分箱 / 词表改写', d:'每维 256 箱（1–99 百分位均匀），占用 256 个最冷门 Llama token，让 LM 头能吐动作。' },
-            { n:'④ 新机器人适配（LoRA）', d:'小样本 LoRA 微调（也支持全量 + 4/8-bit 量化推理）适配新本体 / 相机 / 任务。' } ],
-          data: [
-            'Open X-Embodiment：~970k 真机操作轨迹的加权混合子集（多机构、多机器人）。',
-            '继承：Prismatic 背后的网络图文（SigLIP / DINOv2 / Llama-2 文本）。',
-            '下游小样本演示（BridgeData V2、自建 Franka 等）做 LoRA / 全量适配。' ],
-          loop: '纯离线行为克隆（监督式 next-token）。没有 RL、没有在线交互、没有部署后自动数据飞轮 —— 换新机器人靠人工采演示 + (LoRA) 微调，不是自生经验。'
+          meta: 'OpenVLA · 训练 = 继承 Prismatic 预训练 → OXE 行为克隆 → 动作分箱 → LoRA 适配（纯 BC）',
+          nodes: [
+            { id:'pre', r:1, c:'C', label:'① VLM 主干预训练', nt:'Prismatic-7B（继承）', k:'继承', text:'起点是预训练好的 Prismatic-7B（SigLIP+DINOv2 + 2 层 MLP + Llama-2 7B），已在网络图文上对齐。这步是继承的，OpenVLA 不重做。' },
+            { id:'data', r:2, c:'L', store:true, label:'训练数据', nt:'OXE ~970k', k:'数据', text:'Open X-Embodiment：~970k 真机操作轨迹的加权混合子集（多机构、多机器人）；下游小样本演示（BridgeData V2、自建 Franka）做适配。' },
+            { id:'bc', r:2, c:'C', label:'② 行为克隆', nt:'64×A100 · 14 天', k:'机器人训练', text:'全模型（含视觉编码器，论文发现微调编码器更好）BC 微调，next-token 交叉熵预测离散动作 token。约 2.15 万 A100·时，batch 2048。' },
+            { id:'tok', r:3, c:'C', label:'③ 动作分箱 / 词表改写', nt:'256 箱 → 冷门 token', k:'动作化', text:'每维 256 箱（1–99 百分位均匀），占用 256 个最冷门 Llama token，让 LM 头能吐动作。' },
+            { id:'ft', r:4, c:'C', label:'④ 新机器人适配', nt:'LoRA 微调', k:'适配', text:'小样本 LoRA 微调（也支持全量 + 4/8-bit 量化推理）适配新本体 / 相机 / 任务。' },
+            { id:'dep', r:5, c:'C', label:'部署', k:'部署', text:'适配后的策略下发到真机闭环运行。' }
+          ],
+          edges: [ {f:'pre',t:'bc'}, {f:'data',t:'bc'}, {f:'bc',t:'tok'}, {f:'tok',t:'ft'}, {f:'ft',t:'dep'}, {f:'dep',t:'bc',kind:'loop',label:'人工再采演示'} ],
+          loop: '<b>OpenVLA 没有自动经验飞轮。</b>纯离线行为克隆（监督式 next-token）：没有 RL、没有在线交互、没有部署后自动数据回流 —— 换新机器人靠人工采演示 + (LoRA) 微调，不是自生经验。'
         }
       },
       pi0: {
-        meta: 'π0 · ~3.3B · PaliGemma(SigLIP So400m + Gemma-2B, ~3B) + ~300M flow 动作专家 · 连续动作块 H=50 · 多相机 + 本体感知',
-        inference: { stages: [
-          { k:'输入 · Observation', name:'多模态输入采集', role:'每个时刻：几路相机图 + 语言指令 + 机器人本体状态。', comps:[
-            { n:'多视角 RGB', d:'每步 1–3 路（外部视角 + 一两个腕部相机）；路数随本体变，补零到固定槽位以共用一个模型。' },
-            { n:'语言指令', d:'扁平自由指令（如：叠衬衫）。无高层子任务分解 —— 分层是 π0.5 才加的。' },
-            { n:'本体状态向量', d:'当前关节 / 夹爪连续配置；DoF 随本体变，补零到训练里最大机器人的维度。' } ] },
-          { k:'视觉编码 · Encode', name:'视觉编码（SigLIP So400m）', role:'每路相机图 → 一串视觉 token（PaliGemma 视觉塔）。', comps:[
-            { n:'SigLIP So400m（ViT）', d:'PaliGemma 的 ~400M sigmoid-对比预训练 ViT；逐视角编码成 patch。端到端训练，不冻结。' },
-            { n:'逐视角 token 化', d:'每路图各出一串 token，全部拼进共享的观测前缀。' },
-            { n:'线性视觉 projector', d:'把 SigLIP patch 线性投进 Gemma 的 token 空间，与文本 token 同维。' } ] },
-          { k:'语言 · Tokenize', name:'语言 token 化 & 嵌入', role:'把指令文本嵌进和视觉同一套 token 空间。', comps:[
-            { n:'Gemma tokenizer', d:'PaliGemma/Gemma 的 SentencePiece 分词器。' },
-            { n:'文本 token embedding', d:'查表得到语言 embedding，与投影后的图像 token 共享 Gemma 隐藏维。' } ] },
-          { k:'主干 · Backbone', name:'VLM 主干融合（PaliGemma: SigLIP + Gemma-2B）', role:'对图 + 文 token 联合自注意，建出场景与任务的上下文表示。', comps:[
-            { n:'Gemma-2B LLM', d:'PaliGemma 的语言主干；加视觉塔后整 VLM 约 3B（别把 2B 的 LLM 和 ~3B 整体混了）。' },
-            { n:'拼接后自注意融合', d:'各路图 token + 文本 token 拼成一段观测前缀，前缀内全（双向）注意，无独立 cross-attention。' },
-            { n:'前缀 KV 缓存', d:'观测前缀的 K/V 每个观测算一次，flow 各积分步复用 → 3B 重前向每块只跑一次。' } ] },
-          { k:'动作头 · Decode', name:'动作专家 + Flow-Matching 去噪', role:'一个小 transformer 把噪声动作块迭代去噪成连续动作序列，条件于 VLM 上下文 + 本体。', accent:true, comps:[
-            { n:'动作专家 transformer（~300M）', d:'独立权重，与 VLM 逐层交错、共享同一套自注意 —— MoE 式双专家（总约 3.3B）。' },
-            { n:'状态 + 噪声动作 token', d:'本体状态 token + 被加噪到 flow 时刻 τ 的 H=50 动作块，作为动作专家的输入“后缀”。' },
-            { n:'共享注意条件', d:'动作 token 注意 VLM 前缀的 K/V；blockwise mask：观测前缀看不到动作，动作能看全观测。' },
-            { n:'flow 向量场头', d:'回归把噪声动作推向干净动作的速度场（conditional flow matching，线性高斯路径）。连续回归，不是离散 token，也不是 Gaussian/DDPM 头。' },
-            { n:'前向欧拉 ODE（10 步）', d:'从纯高斯噪声 τ=0 积到干净动作 τ=1，10 步、δ=0.1；每步只重跑 ~300M 专家，VLM 前缀缓存复用。' } ] },
-          { k:'动作表示 · Action', name:'动作块输出 & 执行', role:'吐出一段连续动作，流给机器人控制器。', comps:[
-            { n:'动作块（H=50）', d:'一次推理出 50 步未来动作（action chunking），摊薄 VLM 前向 + 时序更一致。' },
-            { n:'连续动作表示', d:'实数动作向量，维度=本体 DoF（补零到最大机器人）。无离散箱 / 无 VQ；绝对关节目标 vs 增量随本体而定。' },
-            { n:'高频执行', d:'灵巧任务可达约 50 Hz；部署约每 0.5–0.8 秒重规划一块（块内开环，再重算）。' },
-            { n:'机器人低层控制器', d:'本体相关的位置 / PD / 阻抗控制器跟踪动作目标，产生关节运动。' } ] }
-        ] },
+        inference: {
+          meta: 'π0 · ~3.3B · PaliGemma(SigLIP So400m + Gemma-2B) + ~300M flow 动作专家 · 连续动作块 H=50 · 多相机 + 本体感知',
+          nodes: [
+            { id:'cams', r:1, c:'C', label:'多视角 RGB', nt:'1–3 路', k:'输入', comps:[
+              C('多视角 RGB','每步 1–3 路（外部视角 + 一两个腕部相机）；路数随本体变，补零到固定槽位以共用一个模型。') ] },
+            { id:'sig', r:2, c:'C', label:'SigLIP So400m + 线性投影', nt:'~400M ViT', k:'视觉编码', comps:[
+              C('SigLIP So400m（ViT）','PaliGemma 的 ~400M sigmoid-对比 ViT；逐视角编码成 patch。端到端训练，不冻结。'),
+              C('逐视角 token 化','每路图各出一串 token，全拼进共享观测前缀。'),
+              C('线性视觉 projector','把 SigLIP patch 线性投进 Gemma 的 token 空间。') ] },
+            { id:'txt', r:3, c:'L', label:'语言指令（扁平）', k:'输入', comps:[
+              C('扁平指令','无高层子任务分解 —— 分层是 π0.5 才加的。'),
+              C('Gemma tokenizer','SentencePiece 分词 + token embedding，与图像 token 同维。') ] },
+            { id:'gem', r:3, c:'C', label:'PaliGemma 主干', nt:'Gemma-2B · 前缀 KV 缓存', k:'主干', comps:[
+              C('Gemma-2B LLM','PaliGemma 语言主干；加视觉塔后整 VLM 约 3B（别把 2B LLM 和 ~3B 整体混了）。'),
+              C('拼接后自注意融合','各路图 token + 文本 token 拼成观测前缀，前缀内全（双向）注意。'),
+              C('前缀 KV 缓存','观测前缀 K/V 每个观测算一次，flow 各积分步复用 → 3B 重前向每块只跑一次。') ] },
+            { id:'prop', r:4, c:'L', label:'本体状态', k:'输入', comps:[
+              C('本体状态向量','当前关节 / 夹爪连续配置；DoF 随本体变，补零到最大机器人维度。') ] },
+            { id:'ae', r:4, c:'C', core:true, label:'动作专家 + Flow-Matching', nt:'~300M · 10 步 ODE', k:'动作头', comps:[
+              C('动作专家 transformer（~300M）','独立权重，与 VLM 逐层交错、共享同一套自注意 —— MoE 式双专家（总约 3.3B）。'),
+              C('状态 + 噪声动作 token','本体状态 token + 被加噪到 flow 时刻 τ 的 H=50 动作块，作为输入“后缀”。'),
+              C('共享注意条件','动作 token 注意 VLM 前缀 K/V；blockwise mask：观测看不到动作，动作能看全观测。'),
+              C('flow 向量场头','回归把噪声动作推向干净动作的速度场（conditional flow matching，线性高斯路径）。连续回归，不是离散 token / DDPM。'),
+              C('前向欧拉 ODE（10 步）','从高斯噪声 τ=0 积到干净动作 τ=1，10 步、δ=0.1；每步只重跑 ~300M 专家，VLM 前缀缓存复用。') ] },
+            { id:'chunk', r:5, c:'C', label:'连续动作块 H=50', nt:'无离散箱', k:'动作表示', comps:[
+              C('动作块（H=50）','一次推理出 50 步未来动作，摊薄 VLM 前向 + 时序更一致。'),
+              C('连续动作表示','实数动作向量，维度=本体 DoF（补零）。无离散箱 / 无 VQ。') ] },
+            { id:'exe', r:6, c:'C', label:'低层控制器', nt:'~50 Hz', k:'执行', comps:[
+              C('高频执行','灵巧任务可达约 50 Hz；部署约每 0.5–0.8 秒重规划一块。'),
+              C('机器人低层控制器','位置 / PD / 阻抗控制器跟踪动作目标，产生关节运动。') ] }
+          ],
+          edges: [ {f:'cams',t:'sig'}, {f:'sig',t:'gem'}, {f:'txt',t:'gem'}, {f:'gem',t:'ae',label:'共享注意/KV'},
+            {f:'prop',t:'ae'}, {f:'ae',t:'ae',kind:'self',label:'ODE ×10'}, {f:'ae',t:'chunk'}, {f:'chunk',t:'exe'}, {f:'exe',t:'cams',kind:'loop',label:'重规划'} ]
+        },
         training: {
-          stages: [
-            { n:'① VLM 主干初始化（PaliGemma）', d:'从预训练 PaliGemma（SigLIP So400m + Gemma-2B，~3B，网络图文预训练）初始化，带来广义语义 / 视觉先验。视觉编码器与 LLM 之后端到端训练，不冻结。' },
-            { n:'② 接上动作专家', d:'挂上新初始化的 ~300M 动作专家 + 连续状态/动作的输入输出投影（总约 3.3B）。动作改由 flow matching 生成，而非 token 解码。' },
-            { n:'③ 跨本体预训练（flow-matching BC）', d:'在大规模异构多机器人混合数据上 flow-matching 行为克隆：采干净动作块 → 随机 τ 沿线性高斯路径加噪 → 回归动作专家的速度场。异构 DoF 靠补零 + 相机槽 mask。' },
-            { n:'④ 高质量任务后训练 / 微调', d:'在小而精的目标任务演示上继续 flow-matching BC（叠衣、收桌、装箱等）。预训练给泛化，微调给熟练。' } ],
-          data: [
-            'PI 内部跨本体数据集（主体）：约 9.03 亿步 ≈ 1 万小时遥操，7 种机器人配置、68 个任务（单臂 / 双臂 / 移动操作）。',
-            'Open X-Embodiment：公开多机构机器人数据，混入以补广度。',
-            'BridgeData v2 + DROID：额外开源机器人数据。',
-            '继承：PaliGemma 背后的网络图文预训练（非机器人数据）。',
-            '微调阶段：小而精的任务专用演示。' ],
-          loop: 'base π0 是纯离线 flow-matching 行为克隆，没有部署后 RL / 自主经验闭环。在线 / 经验学习只在后续变体：π0-FAST（自回归 tokenizer 变体）、π0.5（开放世界 + web/分层 co-train）、π0.6 · RECAP（从在机 rollout 学的 RL 经验飞轮）—— 都不属于原 π0 论文。'
+          meta: 'π0 · 训练 = PaliGemma 初始化 → 接动作专家 → 跨本体 flow-matching 预训练 → 任务微调（base 纯 BC）',
+          nodes: [
+            { id:'pre', r:1, c:'C', label:'① PaliGemma 初始化', nt:'SigLIP + Gemma-2B（继承）', k:'继承', text:'从预训练 PaliGemma（SigLIP So400m + Gemma-2B，~3B，网络图文预训练）初始化，带来语义 / 视觉先验。视觉编码器与 LLM 之后端到端训练，不冻结。' },
+            { id:'add', r:2, c:'C', label:'② 接上动作专家', nt:'~300M（总 ~3.3B）', k:'结构', text:'挂上新初始化的 ~300M 动作专家 + 连续状态/动作的输入输出投影。动作改由 flow matching 生成，而非 token 解码。' },
+            { id:'data', r:3, c:'L', store:true, label:'跨本体数据', nt:'PI ~1万h + OXE', k:'数据', text:'PI 内部跨本体数据集（主体）：约 9.03 亿步 ≈ 1 万小时遥操，7 种机器人、68 个任务；加 Open X-Embodiment + BridgeData v2 + DROID 补广度；微调阶段用小而精的任务演示。' },
+            { id:'bc', r:3, c:'C', label:'③ 跨本体预训练', nt:'flow-matching BC', k:'机器人训练', text:'大规模异构多机器人混合数据上 flow-matching 行为克隆：采干净动作块 → 随机 τ 沿线性高斯路径加噪 → 回归动作专家的速度场。异构 DoF 靠补零 + 相机槽 mask。' },
+            { id:'ft', r:4, c:'C', label:'④ 高质量任务微调', k:'后训练', text:'在小而精的目标任务演示上继续 flow-matching BC（叠衣、收桌、装箱等）。预训练给泛化，微调给熟练。' },
+            { id:'dep', r:5, c:'C', label:'部署', k:'部署', text:'下发到真机运行。' }
+          ],
+          edges: [ {f:'pre',t:'add'}, {f:'add',t:'bc'}, {f:'data',t:'bc'}, {f:'bc',t:'ft'}, {f:'ft',t:'dep'}, {f:'dep',t:'bc',kind:'loop',label:'RL 经验(π0.6)'} ],
+          loop: '<b>base π0 也是纯 flow-matching 行为克隆</b>，没有部署后 RL / 自主经验闭环。在线 / 经验学习只在后续：π0-FAST（自回归 tokenizer 变体）、π0.5（开放世界 + web/分层 co-train）、π0.6·RECAP（从在机 rollout 学的 RL 经验飞轮）—— 都不属于原 π0 论文。'
         }
       }
     };
 
     const S = { model:'openvla', view:'inference' };
     const esc = s => String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const archEl = document.getElementById('arch');
+    const grid = document.getElementById('fcgrid');
+    const svg = document.getElementById('fcsvg');
+    const fc = document.getElementById('fc');
+    const detailEl = document.getElementById('fcdetail');
+    const loopEl = document.getElementById('fcloop');
     const metaEl = document.getElementById('ameta');
+    let CUR = null, ACTIVE = null;
 
-    const compHtml = c => '<div class="arch-comp"><div class="cn">' + esc(c.n) + '</div><div class="cd">' + esc(c.d) + '</div></div>';
-    const stageHtml = s => '<div class="arch-node' + (s.accent ? ' acc' : '') + '">'
-      + '<div class="arch-khead"><span class="arch-kicker">' + esc(s.k) + '</span>'
-      + (s.accent ? '<span class="arch-tag">⭐ 核心分叉</span>' : '') + '</div>'
-      + '<h3 class="arch-name">' + esc(s.name) + '</h3>'
-      + '<p class="arch-role">' + esc(s.role) + '</p>'
-      + '<div class="arch-comps">' + s.comps.map(compHtml).join('') + '</div></div>';
-    const arrow = '<div class="arch-arrow" aria-hidden="true"></div>';
+    function nodeInner(n) {
+      return '<span class="nm">' + esc(n.label) + (n.core ? ' <span class="star">★</span>' : '') + '</span>'
+        + (n.nt ? '<span class="nt">' + esc(n.nt) + '</span>' : '');
+    }
+    function showDetail(n) {
+      const head = '<div class="dh"><span class="dk">' + esc(n.k || '') + '</span><h3>' + esc(n.label) + (n.core ? ' ★' : '') + '</h3></div>';
+      let body = '';
+      if (n.comps) body = '<div class="comps">' + n.comps.map(c => '<div class="comp"><div class="cn">' + esc(c.n) + '</div><div class="cd">' + esc(c.d) + '</div></div>').join('') + '</div>';
+      else if (n.text) body = '<p>' + esc(n.text) + '</p>';
+      detailEl.innerHTML = head + body;
+    }
+    function selectNode(n) {
+      ACTIVE = n.id;
+      [...grid.children].forEach(el => el.classList.toggle('on', el.dataset.id === n.id));
+      showDetail(n);
+    }
 
-    function renderInference(d) {
-      return d.inference.stages.map((s, i) => stageHtml(s) + (i < d.inference.stages.length - 1 ? arrow : '')).join('');
+    function buildNodes(diag) {
+      grid.innerHTML = '';
+      diag.nodes.forEach(n => {
+        const el = document.createElement('div');
+        el.className = 'fc-node' + (n.core ? ' core' : '') + (n.c !== 'C' ? ' side' : '') + (n.store ? ' store' : '');
+        el.style.gridRow = n.r;
+        el.style.gridColumn = n.c === 'L' ? 1 : n.c === 'R' ? 3 : 2;
+        if (n.c === 'L') el.style.justifySelf = 'end';
+        if (n.c === 'R') el.style.justifySelf = 'start';
+        el.dataset.id = n.id;
+        el.innerHTML = nodeInner(n);
+        el.addEventListener('click', () => selectNode(n));
+        grid.appendChild(el);
+        n._el = el;
+      });
     }
-    function renderTraining(d) {
-      const t = d.training;
-      const stages = t.stages.map((s, i) =>
-        '<div class="arch-node tnode"><div class="tn">' + esc(s.n) + '</div><div class="td">' + esc(s.d) + '</div></div>'
-        + (i < t.stages.length - 1 ? arrow : '')).join('');
-      const data = '<div class="arch-data"><div class="adh">训练数据</div><ul>' + t.data.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
-      const loop = '<div class="arch-loop"><span class="alt">↺ 经验闭环</span><p>' + esc(t.loop) + '</p></div>';
-      return stages + data + loop;
+    function anchors(el) {
+      const r = el.getBoundingClientRect(), h = fc.getBoundingClientRect();
+      const x = r.left - h.left, y = r.top - h.top;
+      return { x, y, w: r.width, h: r.height, cx: x + r.width / 2, cy: y + r.height / 2,
+        top: [x + r.width / 2, y], bot: [x + r.width / 2, y + r.height], left: [x, y + r.height / 2], right: [x + r.width, y + r.height / 2] };
     }
+    const P = a => a[0] + ',' + a[1];
+    function drawEdges(diag) {
+      const W = fc.clientWidth, H = fc.clientHeight;
+      svg.setAttribute('width', W); svg.setAttribute('height', H);
+      const A = {}; diag.nodes.forEach(n => A[n.id] = anchors(n._el));
+      let out = '<defs><marker id="fa" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M1 1 L8 5 L1 9" fill="none" stroke="#aeb8e6" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>';
+      diag.edges.forEach(e => {
+        const s = A[e.f], t = A[e.t]; if (!s || !t) return;
+        let d, lx, ly;
+        if (e.kind === 'self') {
+          const x = s.right[0], y = s.cy;
+          d = 'M ' + x + ',' + (y - 11) + ' C ' + (x + 48) + ',' + (y - 30) + ' ' + (x + 48) + ',' + (y + 30) + ' ' + x + ',' + (y + 11);
+          lx = x + 52; ly = y + 3;
+        } else if (e.kind === 'loop') {
+          const gx = W - 4;
+          d = 'M ' + P(s.right) + ' L ' + (gx - 14) + ',' + s.right[1] + ' Q ' + gx + ',' + s.right[1] + ' ' + gx + ',' + (s.right[1] - 14)
+            + ' L ' + gx + ',' + (t.right[1] + 14) + ' Q ' + gx + ',' + t.right[1] + ' ' + (gx - 14) + ',' + t.right[1] + ' L ' + P(t.right);
+          lx = gx - 8; ly = (s.right[1] + t.right[1]) / 2;
+        } else if (s.cx < t.cx - 4) {
+          d = 'M ' + P(s.right) + ' C ' + (s.right[0] + 26) + ',' + s.right[1] + ' ' + (t.left[0] - 26) + ',' + t.cy + ' ' + P(t.left);
+          lx = (s.right[0] + t.left[0]) / 2; ly = (s.right[1] + t.cy) / 2 - 6;
+        } else if (s.cx > t.cx + 4) {
+          d = 'M ' + P(s.left) + ' C ' + (s.left[0] - 26) + ',' + s.left[1] + ' ' + (t.right[0] + 26) + ',' + t.cy + ' ' + P(t.right);
+          lx = (s.left[0] + t.right[0]) / 2; ly = (s.left[1] + t.cy) / 2 - 6;
+        } else {
+          d = 'M ' + P(s.bot) + ' L ' + P(t.top);
+          lx = s.cx + 9; ly = (s.bot[1] + t.top[1]) / 2 + 3;
+        }
+        const dash = (e.kind === 'loop' || e.kind === 'self') ? ' stroke-dasharray="6 5"' : '';
+        out += '<path d="' + d + '" fill="none" stroke="#aeb8e6" stroke-width="2"' + dash + ' marker-end="url(#fa)"/>';
+        if (e.label) {
+          const anchor = e.kind === 'loop' ? 'end' : 'middle';
+          out += '<text x="' + lx + '" y="' + ly + '" fill="#cdd7f5" font-size="11" font-weight="700" text-anchor="' + anchor + '" style="paint-order:stroke;stroke:#0e1230;stroke-width:3px">' + esc(e.label) + '</text>';
+        }
+      });
+      svg.innerHTML = out;
+    }
+    function redraw() { if (CUR) drawEdges(CUR); }
+
     function render() {
-      const d = DATA[S.model];
-      metaEl.textContent = d.meta;
-      archEl.innerHTML = S.view === 'inference' ? renderInference(d) : renderTraining(d);
+      const diag = D[S.model][S.view];
+      CUR = diag;
+      metaEl.textContent = diag.meta;
+      buildNodes(diag);
+      loopEl.innerHTML = diag.loop ? '<div class="fc-loopnote"><b>↺ 经验闭环：</b>' + diag.loop + '</div>' : '';
+      requestAnimationFrame(() => {
+        redraw();
+        const def = diag.nodes.find(n => n.core) || diag.nodes[0];
+        if (def) selectNode(def);
+      });
     }
     document.getElementById('mtg').addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
-      S.model = b.dataset.m;
-      [...e.currentTarget.children].forEach(x => x.classList.toggle('on', x === b));
-      render();
+      S.model = b.dataset.m; [...e.currentTarget.children].forEach(x => x.classList.toggle('on', x === b)); render();
     });
     document.getElementById('vtg').addEventListener('click', e => {
       const b = e.target.closest('button'); if (!b) return;
-      S.view = b.dataset.v;
-      [...e.currentTarget.children].forEach(x => x.classList.toggle('on', x === b));
-      render();
+      S.view = b.dataset.v; [...e.currentTarget.children].forEach(x => x.classList.toggle('on', x === b)); render();
     });
+    let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(redraw, 120); });
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(redraw);
     render();
   </script>
   <script src="/vla-radar/cursor.js?v=20260627a"></script>
