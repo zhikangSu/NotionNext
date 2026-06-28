@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>入门 · VLA 101 · VLA Radar</title>
+  <meta name="description" content="VLA 是什么、内部长什么样、和世界模型差在哪 —— 给刚进 VLA / 具身智能的人的 5 分钟入门地图。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260625-cosmic" />
+  <style>
+    .def-card { padding: 22px 24px; margin-top: 26px; }
+    .legend { display:flex; flex-wrap:wrap; gap:12px 18px; align-items:center; margin-bottom:16px; }
+    .legend .lg { display:inline-flex; align-items:center; gap:6px; font-size:.82rem; color:var(--meow-muted); font-weight:700; }
+    .legend .lg b { font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--meow-ink); background:var(--meow-cream); border:1.5px solid var(--meow-ink); border-radius:7px; padding:1px 7px; font-weight:800; }
+    .def { font-size:1.05rem; color:var(--meow-ink); line-height:1.7; margin:0 0 14px; font-weight:700; }
+    .fml { font-family:ui-monospace,Menlo,Consolas,monospace; color:var(--meow-blue); background:var(--meow-sky); border:1.5px solid var(--meow-sky-deep); border-radius:10px; padding:8px 14px; display:inline-block; font-weight:700; }
+    .fml.big { font-size:1.25rem; }
+    .def-sub { color:var(--meow-muted); margin:14px 0 0; line-height:1.66; font-weight:600; }
+
+    .bx-h { font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.3rem; font-weight:800; color:#eaf0ff; margin:36px 0 14px; }
+    .bx-note { color:#aeb8e6; font-size:.9rem; line-height:1.7; margin:14px 0 0; }
+    .bx-note b { color:#fff; }
+
+    .cmp-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; }
+    .cmp-card { padding:22px; display:flex; flex-direction:column; }
+    .cmp-card h3 { font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.25rem; font-weight:800; margin:0 0 6px; color:var(--meow-ink); }
+    .cmp-card .sub { color:var(--meow-muted); font-weight:600; line-height:1.6; margin:0 0 16px; min-height:46px; font-size:.92rem; }
+    .cmp-card .flow { display:flex; align-items:center; gap:9px; margin:0 0 16px; color:var(--meow-ink); min-height:26px; }
+    .cmp-card .flow .ar { color:var(--meow-muted); font-weight:900; }
+    .cmp-card .fml { align-self:flex-start; }
+    .cmp-card.acc { border-color:var(--meow-pink); }
+    .cmp-card.acc h3 { color:var(--meow-pink); }
+    .cmp-card.acc .flow { color:var(--meow-pink); }
+    .cmp-card.acc .fml { color:var(--meow-pink); background:var(--meow-pink-soft); border-color:var(--meow-pink); }
+
+    .stack { display:flex; flex-wrap:wrap; align-items:center; gap:9px; }
+    .stk { font-weight:800; color:var(--meow-ink); background:var(--meow-cream); border:2px solid var(--meow-ink); border-radius:12px; padding:9px 13px; font-size:.92rem; box-shadow:3px 3px 0 rgba(30,36,71,.85); }
+    a.stk { text-decoration:none; transition:transform .12s ease, box-shadow .12s ease, color .12s ease; }
+    a.stk:hover { transform:translate(-2px,-2px); box-shadow:5px 5px 0 var(--meow-blue); color:var(--meow-blue); }
+    .stack .ar { color:#9aa6dd; font-weight:900; }
+
+    .read-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(248px,1fr)); gap:14px; }
+    .read-card { padding:18px 20px; text-decoration:none; color:inherit; display:flex; flex-direction:column; gap:5px; }
+    .read-card .rt { font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.1rem; font-weight:800; color:var(--meow-ink); }
+    .read-card .rid { font-family:ui-monospace,monospace; font-size:.72rem; color:var(--meow-muted); font-weight:700; }
+    .read-card .rw { color:var(--meow-muted); font-weight:600; line-height:1.6; margin:2px 0 0; font-size:.9rem; }
+    .read-card .rgo { margin-top:6px; color:var(--meow-blue); font-weight:800; font-size:.86rem; }
+
+    .bridge { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:26px; padding:20px; text-decoration:none; font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:1.15rem; font-weight:800; color:var(--meow-ink); text-align:center; }
+    .bridge:hover { color:var(--meow-blue); }
+
+    .credit { color:#8b95c8; font-size:.8rem; line-height:1.6; margin:32px 0 0; }
+    .credit a { color:#b6c0e6; border-bottom:1px solid #6b76ad; }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="/vla-radar/"><span class="brand-badge">🐾</span><span>Meowsu · VLA Radar</span></a>
+      <div class="nav-links">
+        <a href="/vla-radar/basics.html">入门</a>
+        <a href="/vla-radar/#map">开放问题</a>
+        <a href="/vla-radar/radar.html">雷达</a>
+        <a href="/vla-radar/#finetune">微调</a>
+        <a href="/vla-radar/views.html">视角</a>
+        <a href="/vla-radar/papers.html">论文库</a>
+        <a href="/">返回博客</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <section class="section paper-wrap">
+      <div class="container">
+        <a class="paper-back" href="/vla-radar/">← 回到 VLA Radar 首页</a>
+        <span class="badge">入门 · VLA 101</span>
+        <h1 class="paper-title">VLA 是什么，5 分钟先有个地图</h1>
+        <p class="paper-meta">给刚进 VLA / 具身智能的人：先搞懂它是什么、内部长什么样、和"世界模型"差在哪，再去看 8 个开放问题和论文选集。</p>
+
+        <div class="sticker-card def-card">
+          <div class="legend">
+            <span class="lg"><b>o</b> 观测</span>
+            <span class="lg"><b>l</b> 指令 / 目标</span>
+            <span class="lg"><b>a</b> 动作</span>
+            <span class="lg"><b>o'</b> 想象的未来</span>
+            <span class="lg"><b>p(·)</b> 条件模型</span>
+          </div>
+          <p class="def">Vision-Language-Action：看着画面 (o)、读懂指令 (l)、直接输出动作 (a)。一句话就是：</p>
+          <span class="fml big">p(a | o, l)</span>
+          <p class="def-sub">给定"看到的"和"被要求的"，预测"该做的动作"。这就是一个 VLA 模型在做的全部事情。</p>
+        </div>
+
+        <h2 class="bx-h">它和"世界模型"差在哪？三件套对比</h2>
+        <div class="cmp-grid">
+          <div class="sticker-card cmp-card">
+            <h3>VLA</h3>
+            <p class="sub">看当下、直接出动作，不预测未来。</p>
+            <div class="flow"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="2.6"/></svg><span class="ar">→</span><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="6.5" r="2.4"/><path d="M12 9v6"/><path d="M6 18.5c0-1.4 2.7-2.5 6-2.5s6 1.1 6 2.5-2.7 2.5-6 2.5-6-1.1-6-2.5z"/></svg></div>
+            <span class="fml">p(a | o, l)</span>
+          </div>
+          <div class="sticker-card cmp-card">
+            <h3>世界模型</h3>
+            <p class="sub">想象"这样动之后会怎样"，只预测、不出动作。</p>
+            <div class="flow"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="2.6"/></svg><span class="ar">→</span><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="11" rx="5" stroke-dasharray="2.5 2.5"/><circle cx="7" cy="18.5" r="1.1"/><circle cx="4" cy="21.5" r=".7"/></svg></div>
+            <span class="fml">p(o' | o, a, l)</span>
+          </div>
+          <div class="sticker-card cmp-card acc">
+            <h3>世界-动作模型</h3>
+            <p class="sub">先想象未来，再用它帮忙决定动作。</p>
+            <div class="flow"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8V5h3M20 8V5h-3M4 16v3h3M20 16v3h-3"/><circle cx="12" cy="12" r="2.6"/></svg><span class="ar">→</span><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="4" y="4" width="16" height="11" rx="5" stroke-dasharray="2.5 2.5"/><circle cx="7" cy="18.5" r="1.1"/></svg><span class="ar">→</span><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="6.5" r="2.4"/><path d="M12 9v6"/><path d="M6 18.5c0-1.4 2.7-2.5 6-2.5s6 1.1 6 2.5-2.7 2.5-6 2.5-6-1.1-6-2.5z"/></svg></div>
+            <span class="fml">p(o', a | o, l)</span>
+          </div>
+        </div>
+        <p class="bx-note">划重点：<b>世界模型只想象、不出手</b>；<b>VLA 直接出手</b>；<b>世界-动作模型是"先想象、再出手"</b>。</p>
+
+        <h2 class="bx-h">VLA 内部长什么样</h2>
+        <div class="stack">
+          <span class="stk">图像 + 指令</span><span class="ar">→</span>
+          <a class="stk" href="/vla-radar/explorer.html">视觉-语言主干</a><span class="ar">→</span>
+          <a class="stk" href="/vla-radar/explorer.html">推理</a><span class="ar">→</span>
+          <a class="stk" href="/vla-radar/explorer.html">动作头 · 解码</a><span class="ar">→</span>
+          <span class="stk">执行</span>
+        </div>
+        <p class="bx-note">每一个可点的方块都跳到「<b>组件透视</b>」，看最近哪些论文在改这一层（主干 / 推理 / 动作头……）。</p>
+
+        <h2 class="bx-h">先读这 5 篇打底</h2>
+        <div class="read-grid">
+          <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2212.06817&from=basics">
+            <span class="rt">RT-1</span><span class="rid">arXiv:2212.06817</span>
+            <p class="rw">起点：真实机器人多任务数据 + Transformer 能扩展；动作以离散 token 输出。</p>
+            <span class="rgo">读 →</span>
+          </a>
+          <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2307.15818&from=basics">
+            <span class="rt">RT-2</span><span class="rid">arXiv:2307.15818</span>
+            <p class="rw">把 VLM 的网络知识接进控制，动作被映射进语言 token 空间。</p>
+            <span class="rgo">读 →</span>
+          </a>
+          <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2406.09246&from=basics">
+            <span class="rt">OpenVLA</span><span class="rid">arXiv:2406.09246</span>
+            <p class="rw">开源 7B generalist policy，社区复现与改造的基线。</p>
+            <span class="rgo">读 →</span>
+          </a>
+          <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2410.24164&from=basics">
+            <span class="rt">π0</span><span class="rid">arXiv:2410.24164</span>
+            <p class="rw">连续动作块 + 独立 action expert，当前的主流解法。</p>
+            <span class="rgo">读 →</span>
+          </a>
+          <a class="sticker-card read-card" href="/vla-radar/paper.html?id=2303.04137&from=basics">
+            <span class="rt">Diffusion Policy</span><span class="rid">arXiv:2303.04137</span>
+            <p class="rw">用扩散建模动作分布，"动作怎么表示"这条线的关键一招。</p>
+            <span class="rgo">读 →</span>
+          </a>
+        </div>
+
+        <a class="sticker-card bridge" href="/vla-radar/#map">有地图了 → 去看 8 个开放问题的星海 →</a>
+
+        <p class="credit">VLA / 世界模型 / 世界-动作模型 的三件套分类框架，参考自 <a href="https://world-action-models.github.io/" target="_blank" rel="noopener noreferrer">world-action-models.github.io</a>。</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+    </div>
+  </footer>
+  <script src="/vla-radar/cursor.js?v=20260627a"></script>
+  <script src="/vla-radar/live2d/pet.js?v=20260626i"></script>
+</body>
+</html>
