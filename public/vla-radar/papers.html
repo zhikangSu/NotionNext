@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260702-academic" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260702b" />
   <script>try{if(localStorage.getItem('vlaTheme')==='academic')document.documentElement.classList.add('academic')}catch(e){}</script>
   <style>
     .tier-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 4px; }
@@ -51,11 +51,19 @@
           <button class="tier-tab" data-tier="0">🗄️ 仅档案</button>
         </div>
         <input class="searchbox" id="q" placeholder="搜索:flow / RL / OpenVLA / embodiment / efficient ..." style="margin:16px 0 6px" />
-        <div class="archive-actions">
+        <div class="aca-only"><select class="aca-select" id="painSel" aria-label="按开放问题筛选"><option value="all">全部开放问题</option></select></div>
+        <div class="archive-actions cosmic-only">
           <button class="archive-action" id="expandAll" type="button">展开全部</button>
           <button class="archive-action" id="collapseAll" type="button">收起全部</button>
         </div>
-        <div id="root"><div class="paper-state">正在加载论文库 …</div></div>
+        <div id="root" class="cosmic-only"><div class="paper-state">正在加载论文库 …</div></div>
+        <div class="aca-only aca-table-wrap">
+          <table class="aca-table">
+            <thead><tr><th>日期</th><th>标题</th><th>层级</th><th>开放问题</th><th>arXiv</th></tr></thead>
+            <tbody id="acaTbody"><tr><td colspan="5" style="color:var(--meow-muted)">正在加载 …</td></tr></tbody>
+          </table>
+          <p class="aca-more"><button class="archive-action" id="acaMore" type="button" hidden>显示全部</button></p>
+        </div>
       </div>
     </section>
   </main>
@@ -66,6 +74,7 @@
     </div>
   </footer>
 
+  <script src="/vla-radar/data/curated.js"></script>
   <script>
     const root = document.getElementById('root');
     const countEl = document.getElementById('count');
@@ -80,6 +89,16 @@
     const tierTabs = document.getElementById('tierTabs');
     const TIER_LABEL = { '2': '🗺️ 地图', '1': '📡 雷达', '0': '🗄️ 仅档案' };
     const tierMark = t => t === 2 ? '🗺️' : t === 1 ? '📡' : t === 0 ? '🗄️' : '';
+
+    // 学术版扁平表:问题筛选 + 截断
+    const PAIN = (window.VLA_CURATED && window.VLA_CURATED.painPoints) || [];
+    const painName = k => (PAIN.find(p => p.key === k) || {}).name || k;
+    const painSel = document.getElementById('painSel');
+    const acaTbody = document.getElementById('acaTbody');
+    const acaMore = document.getElementById('acaMore');
+    let painFilter = 'all';
+    let acaCap = 60;
+    PAIN.forEach(p => { const o = document.createElement('option'); o.value = p.key; o.textContent = p.name; painSel.appendChild(o); });
 
     const esc = s => String(s == null ? '' : s)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -126,11 +145,34 @@
       }).join('');
     };
 
+    // 学术版扁平表(与日期归档共享同一份筛选结果)
+    const tierBadge = t => t === 2 ? '<span class="tier-b t2">地图</span>' : t === 1 ? '<span class="tier-b t1">雷达</span>' : '<span class="tier-b">档案</span>';
+    const renderTable = papers => {
+      if (!acaTbody) return;
+      if (!papers.length) {
+        acaTbody.innerHTML = '<tr><td colspan="5" style="color:var(--meow-muted)">没有匹配的论文,换个关键词试试。</td></tr>';
+        acaMore.hidden = true;
+        return;
+      }
+      acaTbody.innerHTML = papers.slice(0, acaCap).map(p => {
+        const pains = (Array.isArray(p.pain_points) ? p.pain_points : []).slice(0, 3)
+          .map(k => `<span class="pchip" data-pain="${esc(k)}" title="按此问题筛选">${esc(painName(k))}</span>`).join('');
+        return `<tr><td class="d">${esc((p.published || '').slice(0, 10))}</td>` +
+          `<td><a class="t" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}&from=papers">${esc(p.title || p.arxiv_id)}</a></td>` +
+          `<td>${tierBadge(p.tier)}</td>` +
+          `<td>${pains || '<span style="color:var(--meow-muted)">—</span>'}</td>` +
+          `<td><a class="ax" href="https://arxiv.org/abs/${encodeURIComponent(p.arxiv_id)}" target="_blank" rel="noopener">${esc(p.arxiv_id)}</a></td></tr>`;
+      }).join('');
+      acaMore.hidden = papers.length <= acaCap;
+      acaMore.textContent = `显示全部 ${papers.length} 篇`;
+    };
+
     const applyFilter = () => {
       const query = q.value.trim().toLowerCase();
       const byTier = tierFilter === 'all' ? all : all.filter(p => String(p.tier) === tierFilter);
-      const f = query ? byTier.filter(p => JSON.stringify(p).toLowerCase().includes(query)) : byTier;
-      countEl.textContent = `共 ${all.length} 篇` + (tierFilter !== 'all' ? ` · ${TIER_LABEL[tierFilter]} ${byTier.length} 篇` : '') + (query ? ` · 匹配 ${f.length} 篇` : '');
+      const byPain = painFilter === 'all' ? byTier : byTier.filter(p => Array.isArray(p.pain_points) && p.pain_points.includes(painFilter));
+      const f = query ? byPain.filter(p => JSON.stringify(p).toLowerCase().includes(query)) : byPain;
+      countEl.textContent = `共 ${all.length} 篇` + (tierFilter !== 'all' ? ` · ${TIER_LABEL[tierFilter]} ${byTier.length} 篇` : '') + (painFilter !== 'all' ? ` · ${painName(painFilter)} ${byPain.length} 篇` : '') + (query ? ` · 匹配 ${f.length} 篇` : '');
       const groups = groupByDate(f);
       if (query) {
         openDates = new Set(groups.map(([date]) => date));
@@ -139,6 +181,7 @@
         openDates = new Set([groups[0][0]]);
       }
       render(f);
+      renderTable(f);
     };
 
     async function load() {
@@ -146,21 +189,36 @@
         const res = await fetch('/api/vla-radar/list?limit=200', { cache: 'no-store' });
         const j = await res.json();
         if (j && j.configured === false) {
-          root.innerHTML = '<div class="paper-state">论文库还没接好(Supabase 未配置)。</div>';
+          root.innerHTML = '<div class="paper-state">论文库暂时失联,稍后再来 📡</div>';
+          if (acaTbody) acaTbody.innerHTML = '<tr><td colspan="5" style="color:var(--meow-muted)">论文库暂时失联,稍后再来。</td></tr>';
           return;
         }
         all = (j && j.papers) || [];
         if (!all.length) {
           countEl.textContent = '';
           root.innerHTML = '<div class="paper-state">还没有论文,等每天早上 9 点的抓取 🛰️</div>';
+          if (acaTbody) acaTbody.innerHTML = '<tr><td colspan="5" style="color:var(--meow-muted)">还没有论文,等每天早上 9 点的抓取。</td></tr>';
           return;
         }
         applyFilter();
       } catch (e) {
-        root.innerHTML = '<div class="paper-state">加载出错:' + esc(e && e.message ? e.message : e) + '</div>';
+        console.error('papers load failed:', e);
+        root.innerHTML = '<div class="paper-state">加载出错了,刷新试试。</div>';
+        if (acaTbody) acaTbody.innerHTML = '<tr><td colspan="5" style="color:var(--meow-muted)">加载出错了,刷新试试。</td></tr>';
       }
     }
     q.addEventListener('input', applyFilter);
+    painSel.addEventListener('change', () => { painFilter = painSel.value; acaCap = 60; applyFilter(); });
+    acaMore.addEventListener('click', () => { acaCap = Infinity; applyFilter(); });
+    acaTbody.addEventListener('click', e => {
+      const chip = e.target.closest('.pchip');
+      if (!chip) return;
+      e.preventDefault();
+      painFilter = chip.dataset.pain;
+      painSel.value = painFilter;
+      acaCap = 60;
+      applyFilter();
+    });
     tierTabs.addEventListener('click', e => {
       const btn = e.target.closest('.tier-tab');
       if (!btn) return;

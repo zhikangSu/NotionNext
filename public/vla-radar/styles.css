@@ -1060,3 +1060,129 @@
     .theme-toggle:hover { transform: translate(-1px,-1px); }
     html.academic .theme-toggle { border: 1px solid #cfd8e3; box-shadow: none; }
     html.academic .theme-toggle:hover { transform: none; background: #eef2f7; }
+
+    /* ====================================================================
+       🎓 学术布局 (academic LAYOUT · 2026-07-02)
+       皮肤之上的第二层：学术模式重排信息结构（参考 world-action-models.github.io）。
+       纪律：所有新 HTML 挂 .aca-only*（星海版不可见）；星海专属块挂 .cosmic-only；
+       DOM 顺序一行不动 → 星海版零回归。两棵树常驻渲染，切主题即时生效。
+       ==================================================================== */
+
+    /* —— 工具类（带 display 变体，防 flex 块被 block 竖排）—— */
+    .aca-only, .aca-only-flex, .aca-only-inline { display: none !important; }
+    html.academic .aca-only { display: block !important; }
+    html.academic .aca-only-flex { display: flex !important; }
+    html.academic .aca-only-inline { display: inline !important; }
+    html.academic .cosmic-only { display: none !important; }
+
+    /* —— 学者页测宽 + 节奏 —— */
+    html.academic { --container: 960px; }
+    html.academic .section { padding: 34px 0; }
+
+    /* —— ① 刊头：替换英雄区 —— */
+    html.academic .hero { padding: 44px 0 10px; }
+    html.academic .hero-grid { grid-template-columns: 1fr; gap: 0; }
+    html.academic .hero h1 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); line-height: 1.22; }
+    html.academic .hero-lede { max-width: none; }
+    html.academic .aca-stats { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .86rem; color: var(--meow-muted); margin: 12px 0 0; font-weight: 600; }
+    html.academic .aca-stats b { color: var(--meow-ink); }
+    html.academic .aca-links { margin: 8px 0 0; font-weight: 700; font-size: .92rem; }
+    html.academic .aca-links a { color: var(--meow-blue); margin-right: 16px; }
+    html.academic .aca-links a:hover { text-decoration: underline; }
+
+    /* —— ② 锚点条（sticky 在主导航下）—— */
+    html.academic .aca-anchors { position: sticky; top: 70px; z-index: 40; background: rgba(248,249,251,.92); backdrop-filter: blur(8px); border-bottom: 1px solid #e2e7f0; padding: 9px 0; }
+    html.academic .aca-anchors .container { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .88rem; font-weight: 700; }
+    html.academic .aca-anchors a { color: var(--meow-muted); }
+    html.academic .aca-anchors a:hover { color: var(--meow-blue); }
+
+    /* —— ③ 定义速览 —— */
+    html.academic .aca-define .fml { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--meow-blue); background: var(--meow-sky); border: 1px solid var(--meow-sky-deep); border-radius: 9px; padding: 7px 14px; display: inline-block; font-weight: 700; font-size: 1.08rem; }
+    html.academic .aca-define .def-line { color: var(--meow-ink); font-weight: 600; margin: 10px 0 0; }
+    html.academic .aca-define .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 16px; }
+    html.academic .aca-define .trio > div { border-top: 1px solid #e2e7f0; padding-top: 10px; font-size: .9rem; color: var(--meow-muted); font-weight: 600; line-height: 1.62; }
+    html.academic .aca-define .trio b { color: var(--meow-ink); display: block; margin-bottom: 2px; }
+    html.academic .aca-define .trio code { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--meow-blue); font-size: .84rem; display: block; margin-bottom: 3px; }
+    html.academic .aca-define .def-more { color: var(--meow-muted); font-size: .86rem; margin: 14px 0 0; font-weight: 600; }
+    html.academic .aca-define .def-more a { color: var(--meow-blue); font-weight: 800; }
+    @media (max-width: 720px) { html.academic .aca-define .trio { grid-template-columns: 1fr; } }
+
+    /* —— ④ 今日到站 —— */
+    html.academic .aca-today-list { border-top: 1px solid #e2e7f0; }
+    html.academic .aca-today-list .tr { display: flex; gap: 12px; align-items: baseline; padding: 8px 2px; border-bottom: 1px solid #e8edf4; font-size: .92rem; }
+    html.academic .aca-today-list .tr .d { font-family: ui-monospace, Menlo, monospace; color: var(--meow-muted); flex: 0 0 auto; font-size: .78rem; }
+    html.academic .aca-today-list .tr a.t { color: var(--meow-ink); font-weight: 600; flex: 1 1 auto; min-width: 0; line-height: 1.45; }
+    html.academic .aca-today-list .tr a.t:hover { color: var(--meow-blue); }
+    html.academic .aca-today-list .tr .pc { font-size: .74rem; color: var(--meow-muted); font-weight: 700; flex: 0 0 auto; }
+    html.academic .aca-today-list .tr .hot { color: var(--meow-blue); }
+    html.academic .aca-today-more { margin: 10px 0 0; font-weight: 700; font-size: .9rem; }
+    html.academic .aca-today-more a { color: var(--meow-blue); }
+    html.academic .aca-legend { color: var(--meow-muted); font-size: .84rem; font-weight: 600; margin: 6px 0 0; }
+
+    /* —— ⑤ P1–P8：贴纸卡 → 单栏编号列表（纯 CSS 重排，JS 不动）—— */
+    html.academic .map-grid { grid-template-columns: 1fr; gap: 0; counter-reset: prob; margin-top: 4px; }
+    html.academic .prob-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: baseline; background: transparent; border: 0; border-top: 1px solid #e2e7f0; border-radius: 0; box-shadow: none; padding: 16px 2px 13px; gap: 6px 14px; }
+    html.academic .prob-card:hover { transform: none; box-shadow: none; }
+    html.academic .prob-card.empty { background: transparent; }
+    html.academic .prob-ic { display: none; }
+    html.academic .prob-head { grid-column: 1; gap: 0; }
+    html.academic .prob-head h3 { font-size: 1.08rem; }
+    html.academic .prob-head h3::before { counter-increment: prob; content: "P" counter(prob) " · "; color: var(--meow-blue); }
+    html.academic .prob-head p { font-size: .86rem; }
+    html.academic .prob-meta { grid-column: 2; grid-row: 1; font-size: .78rem; white-space: nowrap; }
+    html.academic .prob-papers, html.academic .prob-foot { grid-column: 1 / -1; }
+    html.academic .pl-paper { padding: 4px 2px; margin: 0; border-radius: 6px; }
+    html.academic .prob-foot a { border-bottom: 1px solid #c9d6ea; }
+    @media (max-width: 640px) { html.academic .prob-card { grid-template-columns: 1fr; } html.academic .prob-meta { grid-column: 1; grid-row: auto; white-space: normal; } }
+
+    /* —— ⑥ 范式走向：双卡 → 单栏纯列表 —— */
+    html.academic .split-grid { grid-template-columns: 1fr; gap: 8px; }
+    html.academic #changed .sticker-card { border: 0; border-top: 1px solid #e2e7f0; border-radius: 0; box-shadow: none; background: transparent; padding: 18px 2px 8px; }
+    html.academic #changed h2 { font-size: 1.3rem !important; } /* 原为内联 2.5rem，需 !important */
+    html.academic #changed .list li { border: 0; background: transparent; padding: 5px 0; }
+    html.academic #changed .list li > span:first-child { display: none; }
+
+    /* —— ⑦ 实战笔记：tabs 展平，Ctrl-F 可搜 —— */
+    html.academic #finetune .tabs { display: none; }
+    html.academic #finetune .tab-panel { display: block; border-top: 1px solid #e2e7f0; padding: 12px 0 4px; }
+    html.academic #finetune .tab-panel:first-of-type { border-top: 0; }
+
+    /* —— ⑧ 分析视角：卡片 → 双列紧凑链接行 —— */
+    html.academic .lens-row { grid-template-columns: repeat(2, 1fr); gap: 0 26px; margin-top: 0; }
+    html.academic .lens-pill { flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 7px; padding: 11px 2px; border: 0; border-top: 1px solid #e2e7f0; border-radius: 0; box-shadow: none; background: transparent; }
+    html.academic .lens-pill:hover { transform: none; box-shadow: none; }
+    html.academic .lens-pill:hover b { color: var(--meow-blue); }
+    html.academic .lens-pill .lens-ico { font-size: .95rem; }
+    html.academic .lens-pill b { font-size: .98rem; }
+    html.academic .lens-pill small { font-size: .8rem; }
+    @media (max-width: 720px) { html.academic .lens-row { grid-template-columns: 1fr; } }
+
+    /* —— ⑨ 数据与方法 —— */
+    html.academic .aca-method ol { margin: 8px 0 0; padding-left: 22px; color: var(--meow-ink); font-weight: 600; line-height: 1.85; font-size: .92rem; }
+    html.academic .aca-method p { color: var(--meow-muted); font-size: .85rem; line-height: 1.7; margin: 12px 0 0; font-weight: 600; }
+
+    /* —— papers.html：学术版扁平论文表 —— */
+    html.academic .aca-table-wrap { overflow-x: auto; margin-top: 14px; }
+    html.academic .aca-table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+    html.academic .aca-table th { text-align: left; font-size: .74rem; letter-spacing: .03em; color: var(--meow-muted); font-weight: 800; padding: 8px 10px; border-bottom: 2px solid #d5dce8; background: #f8f9fb; }
+    html.academic .aca-table td { padding: 8px 10px; border-bottom: 1px solid #e8edf4; vertical-align: top; }
+    html.academic .aca-table td.d { font-family: ui-monospace, Menlo, monospace; color: var(--meow-muted); white-space: nowrap; font-size: .78rem; }
+    html.academic .aca-table a.t { color: var(--meow-ink); font-weight: 600; line-height: 1.4; }
+    html.academic .aca-table a.t:hover { color: var(--meow-blue); }
+    html.academic .aca-table .tier-b { font-size: .72rem; font-weight: 800; border: 1px solid #e2e7f0; border-radius: 999px; padding: 1px 9px; white-space: nowrap; color: var(--meow-muted); }
+    html.academic .aca-table .tier-b.t2 { background: #e8effc; color: var(--meow-blue); border-color: #c9d8f5; }
+    html.academic .aca-table .tier-b.t1 { background: #f4f6fa; color: var(--meow-ink); }
+    html.academic .aca-table .pchip { display: inline-block; font-size: .72rem; font-weight: 700; color: var(--meow-muted); border: 1px solid #e2e7f0; border-radius: 999px; padding: 0 8px; margin: 0 4px 3px 0; cursor: pointer; background: #fff; }
+    html.academic .aca-table .pchip:hover { color: var(--meow-blue); border-color: #c9d8f5; }
+    html.academic .aca-table a.ax { font-family: ui-monospace, Menlo, monospace; font-size: .78rem; color: var(--meow-blue); white-space: nowrap; }
+    html.academic .aca-more { margin: 14px 0 0; }
+    html.academic .aca-select { border: 1px solid #cfd8e3; border-radius: 10px; background: #fff; color: var(--meow-ink); font-weight: 700; font-size: .86rem; padding: 7px 10px; margin-top: 10px; }
+
+    /* —— radar / basics 内页收紧 —— */
+    html.academic .rd-grid { grid-template-columns: 1fr; gap: 8px; }
+    html.academic .rd-card { padding: 12px 4px; border: 0; border-top: 1px solid #e2e7f0; border-radius: 0; box-shadow: none; background: transparent; gap: 6px; }
+    html.academic .rd-card:hover { box-shadow: none; }
+    html.academic .read-grid { grid-template-columns: 1fr; gap: 0; }
+    html.academic .read-card { padding: 13px 4px; border: 0; border-top: 1px solid #e2e7f0; border-radius: 0; box-shadow: none; background: transparent; }
+    html.academic .aca-note { color: var(--meow-muted); font-size: .86rem; font-weight: 600; margin: 8px 0 0; }
+    html.academic .aca-note a { color: var(--meow-blue); font-weight: 800; }

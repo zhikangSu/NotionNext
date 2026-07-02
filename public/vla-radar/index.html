@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260702-academic" />
+  <link rel="stylesheet" href="/vla-radar/styles.css?v=20260702b" />
   <script>try{if(localStorage.getItem('vlaTheme')==='academic')document.documentElement.classList.add('academic')}catch(e){}</script>
   <style>
     /* ===== 多视角入口带 ===== */
@@ -115,23 +115,25 @@
     <canvas id="cosmos" aria-hidden="true"></canvas>
     <div class="container hero-grid">
       <div>
-        <span class="badge">每日自动追踪 arXiv · AI 逐篇解读 · 8 个开放问题</span>
-        <h1>在 VLA 的星海里，<br /><span>盯住发光的那几颗</span></h1>
+        <span class="badge cosmic-only">每日自动追踪 arXiv · AI 逐篇解读 · 8 个开放问题</span>
+        <h1><span class="cosmic-only">在 VLA 的星海里，<br /><span>盯住发光的那几颗</span></span><span class="aca-only-inline">VLA Radar — 视觉·语言·动作模型研究地图</span></h1>
         <p class="hero-lede"><b>VLA</b>（Vision-Language-Action）= 让机器人「看懂画面、听懂指令、伸手就干」的那类大模型。这个站<b>每天自动抓取 arXiv 上的 VLA 新论文</b>，AI 逐篇解读：打哪个问题、改了哪层、证据信不信。</p>
-        <p>这不是论文列表，是把 VLA 的 <b>8 个开放问题</b>摊成一片星海：每个问题里发光的几颗，是已经证明过自己的代表作；<b>还黑着的地方，就是没人点亮的机会</b>。新论文先进<b>雷达</b>，亮够了才升进<b>地图</b>。</p>
-        <div class="hero-actions">
+        <p class="cosmic-only">这不是论文列表，是把 VLA 的 <b>8 个开放问题</b>摊成一片星海：每个问题里发光的几颗，是已经证明过自己的代表作；<b>还黑着的地方，就是没人点亮的机会</b>。新论文先进<b>雷达</b>，亮够了才升进<b>地图</b>。</p>
+        <p class="aca-only aca-stats" id="acaStats">统计加载中 …</p>
+        <p class="aca-only aca-links"><a href="/vla-radar/basics.html">5 分钟入门</a><a href="/vla-radar/radar.html">每日雷达</a><a href="/vla-radar/papers.html">论文库</a><a href="/">返回博客</a></p>
+        <div class="hero-actions cosmic-only">
           <a class="btn" href="#map">看 8 条开放问题 →</a>
           <a class="btn-ghost" href="/vla-radar/radar.html">看每日雷达</a>
           <a class="btn-soft" href="/vla-radar/basics.html">第一次来？5 分钟入门 →</a>
         </div>
-        <div class="quick-stats" aria-label="VLA radar stats">
+        <div class="quick-stats cosmic-only" aria-label="VLA radar stats">
           <a class="stat-card" href="#map"><strong>8</strong><span>开放问题</span></a>
           <a class="stat-card" href="#map"><strong id="statMap">…</strong><span>地图 · 证明过的地标</span></a>
           <a class="stat-card" href="/vla-radar/radar.html"><strong id="statRadar">…</strong><span>雷达 · 观察中的新论文</span></a>
           <a class="stat-card" href="/vla-radar/views.html"><strong>6</strong><span>分析视角</span></a>
         </div>
       </div>
-      <aside class="hero-card" aria-label="VLA radar">
+      <aside class="hero-card cosmic-only" aria-label="VLA radar">
         <div class="orbit"></div><div class="orbit"></div>
         <div class="radar-sweep" aria-hidden="true"></div>
         <span class="radar-blip b1" aria-hidden="true"></span><span class="radar-blip b2" aria-hidden="true"></span>
@@ -152,10 +154,47 @@
     </div>
   </header>
 
+  <nav class="aca-only aca-anchors" aria-label="页内目录">
+    <div class="container">
+      <a href="#define">定义</a>
+      <a href="#today">今日</a>
+      <a href="#map">开放问题</a>
+      <a href="#changed">走向</a>
+      <a href="#finetune">笔记</a>
+      <a href="#views">视角</a>
+      <a href="#method">方法</a>
+      <a href="/vla-radar/papers.html">论文表 →</a>
+    </div>
+  </nav>
+
   <main>
+    <section id="define" class="section aca-only">
+      <div class="container">
+        <div class="section-title"><h2>定义</h2></div>
+        <div class="aca-define">
+          <span class="fml">p(a | o, l)</span>
+          <p class="def-line">给定「看到的」(o) 和「被要求的」(l)，预测「该做的动作」(a) —— 这就是一个 VLA 模型在做的全部事情。</p>
+          <div class="trio">
+            <div><b>(a) VLA</b><code>p(a | o, l)</code>看当下，直接出手，不预测未来。</div>
+            <div><b>(b) 世界模型</b><code>p(o' | o, a, l)</code>只想象「这样动之后会怎样」，不出动作。</div>
+            <div><b>(c) 世界-动作模型</b><code>p(o', a | o, l)</code>先想象未来，再用它帮忙决定动作。</div>
+          </div>
+          <p class="def-more">符号表、内部结构、必读六篇 → <a href="/vla-radar/basics.html">完整入门</a> · 经典架构拆解 → <a href="/vla-radar/arch.html">OpenVLA / π0 流程图</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="today" class="section aca-only">
+      <div class="container">
+        <div class="section-title"><h2>今日到站</h2><p>最近进入雷达的新论文（观察中 · 待验证），⚡ = 高潜。</p></div>
+        <div class="aca-today-list" id="acaToday"></div>
+        <p class="aca-today-more"><a href="/vla-radar/radar.html">全部雷达 →</a></p>
+      </div>
+    </section>
+
     <section id="map" class="section">
       <div class="container">
-        <div class="sticker-card pipe-strip" aria-label="这个站怎么运作">
+        <div class="sticker-card pipe-strip cosmic-only" aria-label="这个站怎么运作">
           <span class="pipe-step"><span class="pi">📡</span><div><b>arXiv 每日抓取</b><small>自动收新 VLA 论文</small></div></span>
           <span class="pipe-ar">→</span>
           <span class="pipe-step"><span class="pi">🤖</span><div><b>AI 逐篇解读</b><small>打哪个问题 · 改哪层 · 证据强弱</small></div></span>
@@ -166,15 +205,16 @@
           <span class="pipe-ar">·</span>
           <a class="pipe-step" href="/vla-radar/papers.html"><span class="pi">🗃️</span><div><b>论文库</b><small>全部 · 随时可搜</small></div></a>
         </div>
-        <p class="pipe-rule">怎么算「亮够了」？<b>开源了代码、被独立复现、被后续工作当基座或对比</b>——攒够这些信号，才从雷达毕业进地图。</p>
+        <p class="pipe-rule cosmic-only">怎么算「亮够了」？<b>开源了代码、被独立复现、被后续工作当基座或对比</b>——攒够这些信号，才从雷达毕业进地图。</p>
         <div class="section-head">
           <div class="section-title">
-            <span class="badge">先看问题，再看论文</span>
+            <span class="badge cosmic-only">先看问题，再看论文</span>
             <h2>VLA 的 8 条开放问题</h2>
             <p>每条问题挂着已经"证明过自己"的代表作（地图）。挤的地方说明这条线很卷，<b>空的地方就是你的机会</b>。还在被验证的新论文都在雷达里排队。卡片上的词看着眼生？<a href="/vla-radar/basics.html" style="font-weight:800;border-bottom:2px solid var(--meow-yellow);color:inherit">先去 5 分钟入门装个底图 →</a></p>
+            <p class="aca-only aca-legend">图例：<b>地图</b> = 证明过的地标（开源 / 被复现 / 被后续当基座），<b>雷达</b> = 观察中的新论文；升级标准见页尾「数据与方法」。</p>
           </div>
         </div>
-        <div class="radar-strip" id="radarStrip">
+        <div class="radar-strip cosmic-only" id="radarStrip">
           <span class="rs-dot"></span><span>正在统计今日雷达 …</span>
         </div>
         <div class="map-grid" id="mapGrid"></div>
@@ -262,6 +302,22 @@
         </div>
       </div>
     </section>
+
+    <section id="method" class="section aca-only">
+      <div class="container">
+        <div class="section-title"><h2>数据与方法</h2></div>
+        <div class="aca-method">
+          <ol>
+            <li><b>arXiv 每日抓取</b>：每天早上 9 点自动收录新的 VLA 论文。</li>
+            <li><b>AI 逐篇解读</b>：打哪个开放问题、改了哪一层、证据强弱、对读者的启发。</li>
+            <li><b>进「雷达」</b>（tier 1）：新论文先观察、待验证。</li>
+            <li><b>升「地图」</b>（tier 2）：开源代码、被独立复现、被后续工作当基座或对比——攒够这些信号才升级。</li>
+            <li><b>论文库</b>：全量收录，随时可搜。</li>
+          </ol>
+          <p>论文解读由 AI 自动生成、按同一模板结构化，可能有理解偏差——重要结论请回到原文核对。数据接口：/api/vla-radar/list（Supabase 后端）。</p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer">
@@ -324,6 +380,27 @@
         (latest ? `<span class="rs-sep">·</span><span>最新收录 <b>${esc(latest)}</b>${fresh ? `，近 7 天 +${fresh} 篇` : ''}</span>` : '') +
         `<a href="/vla-radar/radar.html">看雷达 →</a>`;
 
+      // 学术版：刊头统计 + 今日到站（同一次 fetch，两棵树常驻渲染，切主题即时生效）
+      try {
+        const acaStats = document.getElementById('acaStats');
+        if (acaStats) acaStats.innerHTML =
+          `已收录 <b>${papers.length}</b> 篇 · 地图 <b>${t2}</b> 地标 · 雷达 <b>${t1}</b> 在追` +
+          (latest ? ` · 最新收录 <b>${esc(latest)}</b>${fresh ? `（近 7 天 +${fresh}）` : ''}` : '');
+        const todayEl = document.getElementById('acaToday');
+        if (todayEl) {
+          const pName = k => ((PAIN.find(x => x.key === k) || {}).name || k);
+          const recent = papers.filter(p => p.tier === 1)
+            .sort((a, b) => String(b.published || '').localeCompare(String(a.published || ''))).slice(0, 8);
+          todayEl.innerHTML = recent.map(p => {
+            const hot = (p.relevance >= 3 && p.quality >= 3) ? ' <span class="hot">⚡</span>' : '';
+            const pc = (Array.isArray(p.pain_points) ? p.pain_points : []).slice(0, 2).map(pName).join(' · ');
+            return `<div class="tr"><span class="d">${esc((p.published || '').slice(0, 10))}</span>` +
+              `<a class="t" href="/vla-radar/paper.html?id=${encodeURIComponent(p.arxiv_id)}&from=home">${esc(cleanTitle(p.title))}</a>` +
+              `<span class="pc">${esc(pc)}${hot}</span></div>`;
+          }).join('') || '<div class="tr"><span class="pc">雷达里暂时没有新论文。</span></div>';
+        }
+      } catch (e) {}
+
       // 按地图论文数排序：卷的在前，空的在后（空=机会，放末尾但显眼）
       const order = [...PAIN].sort((a, b) => byPain[b.key].map.length - byPain[a.key].map.length);
       mapGrid.innerHTML = order.map(pp => {
@@ -335,7 +412,7 @@
             <span class="pl-yr">${esc(yr(p))}</span><span class="pl-t">${esc(cleanTitle(p.title))}</span></a>`
         ).join('');
         const meta = empty
-          ? `<span class="prob-open">还没出地标 · 这儿有空子 🕳️</span>` +
+          ? `<span class="prob-open"><span class="cosmic-only">还没出地标 · 这儿有空子 🕳️</span><span class="aca-only-inline">暂无地标 · 开放方向</span></span>` +
             (b.radar ? `<span class="m-radar">雷达 ${b.radar} 篇在试</span>` : '')
           : `<span class="m-map">${maps.length} 篇地图地标</span>` +
             (b.radar ? `<span class="m-radar">· 雷达 ${b.radar} 篇在追</span>` : '');
