@@ -27,6 +27,18 @@
     .radar-strip a { margin-left:auto; font-weight:800; color:var(--meow-ink); background:var(--meow-yellow); padding:6px 14px; border-radius:999px; }
     .radar-strip a:hover { background:#fff; }
 
+    /* ===== 流水线图例：这个站怎么运作 ===== */
+    .pipe-strip { display:flex; flex-wrap:wrap; align-items:center; gap:10px 12px; padding:16px 20px; margin-bottom:10px; }
+    .pipe-step { display:flex; align-items:center; gap:9px; text-decoration:none; color:inherit; }
+    .pipe-step .pi { flex:0 0 auto; width:38px; height:38px; display:grid; place-items:center; font-size:1.15rem; border:2px solid var(--meow-ink); border-radius:12px; background:var(--meow-cream); }
+    .pipe-step div b { display:block; font-family:'Baloo 2','Noto Sans SC',sans-serif; font-size:.95rem; line-height:1.2; color:var(--meow-ink); }
+    .pipe-step div small { color:var(--meow-muted); font-weight:700; font-size:.74rem; }
+    a.pipe-step:hover .pi { background:var(--meow-sky); }
+    a.pipe-step:hover div b { color:var(--meow-blue); }
+    .pipe-ar { color:var(--meow-muted); font-weight:900; }
+    .pipe-rule { margin:0 0 18px; color:#aeb8e6; font-size:.86rem; font-weight:700; line-height:1.6; }
+    .pipe-rule b { color:#fff; }
+
     /* ===== 8 条开放问题地图 ===== */
     .map-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin-top:8px; }
     .prob-card { display:flex; flex-direction:column; gap:12px; padding:22px 22px 18px; }
@@ -89,8 +101,8 @@
       <div class="nav-links">
         <a href="/vla-radar/basics.html">入门</a>
         <a href="#map">开放问题</a>
-        <a href="/vla-radar/radar.html">雷达</a>
-        <a href="#finetune">微调</a>
+        <a href="/vla-radar/radar.html">每日雷达</a>
+        <a href="#finetune">微调怎么选</a>
         <a href="/vla-radar/views.html">视角</a>
         <a href="/vla-radar/papers.html">论文库</a>
         <a href="/">返回博客</a>
@@ -102,18 +114,19 @@
     <canvas id="cosmos" aria-hidden="true"></canvas>
     <div class="container hero-grid">
       <div>
-        <span class="badge">VLA 研究星图 · 8 个开放问题</span>
+        <span class="badge">每日自动追踪 arXiv · AI 逐篇解读 · 8 个开放问题</span>
         <h1>在 VLA 的星海里，<br /><span>盯住发光的那几颗</span></h1>
+        <p class="hero-lede"><b>VLA</b>（Vision-Language-Action）= 让机器人「看懂画面、听懂指令、伸手就干」的那类大模型。这个站<b>每天自动抓取 arXiv 上的 VLA 新论文</b>，AI 逐篇解读：打哪个问题、改了哪层、证据信不信。</p>
         <p>这不是论文列表，是把 VLA 的 <b>8 个开放问题</b>摊成一片星海：每个问题里发光的几颗，是已经证明过自己的代表作；<b>还黑着的地方，就是没人点亮的机会</b>。新论文先进<b>雷达</b>，亮够了才升进<b>地图</b>。</p>
         <div class="hero-actions">
           <a class="btn" href="#map">看 8 条开放问题 →</a>
           <a class="btn-ghost" href="/vla-radar/radar.html">看每日雷达</a>
-          <a class="btn-soft" href="/archive?from=vla-radar">回学习记录</a>
+          <a class="btn-soft" href="/vla-radar/basics.html">第一次来？5 分钟入门 →</a>
         </div>
         <div class="quick-stats" aria-label="VLA radar stats">
           <a class="stat-card" href="#map"><strong>8</strong><span>开放问题</span></a>
-          <a class="stat-card" href="#map"><strong id="statMap">·</strong><span>地图论文</span></a>
-          <a class="stat-card" href="/vla-radar/radar.html"><strong id="statRadar">·</strong><span>雷达在追</span></a>
+          <a class="stat-card" href="#map"><strong id="statMap">…</strong><span>地图 · 证明过的地标</span></a>
+          <a class="stat-card" href="/vla-radar/radar.html"><strong id="statRadar">…</strong><span>雷达 · 观察中的新论文</span></a>
           <a class="stat-card" href="/vla-radar/views.html"><strong>6</strong><span>分析视角</span></a>
         </div>
       </div>
@@ -126,11 +139,11 @@
             <div class="radar-logo">🤖</div>
             <span class="badge">Robot Foundation Model Radar</span>
             <h2 class="rc-title">Vision · Language · Action</h2>
-            <p class="rc-sub">每篇论文回答：它在打哪个开放问题、改了哪一层、证据信不信、对我有什么启发。</p>
+            <p class="rc-sub">每篇新论文都被 AI 自动解读，回答：它在打哪个开放问题、改了哪一层、证据信不信、对我有什么启发。</p>
             <div class="mini-metric-row">
-              <a class="mini-metric" href="#map"><b id="hcMap">·</b>地图<small>证明过的地标</small></a>
-              <a class="mini-metric" href="/vla-radar/radar.html"><b id="hcRadar">·</b>雷达<small>新论文·待沉淀</small></a>
-              <a class="mini-metric" href="/vla-radar/papers.html"><b id="hcArch">·</b>档案<small>全量·可搜</small></a>
+              <a class="mini-metric" href="#map"><b id="hcMap">…</b>地图<small>证明过的地标</small></a>
+              <a class="mini-metric" href="/vla-radar/radar.html"><b id="hcRadar">…</b>雷达<small>新论文·待验证</small></a>
+              <a class="mini-metric" href="/vla-radar/papers.html"><b id="hcArch">…</b>论文库<small>全量·可搜</small></a>
             </div>
           </div>
         </div>
@@ -141,11 +154,23 @@
   <main>
     <section id="map" class="section">
       <div class="container">
+        <div class="sticker-card pipe-strip" aria-label="这个站怎么运作">
+          <span class="pipe-step"><span class="pi">📡</span><div><b>arXiv 每日抓取</b><small>自动收新 VLA 论文</small></div></span>
+          <span class="pipe-ar">→</span>
+          <span class="pipe-step"><span class="pi">🤖</span><div><b>AI 逐篇解读</b><small>打哪个问题 · 改哪层 · 证据强弱</small></div></span>
+          <span class="pipe-ar">→</span>
+          <a class="pipe-step" href="/vla-radar/radar.html"><span class="pi">🛰️</span><div><b>进「雷达」</b><small>新论文 · 待验证</small></div></a>
+          <span class="pipe-ar">→</span>
+          <a class="pipe-step" href="#map"><span class="pi">🗺️</span><div><b>升入「地图」</b><small>证明过的地标 · 挂在 8 个问题下</small></div></a>
+          <span class="pipe-ar">·</span>
+          <a class="pipe-step" href="/vla-radar/papers.html"><span class="pi">🗃️</span><div><b>论文库</b><small>全部 · 随时可搜</small></div></a>
+        </div>
+        <p class="pipe-rule">怎么算「亮够了」？<b>开源了代码、被独立复现、被后续工作当基座或对比</b>——攒够这些信号，才从雷达毕业进地图。</p>
         <div class="section-head">
           <div class="section-title">
             <span class="badge">先看问题，再看论文</span>
             <h2>VLA 的 8 条开放问题</h2>
-            <p>每条问题挂着已经"证明过自己"的代表作（地图）。挤的地方说明这条线很卷，<b>空的地方就是你的机会</b>。还在被验证的新论文都在雷达里排队。</p>
+            <p>每条问题挂着已经"证明过自己"的代表作（地图）。挤的地方说明这条线很卷，<b>空的地方就是你的机会</b>。还在被验证的新论文都在雷达里排队。卡片上的词看着眼生？<a href="/vla-radar/basics.html" style="font-weight:800;border-bottom:2px solid var(--meow-yellow);color:inherit">先去 5 分钟入门装个底图 →</a></p>
           </div>
         </div>
         <div class="radar-strip" id="radarStrip">
@@ -184,9 +209,9 @@
       <div class="container">
         <div class="section-head">
           <div class="section-title">
-            <span class="badge">后训练怎么选？</span>
+            <span class="badge">实战笔记 · 后训练怎么选？</span>
             <h2>全参微调 / LoRA / 冻结 VLM</h2>
-            <p>三者本质是对原始 VLA "动刀深度"不同：越深越能适配新域，也越容易破坏原始语义与泛化。</p>
+            <p>如果你要亲手调一个 VLA，这是站长踩坑之后的选型建议。三者本质是对原始 VLA "动刀深度"不同：越深越能适配新域，也越容易破坏原始语义与泛化。</p>
           </div>
         </div>
         <div class="sticker-card card-pad">
@@ -210,7 +235,7 @@
           </div>
           <div id="tab-hybrid" class="tab-panel">
             <h3>推荐路线：先冻结，再 LoRA，最后局部/全参</h3>
-            <p>SmolVLA 复现可以先冻结 VLM 验证数据与 action expert；再给后半层或 projector 加 LoRA；只有在有 replay、OOD 验证和足够多样数据时才做局部/全参。对 RL 后训练，尽量隔离高方差动作梯度。</p>
+            <p>以复现 SmolVLA 为例：可以先冻结 VLM 验证数据与 action expert；再给后半层或 projector 加 LoRA；只有在有 replay、OOD 验证和足够多样数据时才做局部/全参。对 RL 后训练，尽量隔离高方差动作梯度。</p>
           </div>
         </div>
       </div>
@@ -222,7 +247,7 @@
           <div class="section-title">
             <span class="badge">同一批论文，换个角度</span>
             <h2>深入 · 6 个分析视角</h2>
-            <p>地图给你"哪条线"，下面这些视角给你"怎么看同一批论文"。主线、分化、Benchmark、代表作都搬进了对应视角。</p>
+            <p>同一批论文，六种切法：按版本链、按改了哪层、按推理链路、按分数可信度、按研究脉络、按引用关系。地图给你「哪条线」，视角给你「怎么看」。</p>
           </div>
           <a class="btn-ghost" href="/vla-radar/views.html">视角总览 →</a>
         </div>
@@ -240,7 +265,7 @@
 
   <footer class="footer">
     <div class="container">
-      <p>Built for Meowsu · 把 VLA 论文流变成 idea radar。</p>
+      <p>每天自动收 arXiv 新论文 · AI 逐篇解读 · 把 VLA 论文流变成 idea radar —— by Meowsu 🐾</p>
     </div>
   </footer>
 
@@ -285,11 +310,17 @@
       document.getElementById('statMap').textContent = t2;
       document.getElementById('statRadar').textContent = t1;
       const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-      set('hcMap', t2); set('hcRadar', t1); set('hcArch', t0);
+      set('hcMap', t2); set('hcRadar', t1); set('hcArch', papers.length);
+      // 新鲜度：最新一篇的日期 + 近 7 天新进多少（证明这个站是活的、每天在转）
+      const dates = papers.map(p => (p.published || '').slice(0, 10)).filter(Boolean).sort();
+      const latest = dates[dates.length - 1] || '';
+      const weekAgo = new Date(Date.now() - 7 * 864e5).toISOString().slice(0, 10);
+      const fresh = dates.filter(d => d >= weekAgo).length;
       radarStrip.innerHTML =
         `<span class="rs-dot"></span><span>已收录 <b>${papers.length}</b> 篇</span>` +
         `<span class="rs-sep">·</span><span>地图 <b>${t2}</b> 篇地标</span>` +
         `<span class="rs-sep">·</span><span>雷达 <b>${t1}</b> 篇在追</span>` +
+        (latest ? `<span class="rs-sep">·</span><span>最新收录 <b>${esc(latest)}</b>${fresh ? `，近 7 天 +${fresh} 篇` : ''}</span>` : '') +
         `<a href="/vla-radar/radar.html">看雷达 →</a>`;
 
       // 按地图论文数排序：卷的在前，空的在后（空=机会，放末尾但显眼）
@@ -319,17 +350,27 @@
       }).join('');
     }
 
+    // 接口挂掉时也把 8 个问题卡渲染出来（结构不依赖数据），只是不挂论文清单
+    function renderMapFallback() {
+      mapGrid.innerHTML = PAIN.map(pp => `<section class="sticker-card prob-card">
+        <div class="prob-head"><span class="prob-ic">${pp.icon}</span><div><h3>${esc(pp.name)}</h3><p>${esc(pp.short)}</p></div></div>
+        <div class="prob-meta"><span class="m-radar">论文清单加载中断 · 稍后刷新试试</span></div>
+      </section>`).join('');
+    }
     async function load() {
       try {
         const res = await fetch('/api/vla-radar/list?limit=300', { cache: 'no-store' });
         const j = await res.json();
         if (j && j.configured === false) {
-          radarStrip.innerHTML = '<span class="rs-dot"></span><span>论文库还没接好（Supabase 未配置）。</span>';
+          radarStrip.innerHTML = '<span class="rs-dot"></span><span>雷达暂时失联了，喵正在拍天线 📡 稍后再来。</span><a href="/vla-radar/papers.html">先去论文库 →</a>';
+          renderMapFallback();
           return;
         }
         renderMap((j && j.papers) || []);
       } catch (e) {
-        radarStrip.innerHTML = `<span class="rs-dot"></span><span>加载出错：${esc(e && e.message ? e.message : e)}</span>`;
+        console.error('vla-radar load failed:', e);
+        radarStrip.innerHTML = '<span class="rs-dot"></span><span>雷达暂时失联了，喵正在拍天线 📡 稍后再来。</span><a href="/vla-radar/papers.html">先去论文库 →</a>';
+        renderMapFallback();
       }
     }
     load();
