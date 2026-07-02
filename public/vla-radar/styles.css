@@ -1079,33 +1079,44 @@
     html.academic { --container: 960px; }
     html.academic .section { padding: 34px 0; }
 
-    /* —— ① 刊头：替换英雄区 —— */
-    html.academic .hero { padding: 44px 0 10px; }
+    /* —— ① 刊头：替换英雄区（紧凑，给仪表盘留首屏空间）—— */
+    html.academic .hero { padding: 28px 0 4px; }
     html.academic .hero-grid { grid-template-columns: 1fr; gap: 0; }
-    html.academic .hero h1 { font-size: clamp(1.7rem, 3.2vw, 2.4rem); line-height: 1.22; }
-    html.academic .hero-lede { max-width: none; }
-    html.academic .aca-stats { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .86rem; color: var(--meow-muted); margin: 12px 0 0; font-weight: 600; }
+    html.academic .hero h1 { font-size: clamp(1.6rem, 3vw, 2.1rem); line-height: 1.22; }
+    html.academic .aca-tag { color: var(--meow-muted); font-weight: 600; margin: 8px 0 0; font-size: .95rem; }
+    html.academic .aca-stats { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .84rem; color: var(--meow-muted); margin: 8px 0 0; font-weight: 600; }
     html.academic .aca-stats b { color: var(--meow-ink); }
-    html.academic .aca-links { margin: 8px 0 0; font-weight: 700; font-size: .92rem; }
-    html.academic .aca-links a { color: var(--meow-blue); margin-right: 16px; }
-    html.academic .aca-links a:hover { text-decoration: underline; }
 
-    /* —— ② 锚点条（sticky 在主导航下）—— */
-    html.academic .aca-anchors { position: sticky; top: 70px; z-index: 40; background: rgba(248,249,251,.92); backdrop-filter: blur(8px); border-bottom: 1px solid #e2e7f0; padding: 9px 0; }
-    html.academic .aca-anchors .container { display: flex; flex-wrap: wrap; gap: 4px 18px; font-size: .88rem; font-weight: 700; }
-    html.academic .aca-anchors a { color: var(--meow-muted); }
-    html.academic .aca-anchors a:hover { color: var(--meow-blue); }
-
-    /* —— ③ 定义速览 —— */
-    html.academic .aca-define .fml { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--meow-blue); background: var(--meow-sky); border: 1px solid var(--meow-sky-deep); border-radius: 9px; padding: 7px 14px; display: inline-block; font-weight: 700; font-size: 1.08rem; }
-    html.academic .aca-define .def-line { color: var(--meow-ink); font-weight: 600; margin: 10px 0 0; }
-    html.academic .aca-define .trio { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 16px; }
-    html.academic .aca-define .trio > div { border-top: 1px solid #e2e7f0; padding-top: 10px; font-size: .9rem; color: var(--meow-muted); font-weight: 600; line-height: 1.62; }
-    html.academic .aca-define .trio b { color: var(--meow-ink); display: block; margin-bottom: 2px; }
-    html.academic .aca-define .trio code { font-family: ui-monospace, Menlo, Consolas, monospace; color: var(--meow-blue); font-size: .84rem; display: block; margin-bottom: 3px; }
-    html.academic .aca-define .def-more { color: var(--meow-muted); font-size: .86rem; margin: 14px 0 0; font-weight: 600; }
-    html.academic .aca-define .def-more a { color: var(--meow-blue); font-weight: 800; }
-    @media (max-width: 720px) { html.academic .aca-define .trio { grid-template-columns: 1fr; } }
+    /* —— ② 仪表盘：一屏总览（8 问题表 + 今日到站 + 入口 + 方法行）—— */
+    html.academic #dash { padding: 14px 0 30px; }
+    html.academic .dash-grid { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(280px, 1fr); gap: 8px 30px; align-items: start; }
+    html.academic .dash-h { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; font-weight: 800; color: var(--meow-ink); font-size: .95rem; padding-bottom: 7px; border-bottom: 2px solid #d5dce8; font-family: 'Baloo 2', 'Noto Sans SC', sans-serif; }
+    html.academic .dash-h span { font-weight: 600; color: var(--meow-muted); font-size: .72rem; font-family: 'Noto Sans SC', sans-serif; }
+    html.academic .dash-empty { color: var(--meow-muted); font-size: .86rem; padding: 10px 0; font-weight: 600; }
+    html.academic .dp-item { border-bottom: 1px solid #e8edf4; }
+    html.academic .dp-row { display: grid; grid-template-columns: minmax(8.5em, auto) minmax(0, 1fr) auto; gap: 12px; align-items: baseline; width: 100%; padding: 9px 2px; background: none; border: 0; cursor: pointer; font: inherit; text-align: left; }
+    html.academic .dp-row:hover .dp-name { color: var(--meow-blue); }
+    html.academic .dp-name { font-weight: 800; color: var(--meow-ink); font-size: .92rem; white-space: nowrap; }
+    html.academic .dp-latest { color: var(--meow-muted); font-weight: 600; font-size: .84rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    html.academic .dp-counts { font-family: ui-monospace, Menlo, monospace; font-size: .74rem; color: var(--meow-muted); white-space: nowrap; }
+    html.academic .dp-item.open .dp-name { color: var(--meow-blue); }
+    html.academic .dp-body { padding: 0 0 10px; }
+    html.academic .dp-paper { display: flex; gap: 10px; align-items: baseline; padding: 4px 2px 4px 16px; color: var(--meow-ink); font-weight: 600; font-size: .86rem; border-radius: 6px; }
+    html.academic .dp-paper:hover { color: var(--meow-blue); background: var(--meow-sky); }
+    html.academic .dp-paper span { font-family: ui-monospace, Menlo, monospace; font-size: .74rem; color: var(--meow-muted); flex: 0 0 auto; }
+    html.academic .dp-links { margin: 6px 0 0 16px; font-size: .8rem; font-weight: 800; }
+    html.academic .dp-links a { color: var(--meow-blue); margin-right: 16px; }
+    html.academic .dash-entries { margin: 20px 0 0; font-size: .88rem; font-weight: 700; color: var(--meow-muted); display: flex; flex-wrap: wrap; gap: 5px 14px; align-items: baseline; }
+    html.academic .dash-entries .lbl { color: var(--meow-ink); font-weight: 800; }
+    html.academic .dash-entries a { color: var(--meow-blue); }
+    html.academic .dash-entries a:hover { text-decoration: underline; }
+    html.academic .dash-method { margin: 12px 0 0; font-size: .8rem; color: var(--meow-muted); font-weight: 600; line-height: 1.7; border-top: 1px solid #e8edf4; padding-top: 10px; }
+    html.academic #views { display: none; }
+    @media (max-width: 860px) {
+      html.academic .dash-grid { grid-template-columns: 1fr; gap: 26px; }
+      html.academic .dp-row { grid-template-columns: minmax(0, 1fr) auto; }
+      html.academic .dp-latest { grid-column: 1 / -1; grid-row: 2; }
+    }
 
     /* —— ④ 今日到站 —— */
     html.academic .aca-today-list { border-top: 1px solid #e2e7f0; }
@@ -1156,10 +1167,6 @@
     html.academic .lens-pill b { font-size: .98rem; }
     html.academic .lens-pill small { font-size: .8rem; }
     @media (max-width: 720px) { html.academic .lens-row { grid-template-columns: 1fr; } }
-
-    /* —— ⑨ 数据与方法 —— */
-    html.academic .aca-method ol { margin: 8px 0 0; padding-left: 22px; color: var(--meow-ink); font-weight: 600; line-height: 1.85; font-size: .92rem; }
-    html.academic .aca-method p { color: var(--meow-muted); font-size: .85rem; line-height: 1.7; margin: 12px 0 0; font-weight: 600; }
 
     /* —— papers.html：学术版扁平论文表 —— */
     html.academic .aca-table-wrap { overflow-x: auto; margin-top: 14px; }
