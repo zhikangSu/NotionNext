@@ -44,6 +44,7 @@
     }
     window.addEventListener('pointermove', function (e) {
       if (e.pointerType === 'touch') return
+      if (document.documentElement.classList.contains('academic')) return // 学术版不要拖尾
       var now = e.timeStamp, dx = e.clientX - lx, dy = e.clientY - ly
       if (now - last < 22 || dx * dx + dy * dy < 30) return
       last = now; lx = e.clientX; ly = e.clientY

@@ -832,3 +832,231 @@
     /* 卡片浮在星空上：保留贴纸感 + 一层柔光让它更"亮" */
     .sticker-card { box-shadow: var(--shadow), 0 10px 34px rgba(6,8,30,.55); }
     .sticker-card:hover { box-shadow: var(--shadow-blue), 0 14px 40px rgba(70,100,255,.35); }
+
+    /* ====================================================================
+       🎓 简洁学术版 (html.academic · 2026-07-02)
+       第二套皮肤：近白底、白卡 + 1px 浅灰边、扁平阴影、单一冷静蓝，
+       去掉星空/光球/闪烁/贴纸偏移阴影。由 theme.js 切换，localStorage 记忆。
+       追加在文件末尾：html.academic 前缀比日间层和星辰层都更特异 + 更靠后，必胜。
+       ==================================================================== */
+
+    /* —— 主题令牌：一次覆写，吃掉所有 var() 引用（含内联样式里的 var）—— */
+    html.academic {
+      --meow-blue: #2f5cc9;
+      --meow-blue-deep: #234a9e;
+      --meow-pink: #9d6480;
+      --meow-pink-soft: #f5eef2;
+      --meow-yellow: #c9d6ea;
+      --meow-cream: #f4f6fa;
+      --meow-sky: #eef3f9;
+      --meow-sky-deep: #d9e2ee;
+      --meow-red: #b0483f;
+      --meow-ink: #1c2430;
+      --meow-muted: #5b6675;
+      --meow-paper: #f8f9fb;
+      --meow-card: #ffffff;
+      --shadow: 0 1px 3px rgba(30, 36, 71, .07);
+      --shadow-blue: 0 2px 8px rgba(30, 36, 71, .12);
+      --radius-xl: 16px;
+      --radius-lg: 14px;
+    }
+
+    /* —— 页面底色：干净近白，星空/网格/光球全关 —— */
+    html.academic body { background: #f8f9fb; }
+    html.academic body::before, html.academic body::after { display: none; }
+    html.academic #cosmos, html.academic .stars, html.academic .orbit,
+    html.academic .radar-sweep, html.academic .radar-blip { display: none; }
+
+    /* —— 导航 / 页脚 —— */
+    html.academic .nav { background: rgba(255,255,255,.9); border-bottom: 1px solid #e2e7f0; }
+    html.academic .brand, html.academic .nav-links a { color: var(--meow-ink); }
+    html.academic .nav-links a:hover { background: #eef2f7; box-shadow: none; }
+    html.academic .brand-badge { border: 1px solid #e2e7f0; box-shadow: none; }
+
+    /* —— 星辰层曾把"出卡文字"翻浅，学术版翻回深色 —— */
+    html.academic .hero h1, html.academic .section-title h2, html.academic .paper-title,
+    html.academic .ex-title, html.academic .fl-hero h1, html.academic .mt-head h1 { color: var(--meow-ink); }
+    html.academic .hero h1 span, html.academic .mt-head h1 span { color: var(--meow-blue); }
+    html.academic .paper-back { color: var(--meow-muted); }
+    html.academic .paper-back:hover { color: var(--meow-blue); }
+    html.academic .hero p, html.academic .section-title p, html.academic .paper-meta,
+    html.academic .footer, html.academic .ex-sub, html.academic .fl-hero p,
+    html.academic .mt-sub, html.academic .mt-foot, html.academic .rd-state { color: var(--meow-muted); }
+    html.academic .ex-block-head, html.academic .bn-secthead { color: var(--meow-ink); }
+
+    /* —— 结构扁平化：贴纸卡 → 白卡 1px 浅边 + 微阴影，不再抬升位移 —— */
+    html.academic .sticker-card { border: 1px solid #e2e7f0; box-shadow: 0 1px 3px rgba(30,36,71,.06); }
+    html.academic .sticker-card:hover { transform: none; box-shadow: 0 2px 8px rgba(30,36,71,.10); }
+    html.academic .badge { border: 1px solid #e2e7f0; box-shadow: none; }
+    html.academic .badge::before { color: var(--meow-blue); -webkit-text-stroke: 0; }
+    html.academic .btn, html.academic .btn-ghost, html.academic .btn-soft { border: 1px solid #cfd8e3; box-shadow: 0 1px 2px rgba(30,36,71,.08); }
+    html.academic .btn { border-color: var(--meow-blue); }
+    html.academic .btn-soft { background: #f1f5f9; }
+    html.academic .btn:hover, html.academic .btn-ghost:hover, html.academic .btn-soft:hover,
+    html.academic .btn:active, html.academic .btn-ghost:active, html.academic .btn-soft:active { transform: none; box-shadow: 0 1px 3px rgba(30,36,71,.12); }
+    html.academic .stat-card, html.academic .lens-pill { border: 1px solid #e2e7f0; }
+    html.academic .stat-card { box-shadow: 0 1px 3px rgba(30,36,71,.06); } /* 基础规则的偏移阴影是写死的，不走 var(--shadow) */
+    html.academic .lens-pill:hover, html.academic .hub-card:hover { transform: none; }
+    html.academic .list li { border: 1px solid #e2e7f0; background: #f8fafc; }
+    html.academic .filter-chip, html.academic .tab-btn, html.academic .searchbox, html.academic .archive-action { border: 1px solid #cfd8e3; box-shadow: none; }
+    html.academic .filter-chip.active { background: var(--meow-blue); color: #fff; border-color: var(--meow-blue); box-shadow: none; }
+    html.academic .tab-btn.active { border-color: var(--meow-blue); }
+    html.academic .archive-action:hover { border-color: #94a3b8; box-shadow: none; }
+    html.academic .timeline-shell { background: #fff; border: 1px solid #e2e7f0; }
+    html.academic .time-card { border: 1px solid #e2e7f0; box-shadow: 0 1px 3px rgba(30,36,71,.06); }
+    html.academic .time-card:hover { transform: none; box-shadow: 0 2px 8px rgba(30,36,71,.10); }
+    html.academic .year { background: #eef2ff; color: #3153ae; border: 1px solid #d7e3f8; }
+    html.academic .benchmark-card::after, html.academic .branch-card::after { color: rgba(30,36,71,.05); }
+    html.academic .benchmark-badge { background: #eef2ff; color: #3153ae; }
+    html.academic .model-pill, html.academic .model-pill:nth-child(2n), html.academic .model-pill:nth-child(3n) { border: 1px solid #cfd8e3; box-shadow: none; background: #fff; color: var(--meow-ink); }
+    html.academic .model-pill:hover { transform: none; box-shadow: 0 1px 3px rgba(30,36,71,.10); }
+    html.academic .daily-item { border: 1px solid #e2e7f0; background: #fff; }
+    html.academic .daily-item.clickable:hover { transform: none; border-color: #c6d2e4; box-shadow: 0 2px 6px rgba(30,36,71,.08); }
+    html.academic .schema { background: #f6f8fb; color: var(--meow-ink); border: 1px solid #e2e7f0; }
+    html.academic .detail-card { border: 1px solid #e2e7f0; box-shadow: 0 8px 24px rgba(30,36,71,.14); }
+    html.academic .drawer-close { background: #eef2f7; }
+    html.academic .link-btn { border: 1px solid #cfd8e3; box-shadow: none; }
+    html.academic .link-btn:hover, html.academic .link-btn:active { transform: none; box-shadow: 0 1px 3px rgba(30,36,71,.12); }
+    html.academic .link-btn.code { background: #fff; color: var(--meow-ink); }
+    html.academic .link-btn.project { background: #eef2ff; color: #3153ae; }
+    html.academic .link-btn.deep { background: var(--meow-blue); }
+    html.academic .deep-queued { border: 1px dashed #cfd8e3; background: #f4f6fa; color: var(--meow-muted); }
+    html.academic .date-head { border: 1px solid #e2e7f0; background: #fff; box-shadow: none; }
+    html.academic .date-head:hover { border-color: #c6d2e4; box-shadow: 0 1px 3px rgba(30,36,71,.08); }
+    html.academic .date-chevron { background: #eef2f7; border: 1px solid #cfd8e3; }
+    html.academic .group-summary { border: 1px solid #e2e7f0; background: #fff; }
+    html.academic .group-summary em { color: var(--meow-muted); }
+    html.academic .analysis-item { border: 1px solid #e2e7f0; background: #fbfcfe; }
+    html.academic .fig { border: 1px solid #e2e7f0; }
+    html.academic .diag-row .k, html.academic .diff-line .dk { border-width: 1px; border-color: #d7e3f8; }
+    html.academic .diag-row.idea .k { color: #3153ae; background: var(--meow-sky); border-color: #d7e3f8; }
+    html.academic .diag-row.warn .k, html.academic .diff-line.warn .dk { color: #8a4a63; background: #f7eef2; border-color: #e8d5dd; }
+    html.academic .branch-icon { border: 1px solid #e2e7f0; background: #f4f6fa; box-shadow: none; }
+    html.academic .evo-num { border: 1px solid #cfd8e3; background: #eef2ff; color: #3153ae; box-shadow: none; }
+    html.academic .evo-body { border: 1px solid #e2e7f0; background: #fff; }
+    html.academic .evo-railchip { border: 1px solid #d7e3f8; }
+    html.academic .evo-bench-pill { border-width: 1px; }
+    html.academic .st-tier { border: 1px solid #e2e7f0; }
+    html.academic .st-tier.st-map { background: #e8effc; color: var(--meow-blue); border-color: #c9d8f5; }
+    html.academic .st-tier.st-radar { background: #f4f6fa; color: var(--meow-ink); border-color: #e2e7f0; }
+
+    /* —— index：英雄卡 / 雷达条 / 流水线 / 问题卡 —— */
+    html.academic .hero-card { background: #fff; backdrop-filter: none; border: 1px solid #e2e7f0; box-shadow: 0 1px 3px rgba(30,36,71,.06); transform: none; }
+    html.academic .radar-logo { border: 1px solid #e2e7f0; box-shadow: none; transform: none; animation: none; }
+    html.academic .rc-title { color: var(--meow-ink); }
+    html.academic .rc-sub { color: var(--meow-muted); }
+    html.academic .hero-card .mini-metric { color: var(--meow-ink); border: 1px solid #e2e7f0; background: #f7f9fc; }
+    html.academic .hero-card .mini-metric:hover { transform: none; background: #eef3fb; box-shadow: 0 1px 4px rgba(30,36,71,.10); }
+    html.academic .hero-card .mini-metric b { color: var(--meow-blue); }
+    html.academic .hero-card .mini-metric small { color: var(--meow-muted); }
+    html.academic .radar-strip { background: #fff; color: var(--meow-ink); border: 1px solid #e2e7f0; }
+    html.academic .radar-strip .rs-dot { background: var(--meow-blue); box-shadow: 0 0 0 3px rgba(53,99,233,.12); }
+    html.academic .radar-strip a { background: var(--meow-blue); color: #fff; }
+    html.academic .radar-strip a:hover { background: var(--meow-blue-deep); color: #fff; }
+    html.academic .pipe-rule { color: var(--meow-muted); }
+    html.academic .pipe-rule b { color: var(--meow-ink); }
+    html.academic .pipe-step .pi, html.academic .prob-ic { border: 1px solid #e2e7f0; background: #f7f9fc; }
+    html.academic .prob-card.empty { background: #fff; }
+    html.academic .prob-foot a { border-bottom: 1px solid #c9d6ea; }
+
+    /* —— basics —— */
+    html.academic .bx-h { color: var(--meow-ink); }
+    html.academic .bx-note { color: var(--meow-muted); }
+    html.academic .bx-note b { color: var(--meow-ink); }
+    html.academic .stack .ar { color: var(--meow-muted); }
+    html.academic .legend .lg b { border: 1px solid #e2e7f0; background: #f7f9fc; }
+    html.academic .stk { border: 1px solid #e2e7f0; background: #f7f9fc; box-shadow: 0 1px 2px rgba(30,36,71,.06); }
+    html.academic a.stk:hover { transform: none; box-shadow: 0 1px 4px rgba(30,36,71,.12); }
+
+    /* —— arch：交互流程图 —— */
+    html.academic .arch-tg { background: #f2f5fa; border: 1px solid #e2e7f0; }
+    html.academic .arch-tg button { color: var(--meow-muted); }
+    html.academic .arch-tg button.on { background: #fff; color: var(--meow-blue); box-shadow: 0 1px 2px rgba(30,36,71,.10); }
+    html.academic .arch-meta, html.academic .arch-hint, html.academic .arch-foot { color: var(--meow-muted); }
+    html.academic .fc-node { border: 1px solid #e2e7f0; box-shadow: 0 1px 3px rgba(30,36,71,.07); }
+    html.academic .fc-node:hover { transform: none; box-shadow: 0 2px 6px rgba(30,36,71,.12); }
+    html.academic .fc-node.side { box-shadow: 0 1px 2px rgba(30,36,71,.06); background: #f7f9fc; }
+    html.academic .fc-node.core { box-shadow: 0 0 0 1px var(--meow-blue), 0 1px 3px rgba(30,36,71,.08); border-color: var(--meow-blue); }
+    html.academic .fc-node.on { outline: 2px solid var(--meow-blue); }
+    html.academic .fc-detail { border: 1px solid #e2e7f0; box-shadow: 0 1px 3px rgba(30,36,71,.07); }
+    html.academic .fc-loopnote { color: var(--meow-ink); background: #f0f5ff; border: 1px solid #c9d6ea; }
+    html.academic .fc-loopnote b { color: var(--meow-blue); }
+    html.academic .fc-svg path { stroke: #9aa7bd; }
+    html.academic .fc-svg text { fill: var(--meow-muted); stroke: #fff !important; }
+
+    /* —— views / papers / radar —— */
+    html.academic .hub-note { color: var(--meow-muted); }
+    html.academic .hub-note a { color: var(--meow-blue); border-bottom: 1px solid #c9d6ea; }
+    html.academic .hub-icon { border: 1px solid #e2e7f0; background: #f7f9fc; }
+    html.academic .tier-tab { border: 1px solid #e2e7f0; }
+    html.academic .tier-tab:hover { transform: none; }
+    html.academic .tier-tab.active { background: var(--meow-blue); border-color: var(--meow-blue); color: #fff; }
+    html.academic .rd-chip { border: 1px solid #e2e7f0; }
+    html.academic .rd-chip:hover { transform: none; }
+    html.academic .rd-chip.active { background: var(--meow-blue); border-color: var(--meow-blue); color: #fff; }
+    html.academic .rd-card:hover { transform: none; }
+    html.academic .rd-hot { background: #e8effc; color: var(--meow-blue); }
+    html.academic .rd-arch { border: 1px dashed #e2e7f0; }
+    html.academic .rd-arch a { border-bottom: 1px solid var(--meow-blue); }
+
+    /* —— 视角切换条（series/flow/metro 共用 .ls-chip；explorer .ls-view；bench .bn-chip）—— */
+    html.academic .ls-chip, html.academic .ls-view, html.academic .bn-chip { border: 1px solid #e2e7f0; box-shadow: 0 1px 2px rgba(15,23,42,.05); }
+    html.academic .ls-chip:hover, html.academic .ls-view:hover, html.academic .bn-chip:hover { transform: none; box-shadow: 0 1px 3px rgba(15,23,42,.08); }
+    html.academic .ls-chip.active, html.academic .ls-view.active, html.academic .bn-chip.active { background: var(--meow-blue); border-color: var(--meow-blue); color: #fff; box-shadow: none; }
+
+    /* —— explorer / flow / bench / metro —— */
+    html.academic .ex-comp { border: 1px solid #e2e7f0; box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+    html.academic .ex-comp:hover { transform: none; box-shadow: 0 2px 6px rgba(15,23,42,.08); }
+    html.academic .ex-comp.active { box-shadow: none; border-color: var(--meow-blue); }
+    html.academic .ex-comp-ic { border: 1px solid #e2e7f0; box-shadow: none; }
+    html.academic .ex-chip { border: 1px solid #e2e7f0; box-shadow: 0 1px 2px rgba(15,23,42,.05); }
+    html.academic .ex-chip:hover { transform: none; }
+    html.academic .ex-chip.active { border-color: var(--meow-blue); background: #eef3fc; box-shadow: none; }
+    html.academic .ex-chip.active .ex-chip-n { color: var(--meow-blue); }
+    html.academic .ex-paper { border: 1px solid #e2e7f0; box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+    html.academic .ex-paper:hover { transform: none; }
+    html.academic .ex-layer { border: 1px solid #d7e2f5; }
+    html.academic .fl-node { border: 1px solid #e2e7f0; box-shadow: 0 1px 3px rgba(15,23,42,.06); }
+    html.academic .fl-node.plain { border: 1px dashed #cbd5e1; background: #fbfcfe; }
+    html.academic .fl-ic { border: 1px solid #e2e7f0; box-shadow: none; }
+    html.academic .fl-chip { border: 1px solid #e2e7f0; background: #f8fafd; }
+    html.academic .fl-chip:hover { border-color: #c3cede; box-shadow: 0 1px 3px rgba(15,23,42,.08); transform: none; }
+    html.academic .fl-loop { border: 1px solid #b9cbf2; background: #f3f6fd; }
+    html.academic .fl-loop-tag { border: 1px solid #b9cbf2; }
+    html.academic .fl-stable li { border: 1px solid #e2e7f0; background: #f8fafd; }
+    html.academic .bn-subj-note { border: 1px dashed #cbd5e1; background: #f7f9fc; color: var(--meow-muted); }
+    html.academic .bn-ico { border: 1px solid #e2e7f0; box-shadow: none; }
+    html.academic .bn-dot { border: 1px solid #94a3b8; }
+    html.academic .bn-anchor { border: 1px solid #e2e7f0; background: #f8fafd; }
+    html.academic .bn-card.is-audit { border-color: #e2e7f0; box-shadow: 0 1px 3px rgba(15,23,42,.06); border-left: 3px solid #b46a8c; }
+    html.academic .bn-audit-tag { border: 1px solid #e2e7f0; background: #f7f9fc; color: var(--meow-muted); }
+    html.academic .bn-audit-card .bn-field .fk { border-width: 1px; }
+    html.academic .bn-audit-card .bn-field.warn .fk { color: #8a5a6e; background: #f5eef2; border-color: #e6d8df; }
+    html.academic .bn-anchor .bn-anchor-k { border-width: 1px; }
+    html.academic .mt-station:hover .mt-dot { transform: scale(1.12); }
+    html.academic .bn-checklist li { border: 1px solid #e2e7f0; background: #f8fafd; }
+    html.academic .bn-check-n { border: 1px solid #e2e7f0; background: #eef3fc; box-shadow: none; }
+    html.academic .mt-note-curated { border: 1px dashed #cbd5e1; background: #fff; }
+    html.academic .mt-legend-item { border: 1px solid #e2e7f0; background: #fff; }
+    html.academic .mt-legend-swatch { border: 1px solid #cbd5e1; }
+
+    /* —— graph：3D 图当"深色插图"保留，只翻页面上的图例/说明文字 —— */
+    html.academic .gr-canvas-card { border: 1px solid #e2e7f0; }
+    html.academic .gr-leg-item { color: var(--meow-ink); }
+    html.academic .gr-leg-dot { border: 1px solid #cbd5e1; }
+    html.academic .gr-edges { color: var(--meow-muted); }
+    html.academic .gr-eline { border-top-color: #8593c9; }
+    html.academic .gr-eline.cmp { border-top-color: rgba(100,116,139,.55); }
+    html.academic .gr-hint { color: var(--meow-muted); }
+
+    /* —— 光标：学术版还原系统光标（拖尾由 cursor.js 自行判类关闭）—— */
+    html.academic, html.academic body { cursor: auto; }
+    html.academic a, html.academic button, html.academic [role="button"], html.academic summary,
+    html.academic label, html.academic select, html.academic .notion-link, html.academic .cursor-pointer { cursor: pointer; }
+    html.academic input[type="text"], html.academic input[type="search"], html.academic textarea { cursor: text; }
+
+    /* —— 主题切换按钮（两种模式各自成样）—— */
+    .theme-toggle { border: 2px solid var(--meow-ink); background: var(--meow-card); color: var(--meow-ink); border-radius: 999px; padding: 6px 13px; font: 800 .82rem/1 'Baloo 2','Noto Sans SC',sans-serif; cursor: pointer; box-shadow: 2px 2px 0 rgba(30,36,71,.35); }
+    .theme-toggle:hover { transform: translate(-1px,-1px); }
+    html.academic .theme-toggle { border: 1px solid #cfd8e3; box-shadow: none; }
+    html.academic .theme-toggle:hover { transform: none; background: #eef2f7; }
